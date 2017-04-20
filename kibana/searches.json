@@ -1,0 +1,51 @@
+[
+  {
+    "_id": "16918040-fd89-11e6-9f9d-572e13c88fe3",
+    "_type": "search",
+    "_source": {
+      "title": "associations",
+      "description": "",
+      "hits": 0,
+      "columns": [
+        "gene",
+        "feature.name",
+        "association.phenotype.description",
+        "association.evidence_label",
+        "association.drug_labels",
+        "association.publication_url"
+      ],
+      "sort": [
+        "_score",
+        "desc"
+      ],
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"associations\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+      }
+    }
+  },
+  {
+    "_id": "57f66470-0f5d-11e7-8419-ed813cc35509",
+    "_type": "search",
+    "_source": {
+      "title": "bmeg",
+      "description": "",
+      "hits": 0,
+      "columns": [
+        "gene",
+        "disease",
+        "statistic",
+        "drug",
+        "pvalue"
+      ],
+      "sort": [
+        "_score",
+        "desc"
+      ],
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"bmeg\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"filter\":[],\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"require_field_match\":false,\"fragment_size\":2147483647}}"
+      }
+    }
+  }
+]

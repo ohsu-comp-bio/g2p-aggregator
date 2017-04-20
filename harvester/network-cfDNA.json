@@ -1,0 +1,245 @@
+[ {
+  "gene-symbol" : "IPO13",
+  "alterations" : [ "Missense_Mutation" ],
+  "complex-partner" : [ "EIF1AX" ]
+}, {
+  "gene-symbol" : "PCDH11Y",
+  "alterations" : [ "Copy number loss" ],
+  "upstream" : [ "SRC", "EGFR", "ERBB3", "ERBB4", "ERBB2", "FYN" ],
+  "complex-partner" : [ "CTNNB1" ]
+}, {
+  "gene-symbol" : "BUB1B",
+  "alterations" : [ "5'UTR Mutation" ],
+  "downstream" : [ "STAG2" ],
+  "complex-partner" : [ "CASC5", "PPP2R1A", "CLIP1", "NUP98", "RAD21", "XPO1", "CENPA", "AURKB", "RANBP2" ]
+}, {
+  "gene-symbol" : "ARID4B",
+  "alterations" : [ "Missense_Mutation" ],
+  "downstream" : [ "HIST2H3A", "HIST2H3D", "HIST2H3C", "HIST1H2BD", "HIST1H3J", "HIST1H3A", "HIST1H3F", "HIST1H3G", "HIST1H3H", "HIST1H3I", "HIST1H3B", "HIST1H3C", "HIST1H3D", "HIST1H3E", "H3F3B", "H3F3A", "HIST1H4I" ],
+  "complex-partner" : [ "SMARCB1", "DNMT3B", "ARID1A", "SMARCD1", "DNMT1", "SMARCA4" ]
+}, {
+  "gene-symbol" : "PREX1",
+  "alterations" : [ "Missense_Mutation" ],
+  "upstream" : [ "PTEN", "PIK3CD", "PIK3R3", "PIK3R2", "PIK3CB", "PIK3R1", "PIK3CG", "PIK3CA", "PIK3C3", "PRKACA" ],
+  "downstream" : [ "RAC1", "RHOA" ]
+}, {
+  "gene-symbol" : "CCND1",
+  "alterations" : [ "Copy number gain" ],
+  "upstream" : [ "GSK3B", "CDKN1A", "CDKN2B", "CDKN1B", "CDKN2C", "CDKN2A", "CTNNB1", "PRKACA" ],
+  "downstream" : [ "RB1", "CDKN1B", "HIST2H3A", "HIST2H3D", "HIST2H3C", "HIST1H3J", "HIST1H3A", "HIST1H3F", "HIST1H3G", "E2F3", "HIST1H3H", "HIST1H3I", "HIST1H3B", "HIST1H3C", "HIST1H3D", "HIST1H3E", "HIST1H4I" ],
+  "complex-partner" : [ "CCND3", "MYB", "AR", "NOTCH1", "CREBBP", "PTK6", "CDK6", "CDK4" ]
+}, {
+  "gene-symbol" : "CAPN5",
+  "alterations" : [ "Copy number gain" ],
+  "upstream" : [ "GRIN2A" ]
+}, {
+  "gene-symbol" : "PPFIA1",
+  "alterations" : [ "Copy number gain" ],
+  "upstream" : [ "AKAP9", "CACNA1D", "GRIN2A", "ATP2B3" ]
+}, {
+  "gene-symbol" : "IL12A",
+  "alterations" : [ "5'UTR Mutation" ],
+  "downstream" : [ "STAT5A", "LCK", "STAT3", "STAT6", "NFKB2" ],
+  "complex-partner" : [ "CSF3R", "MPL", "JAK2", "JAK3", "JAK1", "IFNGR1", "LIFR", "SMO", "IL6ST", "SOCS1", "IL7R" ]
+}, {
+  "gene-symbol" : "RUNX1",
+  "alterations" : [ "5'UTR Mutation" ],
+  "upstream" : [ "CDK6", "MAPK1", "MAPK3" ],
+  "downstream" : [ "GRIN2A", "AKAP9" ],
+  "complex-partner" : [ "CBFB", "SMAD4", "SMAD3" ]
+}, {
+  "gene-symbol" : "GPR161",
+  "alterations" : [ "3'UTR Mutation" ],
+  "downstream" : [ "PRKAR1A" ]
+}, {
+  "gene-symbol" : "S100A9",
+  "alterations" : [ "Copy number gain" ],
+  "complex-partner" : [ "MYD88" ]
+}, {
+  "gene-symbol" : "PFKFB2",
+  "alterations" : [ "Missense_Mutation" ],
+  "upstream" : [ "AKT1", "PRKACA" ]
+}, {
+  "gene-symbol" : "RPS4Y2",
+  "alterations" : [ "Copy number loss" ],
+  "complex-partner" : [ "RPL5", "RPL22", "RPL10" ]
+}, {
+  "gene-symbol" : "PADI6",
+  "alterations" : [ "RNA Mutation" ],
+  "downstream" : [ "HIST1H3J", "HIST1H3A", "HIST2H3A", "HIST1H3F", "HIST1H3G", "HIST1H3H", "HIST1H3I", "HIST1H3B", "HIST2H3D", "HIST1H3C", "HIST2H3C", "HIST1H3D", "HIST1H3E" ]
+}, {
+  "gene-symbol" : "CD1D",
+  "alterations" : [ "Copy number gain" ],
+  "complex-partner" : [ "TRA", "TRB", "B2M" ]
+}, {
+  "gene-symbol" : "CD1C",
+  "alterations" : [ "Copy number gain" ],
+  "complex-partner" : [ "TRA", "TRB", "B2M" ]
+}, {
+  "gene-symbol" : "RPS4Y1",
+  "alterations" : [ "Copy number loss" ],
+  "upstream" : [ "EIF1AX" ],
+  "complex-partner" : [ "EIF4A2", "RPL5", "PPP2R1A", "RPL22", "RPN1", "RPL10", "EIF4E", "EIF3E" ]
+}, {
+  "gene-symbol" : "CSF2RA",
+  "alterations" : [ "Copy number loss" ],
+  "upstream" : [ "JAK2", "PRKACA", "JAK3", "JAK1" ],
+  "downstream" : [ "STAT5A", "STAT5B", "PDPK1", "STAT3", "NRAS", "AKT2", "AKT3", "AKT1", "KRAS", "JAK2", "HRAS" ],
+  "complex-partner" : [ "CSF3R", "MPL", "LIFR", "IL6ST", "PIK3R3", "PIK3R2", "PIK3R1", "IL7R", "PIK3CD", "PIK3CB", "IKBKB", "IL10", "SYK", "IFNGR1", "PIK3CA", "STAT6", "PTPN11" ]
+}, {
+  "gene-symbol" : "CD1A",
+  "alterations" : [ "Copy number gain" ],
+  "complex-partner" : [ "TRA", "TRB", "B2M" ]
+}, {
+  "gene-symbol" : "FADD",
+  "alterations" : [ "Copy number gain" ],
+  "upstream" : [ "CLTC", "TNFAIP3", "AURKA", "MAP3K1", "TRAF2", "CYLD", "FAS", "EZR", "BIRC3" ],
+  "downstream" : [ "MAP3K1", "IKBKB", "CASP8", "MAP3K14" ],
+  "complex-partner" : [ "DAXX", "BCL10", "MALT1" ]
+}, {
+  "gene-symbol" : "KIRREL",
+  "alterations" : [ "Copy number gain" ],
+  "upstream" : [ "FYN" ],
+  "downstream" : [ "PIK3CB", "PIK3R1", "NRAS", "FYN", "HRAS", "NFATC2", "PIK3CA", "KRAS" ],
+  "complex-partner" : [ "PIK3R2", "PLCG1" ]
+}, {
+  "gene-symbol" : "CPSF1",
+  "alterations" : [ "Missense_Mutation" ],
+  "upstream" : [ "TPR", "NUP214", "RANBP2", "NUP93", "NUP98" ],
+  "complex-partner" : [ "CLP1", "SRSF2", "SRSF3", "DDX5", "FUS", "U2AF1", "FIP1L1", "SF3B1", "HNRNPA2B1" ]
+}, {
+  "gene-symbol" : "H3F3A",
+  "alterations" : [ "3'UTR Mutation" ],
+  "upstream" : [ "RB1", "CHEK1", "EP300", "PRKACA", "MEN1", "AR", "HIST1H2BD", "KMT2D", "DNMT1", "KLK2", "BCL9", "HIST1H4I", "EZH2", "CHD4", "DNMT3B", "EED", "DNMT3A", "LEF1", "AURKB", "FYN", "SF3B1", "SUZ12", "TCF7L2", "DEK", "CTNNB1" ],
+  "downstream" : [ "HIST1H4I" ],
+  "complex-partner" : [ "MYC", "HIST2H3A", "HIST2H3D", "HIST2H3C", "HIST1H3J", "HIST1H3A", "HIST1H3F", "HIST1H3G", "HIST1H3H", "HIST1H3I", "HIST1H3B", "HIST1H3C", "HIST1H3D", "HIST1H3E", "CREBBP", "JUN", "PBX1", "CTCF", "PARP1", "NCOA3", "NCOR1", "RARA", "CDKN2A", "KMT2C", "NONO", "MAFB", "KDM6A", "SRC" ]
+}, {
+  "gene-symbol" : "CDK9",
+  "alterations" : [ "Missense_Mutation" ],
+  "downstream" : [ "RB1", "AKT2", "AKT3", "AKT1", "STAT6", "SMAD2", "STAT5A", "NCOA2", "STAT5B", "SMAD4", "SMAD3", "STAT3", "AR", "PPARG", "TP53" ],
+  "complex-partner" : [ "MDC1", "CHEK1", "EP300", "FANCD2", "IL6ST", "NOTCH1", "CDK8", "ATM", "CDK12", "ATR", "ELL", "BRCA1", "MED12", "RAD51D", "TCEB1", "BRD4", "ERCC3", "ERCC2", "TCEA1" ]
+}, {
+  "gene-symbol" : "PPP1R1A",
+  "alterations" : [ "5'UTR Mutation" ],
+  "upstream" : [ "PRKACA" ]
+}, {
+  "gene-symbol" : "FCER1A",
+  "alterations" : [ "Copy number gain" ],
+  "upstream" : [ "PTPN11" ],
+  "downstream" : [ "ITK", "CBLB", "PIK3R1", "CBL", "PLCG1", "JUN", "NFATC2", "PTPN11", "PIK3CA", "BTK", "RAF1" ],
+  "complex-partner" : [ "SYK", "RASA1", "FYN", "FCGR2B" ]
+}, {
+  "gene-symbol" : "CEP55",
+  "alterations" : [ "Missense_Mutation" ],
+  "upstream" : [ "MAPK1" ]
+}, {
+  "gene-symbol" : "GALNT8",
+  "alterations" : [ "Missense_Mutation" ],
+  "downstream" : [ "MUC1" ]
+}, {
+  "gene-symbol" : "PDE4D",
+  "alterations" : [ "Missense_Mutation" ],
+  "upstream" : [ "MAPK1", "PRKACA", "MAPK3" ]
+}, {
+  "gene-symbol" : "ARHGEF17",
+  "alterations" : [ "Copy number gain" ],
+  "downstream" : [ "RHOH", "RHOA", "RAC1" ]
+}, {
+  "gene-symbol" : "PDCD1LG2",
+  "alterations" : [ "3'UTR Mutation" ],
+  "downstream" : [ "TRA", "TRB", "LCK" ],
+  "complex-partner" : [ "PTPN11", "PDCD1" ]
+}, {
+  "gene-symbol" : "GAL",
+  "alterations" : [ "Copy number gain" ],
+  "complex-partner" : [ "SMO" ]
+}, {
+  "gene-symbol" : "VAMP7",
+  "alterations" : [ "Copy number loss" ],
+  "upstream" : [ "SRC", "CLTC" ],
+  "complex-partner" : [ "TFRC", "DNM2", "PICALM" ]
+}, {
+  "gene-symbol" : "CTTN",
+  "alterations" : [ "Copy number gain" ],
+  "upstream" : [ "SRC", "PAK1", "CDH1", "CHEK1", "ABL1", "CTNNB1", "MAPK1", "RAC1", "MAPK3" ],
+  "complex-partner" : [ "FYN" ]
+}, {
+  "gene-symbol" : "IL3RA",
+  "alterations" : [ "Copy number loss" ],
+  "upstream" : [ "JAK2", "PRKACA", "JAK3", "JAK1" ],
+  "downstream" : [ "STAT5A", "STAT5B", "PDPK1", "PIK3R1", "NRAS", "PIK3CA", "AKT2", "AKT3", "AKT1", "KRAS", "JAK2", "HRAS" ],
+  "complex-partner" : [ "CSF3R", "MPL", "LIFR", "IL6ST", "PIK3R3", "PIK3R2", "IL7R", "PIK3CD", "PIK3CB", "IL10", "IFNGR1", "STAT6", "STAT3", "PTPN11" ]
+}, {
+  "gene-symbol" : "IL9R",
+  "alterations" : [ "Copy number loss" ],
+  "upstream" : [ "JAK2", "JAK3", "JAK1" ],
+  "complex-partner" : [ "CSF3R", "MPL", "LIFR", "IL6ST", "STAT5A", "STAT5B", "IL7R", "IL10", "IFNGR1", "STAT6", "STAT3" ]
+}, {
+  "gene-symbol" : "APCS",
+  "alterations" : [ "Copy number gain" ],
+  "upstream" : [ "CACNA1D" ],
+  "complex-partner" : [ "HIST2H3A", "HIST2H3D", "HIST2H3C", "HIST1H2BD", "HIST1H3J", "HIST1H3A", "HIST1H3F", "HIST1H3G", "HIST1H3H", "HIST1H3I", "HIST1H3B", "HIST1H3C", "HIST1H3D", "HIST1H3E", "H3F3B", "H3F3A", "HIST1H4I" ]
+}, {
+  "gene-symbol" : "RAMP3",
+  "alterations" : [ "3'UTR Mutation" ],
+  "complex-partner" : [ "GNAS" ]
+}, {
+  "gene-symbol" : "LILRA3",
+  "alterations" : [ "Missense_Mutation" ],
+  "complex-partner" : [ "HLA-A", "B2M" ]
+}, {
+  "gene-symbol" : "P2RY6",
+  "alterations" : [ "Copy number gain" ],
+  "complex-partner" : [ "GNA11", "GNAQ" ]
+}, {
+  "gene-symbol" : "P2RY2",
+  "alterations" : [ "Copy number gain" ],
+  "complex-partner" : [ "GNA11", "GNAQ" ]
+}, {
+  "gene-symbol" : "STX6",
+  "alterations" : [ "3'UTR Mutation" ],
+  "complex-partner" : [ "VTI1A" ]
+}, {
+  "gene-symbol" : "TBL1Y",
+  "alterations" : [ "Copy number loss" ],
+  "complex-partner" : [ "SMARCB1", "HIST1H3J", "CHD4", "HIST1H3A", "HIST1H3F", "HIST1H3G", "HIST1H3H", "HIST1H3I", "HIST1H3B", "HIST1H3C", "HIST1H3D", "HIST1H3E", "AXIN1", "TBL1XR1", "CTNNB1" ]
+}, {
+  "gene-symbol" : "PCNT",
+  "alterations" : [ "Missense_Mutation" ],
+  "downstream" : [ "AURKA" ],
+  "complex-partner" : [ "PPP2R1A", "PRKACA", "AKAP9", "FGFR1OP", "CEP89", "YWHAE", "PCM1", "CNTRL", "HSP90AA1", "DCTN1" ]
+}, {
+  "gene-symbol" : "SH2B1",
+  "alterations" : [ "5'UTR Mutation" ],
+  "upstream" : [ "MAPK1", "MAPK3" ],
+  "downstream" : [ "JAK2" ],
+  "complex-partner" : [ "IRS1", "IRS2" ]
+}, {
+  "gene-symbol" : "ATP2B2",
+  "alterations" : [ "Missense_Mutation" ],
+  "downstream" : [ "TPM4", "TPM3", "AKAP9", "GRIN2A", "MYH11", "NFATC2" ]
+}, {
+  "gene-symbol" : "TPCN2",
+  "alterations" : [ "Copy number gain" ],
+  "downstream" : [ "TPM4", "TPM3", "AKAP9", "GRIN2A", "MYH11", "NFATC2" ]
+}, {
+  "gene-symbol" : "NEDD1",
+  "alterations" : [ "Missense_Mutation" ],
+  "upstream" : [ "AURKA" ],
+  "downstream" : [ "AURKA" ],
+  "complex-partner" : [ "PPP2R1A", "PRKACA", "AKAP9", "FGFR1OP", "CEP89", "YWHAE", "NUMA1", "PCM1", "CNTRL", "HSP90AA1", "DCTN1" ]
+}, {
+  "gene-symbol" : "SPRY3",
+  "alterations" : [ "Copy number loss" ],
+  "upstream" : [ "PIK3CD", "PIK3CB", "PIK3CG", "PIK3CA", "RASA1", "PLCG2", "PIK3C3", "PLCG1", "FGFR4", "FGFR3", "FGFR2", "FGFR1" ],
+  "downstream" : [ "ERBB3", "ERBB4", "ERBB2", "EGFR" ]
+}, {
+  "gene-symbol" : "NCAPD2",
+  "alterations" : [ "3'UTR Mutation" ],
+  "upstream" : [ "AURKB" ],
+  "complex-partner" : [ "PARP1" ]
+}, {
+  "gene-symbol" : "ACKR1",
+  "alterations" : [ "Copy number gain" ],
+  "complex-partner" : [ "RAC1" ]
+} ]

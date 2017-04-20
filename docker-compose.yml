@@ -1,0 +1,57 @@
+################
+version: '2.1'
+
+services:
+  # Elastic Search
+  # note: on docker for mac, you may need to adjust the docker-machines' config
+  # if you get this error ....
+  # elastic    | ERROR: bootstrap checks failed
+  # elastic    | max virtual memory areas vm.max_map_count [65530] likely too low, increase to at least [262144]
+  # ... see this
+  # https://github.com/elastic/elasticsearch-docker/blob/master/README.md#osx-with-docker-toolbox
+  elastic:
+    container_name: elastic_smmart
+    build:
+      context: services/elastic/
+    volumes:
+      - "./util:/util/"
+    ports:
+      - "${ELASTIC_PORT}:${ELASTIC_PORT}"
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - xpack.security.enabled=false
+
+
+
+  kibana:
+    container_name: kibana_smmart
+    build:
+      context: services/kibana/
+    volumes:
+      - "./util:/util/"
+    ports:
+      - "${KIBANA_PORT}:${KIBANA_PORT}"
+    links:
+      - elastic:elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - XPACK_MONITORING_REPORT_STATS=false
+      - SERVER_BASEPATH=/kibana
+
+  nginx:
+    container_name: nginx_smmart
+    image: nginx:latest
+    volumes:
+      - "./util:/util/"
+      - "./services/nginx/default:/etc/nginx/conf.d/default.conf:ro"
+      - "./services/nginx/.htpasswd:/etc/nginx/.htpasswd"
+      - "./compbio-tls:/compbio-tls"
+      - "./services/nginx/g2p.html:/var/www/static-html/g2p.html"
+
+    ports:
+      - "443:443"
+      - "80:80"
+    links:
+      - elastic
+      - kibana

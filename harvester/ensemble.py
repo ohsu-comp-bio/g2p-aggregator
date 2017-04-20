@@ -1,0 +1,1 @@
+{"phenotypeAssociationSetId": "45c48c2aff5126e0e720edc2ebff72f4", "featureIds":[], "phenotypeIds": [32048], "evidence" : [{"evidenceType": "", "description": "publication", "externalIdentifiers" :["PMID:23996088"]} ], "pageSize": 10 }

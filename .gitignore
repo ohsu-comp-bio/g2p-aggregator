@@ -1,0 +1,11 @@
+.env
+*.pyc
+esdata
+*.DS_Store
+compbio-tls
+__pycache__/
+*.py[cod]
+*$py.class
+harvester/tests/integration/bioschemas
+attic
+.plotly
