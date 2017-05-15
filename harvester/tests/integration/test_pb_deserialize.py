@@ -33,6 +33,24 @@ CGI_TEST_MESSAGE = """
 {"cgi": {"Primary Tumor type": "G;CANCER", "Drug family": "[CDK4/6 inhibitor]", "Alteration type": "MUT", "Targeting": "", "Assay type": "", "Evidence level": "Pre-clinical", "Biomarker": "CDKN2A oncogenic mutation", "Drug": "[]", "Alteration": "CDKN2A:.", "Source": "PMID:22471707;PMID:22586120;PMID:22711607", "Curator": "RDientsmann", "Comments": "", "Drug status": "", "Drug full name": "CDK4/6 inhibitors", "TCGI included": true, "Curation date": "", "Gene": "CDKN2A", "Metastatic Tumor Type": "", "Association": "Responsive"}, "source": "cgi", "gene": "CDKN2A", "feature": {"geneSymbol": "CDKN2A", "name": "CDKN2A oncogenic mutation", "description": "CDKN2A:."}, "association": {"drug_labels": "CDK4/6 inhibitors", "description": "CDKN2A CDK4/6 inhibitors Responsive", "publication_url": "http://www.ncbi.nlm.nih.gov/pubmed/22471707", "evidence": [{"info": {"publications": ["http://www.ncbi.nlm.nih.gov/pubmed/22471707", "http://www.ncbi.nlm.nih.gov/pubmed/22586120", "http://www.ncbi.nlm.nih.gov/pubmed/22711607"]}, "evidenceType": {"sourceName": "cgi"}, "description": "Responsive"}], "environmentalContexts": [{"description": "CDK4/6 inhibitors"}], "evidence_label": "Responsive Pre-clinical", "phenotype": {"description": "G;CANCER"}}}
 """  # NOQA
 
+PMKB_TEST_MESSAGE = """
+{"tags": [], "feature": {"end": "133748283", "name": "ABL1 T315I", "start": "133748283", "referenceName": "GRCh37/hg19", "geneSymbol": "ABL1", "attributes": {"amino_acid_change": {"string_value": "T315I"}, "exons": {"string_value": "6"}, "url": {"string_value": "https://pmkb.weill.cornell.edu/genes/38/variants/101"}, "is_germline_somatic": {"string_value": "Somatic"}, "Variant": {"string_value": "missense"}, "condons": {"string_value": "315"}, "cosmic_id": {"string_value": "12560"}, "coding_nucleotide": {"string_value": "944C>T"}, "transcript_id": {"string_value": "ENST00000318560"}}, "chromosome": "9"}, "source": "pmkb", "pmkb": {"tumor": "Chronic Myeloid Leukemia", "url": "https://pmkb.weill.cornell.edu/therapies/38", "tissues": ["Blood", "Bone Marrow"], "variant": {"amino_acid_change": "T315I", "name": "ABL1 T315I", "exons": "6", "url": "https://pmkb.weill.cornell.edu/genes/38/variants/101", "is_germline_somatic": "Somatic", "Variant": "missense", "condons": "315", "coordinates": "9:133748283-133748283", "cosmic_id": "12560", "coding_nucleotide": "944C>T", "transcript_id": "ENST00000318560", "Gene": "ABL1"}}, "gene": "ABL1", "association": {"drug_labels": "NA", "description": "ABL1 kinase domain mutations in Philadelphia chromosome positive acute lymphoblastic leukemia and chronic myelogenous leukemia are associated with resistance to some types of tryosine kinase inhibitor therapy. The various mutations span several hundred amino acids (M237 thru E507) and vary in their response to later generation tyrosine kinase inhibitors. ", "publication_url": "http://www.ncbi.nlm.nih.gov/pubmed/24382642", "evidence": [{"info": {"publications": [["http://www.ncbi.nlm.nih.gov/pubmed/24382642", "http://www.ncbi.nlm.nih.gov/pubmed/24131888"]]}, "evidenceType": {"sourceName": "pmkb"}, "description": "1"}], "evidence_label": "1", "phenotype": {"description": "Chronic Myeloid Leukemia"}}}
+"""  # NOQA
+
+
+def test_pmkb_pb():
+    """ ensure we can de-serialize the message """
+    harvested_evidence = json_format.Parse(
+                                        PMKB_TEST_MESSAGE,
+                                        evidence.Evidence(),
+                                        ignore_unknown_fields=True)
+    assert harvested_evidence.gene == "ABL1"
+    assert harvested_evidence.source == "pmkb"
+    assert harvested_evidence.feature.end == 133748283
+    assert 'kinase domain mutations' in \
+        harvested_evidence.association.description
+    assert harvested_evidence.pmkb
+
 
 def test_civic_pb():
     """ ensure we can de-serialize the message """
