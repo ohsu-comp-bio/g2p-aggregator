@@ -9,3 +9,7 @@ __pycache__/
 harvester/tests/integration/bioschemas
 attic
 .plotly
+.htpasswd
+util/elastic/backups
+harvester/cosmic_lookup_table.tsv
+harvester/CosmicMutantExport.tsv.gz
