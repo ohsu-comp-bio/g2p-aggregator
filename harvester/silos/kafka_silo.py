@@ -14,7 +14,7 @@ def populate_args(argparser):
     """add arguments we expect """
     argparser.add_argument('--kafka_topic', '-kt',
                            help='''kafka_topic''',
-                           default='smmart-g2p')
+                           default='smmart.g2p')
 
     argparser.add_argument('--kafka_bootstrap', '-kb',
                            help='''kafka host:port''',
