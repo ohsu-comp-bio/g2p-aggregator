@@ -2,6 +2,7 @@ from __future__ import print_function
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 import sys
+import json
 
 # module level funtions
 
@@ -58,8 +59,22 @@ class ElasticSilo:
             _eprint(e, query)
             pass
 
+    def _stringify_sources(self, feature_association):
+        """ Maintaining the original document causes a 'field explosion'
+        thousands on fields in a document. So, for now at least,
+        maintain it as a string.
+        """
+        sources = ['cgi', 'jax', 'civic', 'oncokb', 'molecularmatch', 'pmkb']
+        for source in sources:
+            if source in feature_association:
+                if not isinstance(feature_association[source], basestring):
+                    feature_association[source] = json.dumps(feature_association[source])  # NOQA
+        return feature_association
+
     def save(self, feature_association):
         """ write to es """
+        # prevent field explosion
+        feature_association = self._stringify_sources(feature_association)
         result = self._es.index(index=self._index,
                                 body=feature_association,
                                 doc_type='association',
