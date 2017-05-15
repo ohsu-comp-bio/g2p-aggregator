@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from __future__ import print_function
 import sys
 import argparse
 sys.path.append('silos')  # NOQA
@@ -11,24 +12,27 @@ import civic
 import oncokb
 import cgi_biomarkers
 import molecularmatch
+import pmkb
+
 from elastic_silo import ElasticSilo
 import elastic_silo
 from kafka_silo import KafkaSilo
 import kafka_silo
+
 
 argparser = argparse.ArgumentParser()
 
 argparser.add_argument('--harvesters',  nargs='+',
                        help='''harvest from these sources. default:
                                [cgi_biomarkers,jax,civic,oncokb,
-                               molecularmatch]''',
+                               molecularmatch, pmkb]''',
                        default=['cgi_biomarkers', 'jax', 'civic',
-                                'oncokb', 'molecularmatch'])
+                                'oncokb', 'molecularmatch', 'pmkb'])
 
 
 argparser.add_argument('--silos',  nargs='+',
                        help='''save to these silos. default:[elastic,kafka]''',
-                       default=['elastic', 'kafka'])
+                       default=['elastic'])
 
 
 argparser.add_argument('--delete_index', '-d',
@@ -39,6 +43,10 @@ argparser.add_argument('--delete_source', '-ds',
                        help='delete all content for any harvester',
                        default=False, action="store_true")
 
+argparser.add_argument('--genes',   nargs='+',
+                       help='array of hugo ids, no value will harvest all',
+                       default=None)
+
 
 elastic_silo.populate_args(argparser)
 kafka_silo.populate_args(argparser)
@@ -46,11 +54,20 @@ kafka_silo.populate_args(argparser)
 args = argparser.parse_args()
 for h in args.harvesters:
     assert h in sys.modules, "harvester is not a module: %r" % h
-print "harvesters: %r" % args.harvesters
-print "silos: %r" % args.silos
-print "elastic_search: %r" % args.elastic_search
-print "elastic_index: %r" % args.elastic_index
-print "delete_index: %r" % args.delete_index
+
+
+def _eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+_eprint("harvesters: %r" % args.harvesters)
+_eprint("silos: %r" % args.silos)
+_eprint("elastic_search: %r" % args.elastic_search)
+_eprint("elastic_index: %r" % args.elastic_index)
+_eprint("delete_index: %r" % args.delete_index)
+if not args.genes:
+    _eprint("genes: all")
+else:
+    _eprint("genes: %r" % args.genes)
 
 
 def _make_silos(args):
@@ -74,39 +91,32 @@ def harvest(genes):
         harvester = sys.modules[h]
         if args.delete_source:
             for silo in silos:
+                if h == 'cgi_biomarkers':
+                    h = 'cgi'
                 silo.delete_source(h)
 
         for feature_association in harvester.harvest_and_convert(genes):
+            _eprint(harvester.__name__,
+                    feature_association['gene'],
+                    feature_association['association']['evidence_label']
+                    )
             yield feature_association
-
-
-def get_genes(paths=['network-GeneTrails.json']):  # , 'network-cfDNA.json'
-    """simple list of gene names"""
-    genes = []
-    for path in paths:
-        network = []
-        with open(path) as json_data:
-            network = json.load(json_data)
-            json_data.close()
-
-        pathway_property_names = ['upstream', 'downstream', 'complex-partner']
-        for pathway in network:
-            # ensure is array
-            genes.append(pathway['gene-symbol'])
-            # for pn in pathway_property_names:
-            #     if pn in pathway:
-            #         genes.extend(pathway[pn])
-    return list(set(genes))
 
 
 def main():
     if args.delete_index:
         for silo in silos:
             silo.delete_all()
-    genes = get_genes()
-    for feature_association in harvest(genes):
+    for feature_association in harvest(args.genes):
         for silo in silos:
-            silo.save(feature_association)
+            try:
+                # add tags field for downstream tagger use cases
+                feature_association['tags'] = []
+                silo.save(feature_association)
+            except Exception as e:
+                _eprint(e)
+                _eprint(feature_association)
+
 
 if __name__ == '__main__':
     main()

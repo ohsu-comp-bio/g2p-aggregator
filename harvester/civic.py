@@ -6,20 +6,34 @@ import copy
 
 def harvest(genes):
     """ given an array of gene symbols, harvest them from civic"""
-    for gene in set(genes):
-        r = requests.get('https://civic.genome.wustl.edu/api/genes/{}?identifier_type=entrez_symbol'.format(gene))  # NOQA
-        if r.status_code != 200 or len(r.json()['variants']) == 0:
-            # print "{} Found no variants in civic".format(gene)
-            gene_data = {'gene': gene, 'civic': {}}
-        else:
-            variants = r.json()['variants']
-            # print "{} Found {} variants in civic".format(gene, len(variants))
+    # harvest all genes
+    if not genes:
+        r = requests.get('https://civic.genome.wustl.edu/api/genes?count=99999')  # NOQA
+        for record in r.json()['records']:
+            variants = record['variants']
+            gene = record['name']
             variants_details = []
             for variant in variants:
                 r = requests.get('https://civic.genome.wustl.edu/api/variants/{}'.format(variant['id']))   # NOQA
                 variants_details.append(r.json())
             gene_data = {'gene': gene, 'civic': {'variants': variants_details}}
-        yield gene_data
+            yield gene_data
+    else:
+        # harvest some genes
+        for gene in set(genes):
+            r = requests.get('https://civic.genome.wustl.edu/api/genes/{}?identifier_type=entrez_symbol'.format(gene))  # NOQA
+            if r.status_code != 200 or len(r.json()['variants']) == 0:
+                # print "{} Found no variants in civic".format(gene)
+                gene_data = {'gene': gene, 'civic': {}}
+            else:
+                variants = r.json()['variants']
+                variants_details = []
+                for variant in variants:
+                    r = requests.get('https://civic.genome.wustl.edu/api/variants/{}'.format(variant['id']))   # NOQA
+                    variants_details.append(r.json())
+                gene_data = {'gene': gene,
+                             'civic': {'variants': variants_details}}
+            yield gene_data
 
 
 def convert(gene_data):

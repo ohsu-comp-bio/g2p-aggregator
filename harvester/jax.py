@@ -6,17 +6,27 @@ from inflection import parameterize, underscore
 import json
 
 
-def get_gene_ids(genes):
+def harvest(genes):
+    """ get data from jax """
+    for gene_id in _get_gene_ids(genes):
+        for jax_evidence in get_evidence([gene_id]):
+            yield jax_evidence
+
+
+def _get_gene_ids(genes):
     """gets json for list of all genes and aliases yield"""
     url = 'https://ckb.jax.org/select2/getSelect2GenesForSearchTerm'
     page = requests.get(url, verify=False)
     gene_ids = []
     gene_infos = page.json()
-    for gene_info in gene_infos:
-        # yield {'id': gene_info['id'], 'gene': gene_info['geneName']}
-        for gene in genes:
-            if gene in gene_info['text']:
-                yield {'id': gene_info['id'], 'gene': gene}
+    if not genes:
+        for gene_info in gene_infos:
+            yield {'id': gene_info['id'], 'gene': gene_info['geneName']}
+    else:
+        for gene_info in gene_infos:
+            for gene in genes:
+                if gene in gene_info['text']:
+                    yield {'id': gene_info['id'], 'gene': gene}
 
 
 def get_evidence(gene_ids):
@@ -24,7 +34,6 @@ def get_evidence(gene_ids):
     gene_evidence = []
     for gene_id in gene_ids:
         url = 'https://ckb.jax.org/gene/show?geneId={}'.format(gene_id['id'])
-        print url
         page = requests.get(url, verify=False)
         tree = html.fromstring(page.content)
 
@@ -108,13 +117,6 @@ def convert(jax_evidence):
         yield feature_association
 
 
-def harvest(genes):
-    """ get data from jax """
-    for gene_id in get_gene_ids(genes):
-        for jax_evidence in get_evidence([gene_id]):
-            yield jax_evidence
-
-
 def harvest_and_convert(genes):
     """ get data from jax, convert it to ga4gh and return via yield """
     for jax_evidence in harvest(genes):
@@ -124,9 +126,10 @@ def harvest_and_convert(genes):
             yield feature_association
 
 
-def main():
-    for feature_association in harvest_and_convert(['FGFR1']):
-        print feature_association.keys()
+def _test():
+    for feature_association in harvest_and_convert(None):
+        print feature_association
+        break
 
 if __name__ == '__main__':
-    main()
+    _test()

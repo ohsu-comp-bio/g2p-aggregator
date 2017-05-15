@@ -6,17 +6,17 @@ import json
 
 def harvest(genes):
     r = requests.get('http://oncokb.org/api/v1/levels')
-    # if 'data' not in r.json():
-    #     print r.json()
-    #     exit(1)
-    levels = r.json()  # ['data']
-    # print levels
+    levels = r.json()
+    if not genes:
+        r = requests.get('http://oncokb.org/api/v1/genes')
+        all_genes = r.json()
+        genes = []
+        for gene in all_genes:
+            genes.append(gene['hugoSymbol'])
     for gene in set(genes):
         gene_data = {'gene': gene, 'oncokb': {}}
-        url = 'http://oncokb.org/api/private/search/variants/clinical?hugoSymbol={}'
-        # url = 'http://oncokb.org/public-api/v1/search/variants/clinical?hugoSymbol={}'  # NOQA
+        url = 'http://oncokb.org/api/private/search/variants/clinical?hugoSymbol={}'  # NOQA
         url = url.format(gene)
-        print url
         r = requests.get(url)
         if r.status_code != 200:
             print "{} {} {}".format(gene, url, r.status_code)
@@ -28,7 +28,6 @@ def harvest(genes):
                     clinical['level_label'] = levels[key]
                 else:
                     print '{} not found'.format(clinical['level'])
-            # print "{} Found {} clincal evidence".format(gene,  len(gene_data['oncokb']['clinical']))
         r.close()
         yield gene_data
 
@@ -38,9 +37,6 @@ def convert(gene_data):
     oncokb = {'clinical': []}
     if 'oncokb' in gene_data:
         oncokb = gene_data['oncokb']
-    # print hit
-    # print oncokb
-    # print oncokb['clinical']
     for clinical in oncokb['clinical']:
         variant = clinical['variant']
         gene_data = variant['gene']
@@ -98,9 +94,10 @@ def harvest_and_convert(genes):
             yield feature_association
 
 
-def main():
-    for feature_association in harvest_and_convert(['FGFR1']):
+def _test():
+    for feature_association in harvest_and_convert(None):
         print feature_association.keys()
+        break
 
 if __name__ == '__main__':
-    main()
+    _test()

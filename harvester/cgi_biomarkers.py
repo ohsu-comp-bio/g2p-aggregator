@@ -1,19 +1,12 @@
 import pandas
 import json
+import copy
+
+import cosmic_lookup_table
 
 """ https://www.cancergenomeinterpreter.org/biomarkers """
 
-
-def _get_evidence_drugs(drug_names, path='./cgi_biomarkers_20170208.tsv'):
-    """ load tsv """
-    df = pandas.read_table(path)
-    # change nan to blank string
-    df = df.fillna('')
-    # rows = df.loc[df['Drug'].isin(drug_names)]
-    # dict_list = rows.to_dict(orient='records')
-    dict_list = df.to_dict(orient='records')
-    for row in dict_list:
-        yield row
+LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup("./cosmic_lookup_table.tsv")
 
 
 def _get_evidence(gene_ids, path='./cgi_biomarkers_20170208.tsv'):
@@ -21,9 +14,12 @@ def _get_evidence(gene_ids, path='./cgi_biomarkers_20170208.tsv'):
     df = pandas.read_table(path)
     # change nan to blank string
     df = df.fillna('')
-    rows = df.loc[df['Gene'].isin(gene_ids)]
-    dict_list = rows.to_dict(orient='records')
-    # dict_list = df.to_dict(orient='records')
+    # if no gene list return all
+    if not gene_ids:
+        dict_list = df.to_dict(orient='records')
+    else:
+        rows = df.loc[df['Gene'].isin(gene_ids)]
+        dict_list = rows.to_dict(orient='records')
     for row in dict_list:
         yield row
 
@@ -98,17 +94,36 @@ def convert(evidence):
                            'association': association,
                            'source': 'cgi',
                            'cgi': evidence}
-    yield feature_association
+
+    # For each biomarker, add more feature information and yield.
+    fields = evidence['Alteration'].split(':')
+    if len(fields) == 2:
+        gene, hgvs_p = fields
+        for protein_change in hgvs_p.split(','):
+            matches = LOOKUP_TABLE.get_entries(gene, protein_change)
+            if len(matches) > 0:
+
+                # FIXME: just using the first match for now;
+                # it's not clear what to do if there are multiple matches.
+                match = matches[0]
+                detailed_feature = copy.deepcopy(feature)
+                detailed_feature['chromosome'] = match['chrom']
+                detailed_feature['start'] = match['start']
+                detailed_feature['end'] = match['end']
+                detailed_feature['referenceName'] = match['build']
+                # TODO: add alteration type.
+
+                feature_association['feature'] = detailed_feature
+
+            yield feature_association
+    else:
+        yield feature_association
 
 
 def harvest(genes=None, drugs=None):
     """ get data from cgi """
-    if genes:
-        for evidence in _get_evidence(genes):
-            yield evidence
-    else:
-        for evidence in _get_evidence_drugs(drugs):
-            yield evidence
+    for evidence in _get_evidence(genes):
+        yield evidence
 
 
 def harvest_and_convert(genes=None, drugs=None):
@@ -122,22 +137,8 @@ def harvest_and_convert(genes=None, drugs=None):
 
 
 def _test():
-    drugs = ["Olaparib", "Folfox", "Pembrolizumab", "Palbociclib", "ATRA",
-         "Afatinib", "Vorinostat", "Everolimus", "Trametinib",
-         "Cabozantinib", "Lenvatinib", "Ponatinib", "Ipilimumab",
-         "Nivolumab", "Pertuzumab", "Carboplatin", "Enzalutamide",
-         "Abiraterone", "Vemurafenib", "Cabazitaxel", "Panobinostat",
-         "Imatinib", "Dasatinib", "Sunitinib", "Sorafenib", "Ruxolotinib",
-         "Bortezomib", "Idelalisib", "Venetoclax", "Sirolimus",
-         "Bevacizumab", "Erlotinib", "Celecoxib"]
-
-    for feature_association in harvest_and_convert(drugs=drugs):
+    for feature_association in harvest_and_convert(['KIT']):
         print feature_association.keys()
-        print feature_association
-        break
-
-    # for feature_association in harvest_and_convert(['KIT']):
-    #     print feature_association.keys()
 
 if __name__ == '__main__':
     _test()

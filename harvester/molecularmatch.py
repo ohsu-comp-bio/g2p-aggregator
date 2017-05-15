@@ -14,11 +14,13 @@ mmService = "http://api-demo.molecularmatch.com"
 apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
 
 
-def get_evidence(gene_ids=['KIT']):
+def get_evidence(gene_ids):
     """ load from remote api """
     if not apiKey:
         raise ValueError('Please set MOLECULAR_MATCH_API_KEY in environment')
     # first look for all drugs that impact this gene
+    if not gene_ids:
+        gene_ids = ['']
     for gene in gene_ids:
         url = mmService + resourceURLs["assertions"]
         filters = [{'facet': 'MUTATION',
@@ -45,7 +47,7 @@ def convert(evidence):
 
     """
     sources = evidence['sources']
-    tier = evidence['tier']
+    # tier = evidence['tier']
     direction = evidence['direction']
     narrative = evidence['narrative']
     therapeuticContext = evidence['therapeuticContext']
@@ -118,8 +120,9 @@ def harvest_and_convert(genes):
             yield feature_association
 
 
-def test():
-    gene_ids = ["CCND1", "CDKN2A", "CHEK1", "DDR2", "FGF19", "FGF3", "FGF4", "FGFR1", "MDM4", "PALB2", "RAD51D"]
+def _test():
+    # gene_ids = ["CCND1", "CDKN2A", "CHEK1", "DDR2", "FGF19", "FGF3", "FGF4", "FGFR1", "MDM4", "PALB2", "RAD51D"]
+    gene_ids = None
     for feature_association in harvest_and_convert(gene_ids):
         print feature_association.keys()
         print json.dumps(feature_association, indent=2)
@@ -131,5 +134,4 @@ def test():
     #     break
 
 if __name__ == '__main__':
-    test()
-
+    _test()
