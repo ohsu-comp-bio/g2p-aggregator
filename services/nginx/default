@@ -22,7 +22,9 @@ server {
   location /static-html {
    root /var/www;
   }
+
   location / {
+    rewrite /kibana/(.*) /$1 break;
     proxy_pass                              http://kibana:5601/;
     proxy_buffering                         off;
     proxy_pass_request_headers              on;

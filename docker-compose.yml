@@ -10,7 +10,7 @@ services:
   # ... see this
   # https://github.com/elastic/elasticsearch-docker/blob/master/README.md#osx-with-docker-toolbox
   elastic:
-    container_name: elastic_smmart
+    container_name: elastic_g2p
     build:
       context: services/elastic/
     volumes:
@@ -21,11 +21,12 @@ services:
       - http.host=0.0.0.0
       - transport.host=127.0.0.1
       - xpack.security.enabled=false
+      - path.repo=/util/elastic/backups
 
 
 
   kibana:
-    container_name: kibana_smmart
+    container_name: kibana_g2p
     build:
       context: services/kibana/
     volumes:
@@ -40,7 +41,7 @@ services:
       - SERVER_BASEPATH=/kibana
 
   nginx:
-    container_name: nginx_smmart
+    container_name: nginx_g2p
     image: nginx:latest
     volumes:
       - "./util:/util/"
