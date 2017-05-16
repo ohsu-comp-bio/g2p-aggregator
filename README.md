@@ -25,6 +25,7 @@ Now:
 * oncokb [Precision Oncology Knowledge Base](http://oncokb.org/#/)
 * Cancer Genome Interpreter Cancer [bioMarkers database](https://www.cancergenomeinterpreter.org/biomarkers)
 * GA4GH [reference server](https://github.com/ga4gh/ga4gh-server)
+* Cornell [pmkb](https://pmkb.weill.cornell.edu)
 
 In  progress:
 
@@ -40,10 +41,6 @@ JUST GOOGLE IT:
 
 * The charts and list are all tied to the search. Click to constrain your results
 
-
-## Why are there a limited number of genes?
-
-* We've constrained the data sets to a single use case from SMMART
 
 
 ## How do I import new data into it?
