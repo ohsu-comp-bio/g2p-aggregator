@@ -1,6 +1,6 @@
 # smmart-g2p
 
-A prototype of the Genotype to phenotype user interface exists [here](https://g2p-ohsu.ddns.net/).   
+A prototype of the Genotype to phenotype user interface exists [here](https://g2p-ohsu.ddns.net/g2p).   
 
 ![image](https://cloud.githubusercontent.com/assets/47808/24819664/66139700-1b9a-11e7-85ee-d49841486f0a.png)
 
