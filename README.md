@@ -1,4 +1,4 @@
-# smmart-g2p
+# g2p-aggregator
 
 A prototype of the Genotype to phenotype user interface exists [here](https://g2p-ohsu.ddns.net/g2p).   
 
