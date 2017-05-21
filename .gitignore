@@ -7,6 +7,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 harvester/tests/integration/bioschemas
+harvester/cgi_biomarkers_*
 attic
 .plotly
 .htpasswd
