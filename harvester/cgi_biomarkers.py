@@ -5,7 +5,7 @@ import copy
 
 """ https://www.cancergenomeinterpreter.org/biomarkers """
 
-def _get_evidence(gene_ids, path='./cgi_biomarkers_per_variant_20170208.tsv'):
+def _get_evidence(gene_ids, path='./cgi_biomarkers_per_variant.tsv'):
     """ load tsv """
     df = pandas.read_table(path)
     # change nan to blank string
@@ -63,7 +63,7 @@ def convert(evidence):
     # Create document for insertion.
     gene = evidence['Gene']
     feature = split_gDNA(evidence['gDNA'])
-    
+
     # TODO: add alteration type.
     feature['geneSymbol'] = gene
     feature['name'] = evidence['Biomarker']
