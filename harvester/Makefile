@@ -7,7 +7,10 @@ BENCHMARK_DATASET=oncokb
 
 CGI_VERSION=20170208
 
-## Populate ElasticSearch.
+## Do bulk download of OncoKB and set up TSV for ingestion.
+oncokb_all_actionable_variants.tsv:
+	curl -o oncokb_all_actionable_variants_$(shell date +"%Y%m%d").tsv http://oncokb.org/api/v1/utils/allActionableVariants.txt
+	ln -s oncokb_all_actionable_variants_$(shell date +"%Y%m%d").tsv oncokb_all_actionable_variants.tsv
 
 ## Do bulk download of CGI and set up TSV for ingestion.
 cgi_biomarkers_per_variant.tsv:
@@ -45,4 +48,5 @@ $(COSMIC_MUTATIONS):
 
 clean:
 	rm -rf cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv benchmark.txt \
-	cgi_biomarkers_$(CGI_VERSION) cgi_biomarkers_per_variant.tsv
+	cgi_biomarkers_$(CGI_VERSION) cgi_biomarkers_per_variant.tsv \
+	oncokb_all_actionable_variants*.tsv
