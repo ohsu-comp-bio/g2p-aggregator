@@ -3,6 +3,10 @@
 import requests
 import json
 
+import cosmic_lookup_table
+
+LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup("./cosmic_lookup_table.tsv")
+
 
 def harvest(genes):
     r = requests.get('http://oncokb.org/api/v1/levels')
@@ -39,11 +43,23 @@ def convert(gene_data):
         oncokb = gene_data['oncokb']
     for clinical in oncokb['clinical']:
         variant = clinical['variant']
+        alteration = variant['alteration']
         gene_data = variant['gene']
         feature = {}
         feature['geneSymbol'] = gene
         feature['name'] = variant['name']
         feature['entrez_id'] = gene_data['entrezGeneId']
+
+        # Look up variant and add position information.
+        matches = LOOKUP_TABLE.get_entries(gene, alteration)
+        if len(matches) > 0:
+            # FIXME: just using the first match for now;
+            # it's not clear what to do if there are multiple matches.
+            match = matches[0]
+            feature['chromosome'] = match['chrom']
+            feature['start'] = match['start']
+            feature['end'] = match['end']
+            feature['referenceName'] = match['build']
 
         association = {}
         association['description'] = clinical['level_label']
