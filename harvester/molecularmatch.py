@@ -70,6 +70,18 @@ def convert(evidence):
     feature['geneSymbol'] = gene
     feature['name'] = mutation
 
+    # Add variant-level information.
+    # TODO: only looks at first mutation, not all mutations.
+    try:
+        grch37_mutation = evidence['mutations'][0]['GRCh37_location'][0]
+        feature['chromosome'] = grch37_mutation['chr']
+        feature['start'] = grch37_mutation['start']
+        feature['ref'] = grch37_mutation['ref']
+        feature['alt'] = grch37_mutation['alt']
+        #TODO: add build/reference information
+    except:
+        pass
+
     association = {}
     association['description'] = narrative
     association['environmentalContexts'] = []
