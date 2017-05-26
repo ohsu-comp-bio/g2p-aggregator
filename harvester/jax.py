@@ -107,6 +107,8 @@ def convert(jax_evidence):
                     feature['chromosome'] = match['chrom']
                     feature['start'] = match['start']
                     feature['end'] = match['end']
+                    feature['ref'] = match['ref']
+                    feature['alt'] = match['alt']
                     feature['referenceName'] = match['build']
             except:
                 pass
