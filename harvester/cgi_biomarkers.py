@@ -5,6 +5,30 @@ import copy
 
 """ https://www.cancergenomeinterpreter.org/biomarkers """
 
+def _get_biomarker_type(alteration_type, biomarker):
+    """ Map alteration type to standardized biomarker type. """
+
+    # Dictionary to look up simple types.
+    ALTERATION_TYPE_TO_BIOMARKER_TYPE = {
+        "BIA":  "biallelic inactivation",
+        "EXPR": "overexpression",
+        "FUS": "fusion",
+        "MUT": "snp"
+    }
+
+    rval = ''
+    if alteration_type in ALTERATION_TYPE_TO_BIOMARKER_TYPE:
+        rval = ALTERATION_TYPE_TO_BIOMARKER_TYPE[alteration_type]
+    elif alteration_type == "CNA":
+        # Copy number alteration, either amplification or deletion.
+        if "amplification" in biomarker:
+            rval = "amplification"
+        elif "deletion" in biomarker:
+            rval = "deletion"
+
+    return rval
+
+
 def _get_evidence(gene_ids, path='./cgi_biomarkers_per_variant.tsv'):
     """ load tsv """
     df = pandas.read_table(path)
@@ -64,7 +88,7 @@ def convert(evidence):
     gene = evidence['Gene']
     feature = split_gDNA(evidence['gDNA'])
 
-    # TODO: add alteration type.
+    feature['biomarker_type'] = _get_biomarker_type(evidence['Alteration type'], evidence['Biomarker'])
     feature['geneSymbol'] = gene
     feature['name'] = evidence['Biomarker']
     feature['description'] = evidence['Alteration']
