@@ -2,7 +2,7 @@
 import requests
 import json
 import os
-
+import match
 
 # curl 'http://api-demo.molecularmatch.com/v2/search/assertions' --data 'apiKey=xxxxxxxxx' --data-urlencode 'filters=[{"facet":"MUTATION","term":"KIT"}]'
 resourceURLs = {
@@ -93,7 +93,22 @@ def convert(evidence):
         }
     }]
     # add summary fields for Display
-    association['evidence_label'] = direction
+    
+    # association['evidence_label'] = direction
+    for item in match.ev_lab:
+        for opt in match.ev_lab[item]:
+            if opt in narrative.lower():
+                 association['evidence_label'] = item
+    if 'evidence_label' not in association:
+        association['evidence_label'] = 'NA'
+
+    for item in match.res_type:
+        for opt in match.res_type[item]:
+            if opt in narrative.lower():
+                 association['response_type'] = item
+    if 'response_type' not in association:
+        association['response_type'] = 'NA'
+
     association['publication_url'] = pubs[0]
     association['drug_labels'] = therapeuticContext[0]['name']
     feature_association = {'gene': gene,

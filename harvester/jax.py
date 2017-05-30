@@ -1,10 +1,14 @@
 
+import sys
 from lxml import html
 from lxml import etree
 import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from inflection import parameterize, underscore
 import json
+import match
 
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def harvest(genes):
     """ get data from jax """
@@ -105,7 +109,18 @@ def convert(jax_evidence):
             }
         }]
         # add summary fields for Display
-        association['evidence_label'] = evidence['response_type']
+        for item in match.ev_lab:
+            for opt in match.ev_lab[item]:
+                if opt in evidence['approval_status'].lower():
+                    association['evidence_label'] = item
+        if 'evidence_label' not in association:
+            association['evidence_label'] = evidence['approval_status']
+        for item in match.res_type:
+            for opt in match.res_type[item]:
+                if opt in evidence['response_type'].lower():
+                    association['response_type'] = item
+        if 'response_type' not in association:
+            association['response_type'] = evidence['response_type']
         if len(evidence['references']) > 0:
             association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(evidence['references'][0])  # NOQA
         association['drug_labels'] = evidence['therapy_name']

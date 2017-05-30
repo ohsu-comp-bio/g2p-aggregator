@@ -2,7 +2,7 @@
 
 import requests
 import copy
-
+import match
 
 def harvest(genes):
     """ given an array of gene symbols, harvest them from civic"""
@@ -76,7 +76,21 @@ def convert(gene_data):
                     }
                 },
                 # add summary fields for Display
-                association['evidence_label'] = evidence_item['clinical_significance'],   # NOQA
+
+                for item in match.ev_lab:
+                    for opt in match.ev_lab[item]:
+                        if opt in evidence_item['description'].lower():
+                            association['evidence_label'] = item
+                if 'evidence_label' not in association:
+                    association['evidence_label'] = 'NA'
+                
+                for item in match.res_type:
+                    for opt in match.res_type[item]:
+                        if opt in evidence_item['clinical_significance'].lower():
+                            association['response_type'] = item
+                if 'response_type' not in association:
+                    association['response_type'] = evidence_item['clinical_significance']
+
                 association['publication_url'] = evidence_item['source']['source_url'],   # NOQA
                 association['drug_labels'] = ','.join([drug['name'] for drug in evidence_item['drugs']])   # NOQA
                 # create snapshot of original data
