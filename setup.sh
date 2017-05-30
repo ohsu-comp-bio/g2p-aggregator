@@ -1,4 +1,29 @@
 echo install & configure app
+
+
+
+if [ `alias | grep dc | wc -l` != 0 ]; then
+
+echo Please configure environmental variables
+echo
+echo e.g. for standalone development ...
+cat <<EOT
+  alias dc='docker-compose -f docker-compose.yml'
+  export SERVER_NAME=g2p-ohsu.ddns.net
+  export ADMIN_EMAIL=walsbr@ohsu.edu
+EOT
+echo
+echo e.g. for cloud depoyment ...
+cat <<EOT
+  alias dc='docker-compose -f docker-compose.yml -f cloud-setup/docker-compose-nginx.yml'
+  export SERVER_NAME=g2p-ohsu.ddns.net
+  export ADMIN_EMAIL=walsbr@ohsu.edu
+EOT
+exit 1
+fi
+
+
+
 # for github access
 if [ ! -f ~/g2p-aggregator ]; then
   # clone repo
@@ -10,7 +35,6 @@ ELASTIC_PORT=9200
 KIBANA_PORT=5601
 EOT
 
-  alias dc=docker-compose
   dc up -d
 fi
 
