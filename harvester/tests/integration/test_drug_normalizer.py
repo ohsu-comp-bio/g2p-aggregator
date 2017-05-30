@@ -28,3 +28,8 @@ def test_combination():
     assert compounds[0]['synonym'] == 'Trametinib'
     assert compounds[1]['ontology_term'] == 'compound:CID44462760'
     assert compounds[1]['synonym'] == 'Dabrafenib'
+
+
+def test_celecoxib():
+    compounds = normalize('celecoxib')
+    print compounds
