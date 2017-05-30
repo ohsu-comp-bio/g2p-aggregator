@@ -15,6 +15,10 @@ server {
   ssl_certificate                 /compbio-tls/compbio_ohsu_edu_cert.cer;
   ssl_certificate_key             /compbio-tls/wild.compbio.ohsu.edu.key;
 
+  auth_basic                              "Username and Password Required";
+  auth_basic_user_file                    /etc/nginx/.htpasswd;
+
+
   location /g2p {
      rewrite ^ /static-html/g2p.html last;
    }
@@ -23,9 +27,36 @@ server {
    root /var/www;
   }
 
+
+  location ^/?[^/]*/?[^/]*/_msearch {
+    try_files $uri @elasticsearch;
+  }
+
+  location ^/?[^/]*/?[^/]*/_mget {
+    try_files $uri  @elasticsearch;
+  }
+
+  location ^/?[^/]*/?[^/]*/search {
+    try_files $uri  @elasticsearch;
+  }
+
+  location ^/?[^/]*/?[^/]*/get {
+    try_files $uri  @elasticsearch;
+  }
+
   location / {
+    limit_except POST  PUT DELETE {
+      auth_basic                              "Username and Password Required";
+      auth_basic_user_file                    /etc/nginx/.htpasswd-admin;
+    }
+    try_files $uri @elasticsearch;
+  }
+
+
+
+  location @elasticsearch {
     rewrite /kibana/(.*) /$1 break;
-    proxy_pass                              http://kibana:5601/;
+    proxy_pass                              http://kibana:5601;
     proxy_buffering                         off;
     proxy_pass_request_headers              on;
     proxy_set_header Authorization          "";
@@ -33,8 +64,6 @@ server {
     proxy_set_header X-Real-IP              $remote_addr;
     proxy_set_header X-Forwarded-For        $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto      $scheme;
-    auth_basic                              "Username and Password Required";
-    auth_basic_user_file                    /etc/nginx/.htpasswd;
   }
 
 }
