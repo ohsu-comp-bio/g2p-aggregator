@@ -61,7 +61,7 @@ def convert(gene_data):
             feature['end'] = match['end']
             feature['ref'] = match['ref']
             feature['alt'] = match['alt']
-            feature['referenceName'] = match['build']
+            feature['referenceName'] = str(match['build'])
 
         association = {}
         association['description'] = clinical['level_label']

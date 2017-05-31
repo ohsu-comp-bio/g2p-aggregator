@@ -109,7 +109,7 @@ def convert(jax_evidence):
                     feature['end'] = match['end']
                     feature['ref'] = match['ref']
                     feature['alt'] = match['alt']
-                    feature['referenceName'] = match['build']
+                    feature['referenceName'] = str(match['build'])
             except:
                 pass
 
