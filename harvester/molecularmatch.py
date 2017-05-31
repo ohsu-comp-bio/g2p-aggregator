@@ -8,7 +8,7 @@ import os
 resourceURLs = {
     "assertions": "/v2/search/assertions"
 }
-mmService = "http://api-demo.molecularmatch.com"
+mmService = "http://api.molecularmatch.com"
 
 
 apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
@@ -31,15 +31,18 @@ def get_evidence(gene_ids):
             'filters': json.dumps(filters)
         }
         try:
+            print url, payload
             r = requests.post(url, data=payload)
             assertions = r.json()
 
             # filter those drugs, only those with diseases
-            for hit in assertions['hits']:
-                if gene in hit['narrative']:
+            for hit in assertions['rows']:
+                # do not process rows without drugs
+                if len(hit['therapeuticContext']) > 0:
                     yield hit
         except Exception as e:
             print "molecularmatch error fetching {} {}".format(gene, e)
+            print r.text.encode('utf-8')
 
 
 def convert(evidence):
@@ -70,11 +73,25 @@ def convert(evidence):
     feature['geneSymbol'] = gene
     feature['name'] = mutation
 
+    # Add variant-level information.
+    # TODO: only looks at first mutation, not all mutations.
+    try:
+        grch37_mutation = evidence['mutations'][0]['GRCh37_location'][0]
+        feature['chromosome'] = grch37_mutation['chr']
+        feature['start'] = grch37_mutation['start']
+        feature['ref'] = grch37_mutation['ref']
+        feature['alt'] = grch37_mutation['alt']
+        #  TODO: add build/reference information
+    except:
+        pass
+
+    drug_label = therapeuticContext[0]['name']
+
     association = {}
     association['description'] = narrative
     association['environmentalContexts'] = []
     association['environmentalContexts'].append({
-        'description': therapeuticContext[0]['name']})
+        'description': drug_label})
     association['phenotype'] = {
         'description': condition
     }
@@ -95,7 +112,7 @@ def convert(evidence):
     # add summary fields for Display
     association['evidence_label'] = direction
     association['publication_url'] = pubs[0]
-    association['drug_labels'] = therapeuticContext[0]['name']
+    association['drug_labels'] = drug_label
     feature_association = {'gene': gene,
                            'feature': feature,
                            'association': association,

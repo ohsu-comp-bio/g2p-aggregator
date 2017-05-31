@@ -1,8 +1,11 @@
-# smmart-g2p
+# g2p-aggregator
 
-A prototype of the Genotype to phenotype user interface exists [here](https://g2p-ohsu.ddns.net/).   
+A prototype of the Genotype to phenotype user interface exists [here](https://g2p-ohsu.ddns.net/g2p).   
 
-![image](https://cloud.githubusercontent.com/assets/47808/24819664/66139700-1b9a-11e7-85ee-d49841486f0a.png)
+
+![image](https://cloud.githubusercontent.com/assets/47808/26114835/35b36864-3a13-11e7-9297-7aa996bd965e.png) 
+![image](https://cloud.githubusercontent.com/assets/47808/26114916/6d4ff44a-3a13-11e7-8c5f-09eda59955ac.png) 
+
 
 ## What is it?  Why use it?
 
@@ -22,6 +25,7 @@ Now:
 * oncokb [Precision Oncology Knowledge Base](http://oncokb.org/#/)
 * Cancer Genome Interpreter Cancer [bioMarkers database](https://www.cancergenomeinterpreter.org/biomarkers)
 * GA4GH [reference server](https://github.com/ga4gh/ga4gh-server)
+* Cornell [pmkb](https://pmkb.weill.cornell.edu)
 
 In  progress:
 
@@ -37,10 +41,6 @@ JUST GOOGLE IT:
 
 * The charts and list are all tied to the search. Click to constrain your results
 
-
-## Why are there a limited number of genes?
-
-* We've constrained the data sets to a single use case from SMMART
 
 
 ## How do I import new data into it?
