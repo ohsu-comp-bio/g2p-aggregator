@@ -104,7 +104,7 @@ def convert(jax_evidence):
                     # FIXME: just using the first match for now;
                     # it's not clear what to do if there are multiple matches.
                     match = matches[0]
-                    feature['chromosome'] = match['chrom']
+                    feature['chromosome'] = str(match['chrom'])
                     feature['start'] = match['start']
                     feature['end'] = match['end']
                     feature['ref'] = match['ref']

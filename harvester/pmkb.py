@@ -172,7 +172,7 @@ def convert(evidence):
                 start, stop = a[1].split('-')
                 feature['start'] = start
                 feature['end'] = stop
-                feature['chromosome'] = chromosome
+                feature['chromosome'] = str(chromosome)
                 feature['referenceName'] = 'GRCh37/hg19'
                 attributes = {}
                 for key in variant.keys():

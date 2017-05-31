@@ -47,7 +47,7 @@ def convert(gene_data):
             feature['start'] = variant['coordinates']['start']
             feature['end'] = variant['coordinates']['stop']
             feature['referenceName'] = str(variant['coordinates']['reference_build'])  # NOQA
-            feature['chromosome'] = variant['coordinates']['chromosome']
+            feature['chromosome'] = str(variant['coordinates']['chromosome'])
             feature['name'] = variant['name']
             for evidence_item in variant['evidence_items']:
                 association = {}

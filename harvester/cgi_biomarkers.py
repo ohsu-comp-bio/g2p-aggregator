@@ -76,7 +76,7 @@ def convert(evidence):
             start = re.search(r'(\d+)', remainder).group()
             ref, alt = remainder[len(start):].split(">")
             return {
-                'chromosome': chrom,
+                'chromosome': str(chrom),
                 'start': start,
                 'ref': ref,
                 'alt': alt
