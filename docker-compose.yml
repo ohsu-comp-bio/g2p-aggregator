@@ -38,6 +38,6 @@ services:
     environment:
       - xpack.security.enabled=false
       - XPACK_MONITORING_REPORT_STATS=false
-      - SERVER_BASEPATH=/kibana
+      # - SERVER_BASEPATH=/kibana  # for proxy
 
 # see docker-compose-nginx.yml for nginx proxy
