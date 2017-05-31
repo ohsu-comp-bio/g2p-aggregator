@@ -1,0 +1,19 @@
+version: '2.1'
+services:
+  nginx:
+    container_name: nginx_g2p
+    image: openresty/openresty:trusty
+    volumes:
+      - "./util:/util/"
+      - "./services/nginx/nginx_authorize_by_lua.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro"
+      - "./services/nginx/authorize.lua:/usr/local/openresty/nginx/conf/authorize.lua:ro"
+      - "./services/nginx/.htpasswd:/usr/local/openresty/nginx/conf/.htpasswd"
+      - "./certs:/certs"
+      - "./services/nginx/g2p.html:/var/www/static-html/g2p.html"
+
+    ports:
+      - "443:443"
+      - "80:80"
+    links:
+      - elastic
+      - kibana

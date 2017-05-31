@@ -78,7 +78,7 @@ def convert(gene_data):
                 "id": '{}-{}'.format(gene,
                                      clinical['cancerType']['mainType']['id'])
             },
-            'description': clinical['level_label'],
+            'description': clinical['level'],
             'info': {
                 'publications': [
                     [drugAbstracts['link'] for drugAbstracts in clinical['drugAbstracts']]

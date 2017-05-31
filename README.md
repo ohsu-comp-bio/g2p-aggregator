@@ -129,6 +129,25 @@ tests/integration/test_pb_deserialize.py::test_molecular_match_pb PASSED
 tests/integration/test_pb_deserialize.py::test_cgi_pb PASSED
 ```
 
+## How do I launch the database, bring up the website, etc. ?
+
+There is a [docker compose](https://docs.docker.com/compose/) configuration file in the root directory.
+
+Launch it by:
+
+```
+docker-compose up -d
+```
+This will automatically download elastic search etc. and will expose the standard elastic search and kibana ports (9200 and 5601)
+
+
+If you would like to host an instance, launch docker-compose with an additional nginx file.
+```
+docker-compose -f docker-compose.yml -f cloud-setup/docker-compose-nginx.yml up -d
+```
+This will do the same setup, but will also include an nginx proxy to map http and https ports.  
+
+
 ## What else do I need to know?
 
 * See the README.md in harvester/tests/integration to see how harvested evidence is mapped to [protocol buffer messages](https://github.com/ohsu-comp-bio/bioschemas/blob/master/bioschemas/snapshot/proto/ohsu/g2p.proto).

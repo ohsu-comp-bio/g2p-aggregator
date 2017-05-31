@@ -2,7 +2,6 @@
 *.pyc
 esdata
 *.DS_Store
-compbio-tls
 __pycache__/
 *.py[cod]
 *$py.class
@@ -14,3 +13,6 @@ attic
 util/elastic/backups
 harvester/cosmic_lookup_table.tsv
 harvester/CosmicMutantExport.tsv.gz
+compbio-tls
+certs
+letsencrypt_certs
