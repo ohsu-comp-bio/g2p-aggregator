@@ -6,7 +6,7 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from inflection import parameterize, underscore
 import json
-import match
+import evidence_label as el
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -109,14 +109,14 @@ def convert(jax_evidence):
             }
         }]
         # add summary fields for Display
-        for item in match.ev_lab:
-            for opt in match.ev_lab[item]:
+        for item in el.ev_lab:
+            for opt in el.ev_lab[item]:
                 if opt in evidence['approval_status'].lower():
                     association['evidence_label'] = item
         if 'evidence_label' not in association:
             association['evidence_label'] = evidence['approval_status']
-        for item in match.res_type:
-            for opt in match.res_type[item]:
+        for item in el.res_type:
+            for opt in el.res_type[item]:
                 if opt in evidence['response_type'].lower():
                     association['response_type'] = item
         if 'response_type' not in association:

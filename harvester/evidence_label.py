@@ -11,14 +11,17 @@ eln = ['european leukemianet guidelines']
 
 preclinical = ['preclinical', 'pre-clinical']
 
-trials = ['early trials', 'phase 2', 'phase ii', 'phase 1', 'phase i']
+trials = ['early trials', 'late trials', 'phase 2', 'phase ii', 'phase 1', 'phase i']
+
+cr = ['case report']
 
 ev_lab = {
     'FDA guidelines': fda,
     'NCCN guidelines': nccn,
     'European Leukemia Net guidelines' : eln,
     'preclinical': preclinical,
-    'in trials': trials
+    'in trials': trials,
+    'case report': cr
 }
 
 # normalized vocabulary for response_type

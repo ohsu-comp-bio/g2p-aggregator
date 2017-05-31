@@ -3,7 +3,7 @@ import json
 import copy
 
 import cosmic_lookup_table
-import match
+import evidence_label as el
 
 """ https://www.cancergenomeinterpreter.org/biomarkers """
 
@@ -87,15 +87,15 @@ def convert(evidence):
     }]
     # add summary fields for Display
 
-    for item in match.ev_lab:
-        for opt in match.ev_lab[item]:
+    for item in el.ev_lab:
+        for opt in el.ev_lab[item]:
             if opt in evidence['Evidence level'].lower():
                 association['evidence_label'] = item
     if 'evidence_label' not in association:
         association['evidence_label'] = evidence['Evidence level']
 
-    for item in match.res_type:
-        for opt in match.res_type[item]:
+    for item in el.res_type:
+        for opt in el.res_type[item]:
             if opt in evidence['Association'].lower():
                 association['response_type'] = item
     if 'response_type' not in association:
