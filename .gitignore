@@ -17,3 +17,6 @@ compbio-tls
 certs
 letsencrypt_certs
 harvester/oncokb_all_actionable_variants*.*
+
+# requests-cache(s)
+harvester/*.sqlite
