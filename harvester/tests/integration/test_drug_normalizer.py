@@ -2,12 +2,16 @@ import sys
 sys.path.append('.')  # NOQA
 
 from drug_normalizer import normalize
+import requests
+import requests_cache
+# cache responses
+requests_cache.install_cache('harvester')
 
 
-def test_bayer():
-    compounds = normalize('Bayer')
-    assert compounds[0]['ontology_term'] == 'compound:CID2244'
-    assert compounds[0]['synonym'] == 'aspirin'
+# def test_bayer():
+#     compounds = normalize('Bayer')
+#     assert compounds[0]['ontology_term'] == 'compound:CID2244'
+#     assert compounds[0]['synonym'] == 'aspirin'
 
 
 def test_nonsense():
@@ -32,4 +36,5 @@ def test_combination():
 
 def test_celecoxib():
     compounds = normalize('celecoxib')
-    print compounds
+    assert compounds[0]['ontology_term'] == 'compound:CID2662'
+    assert compounds[0]['synonym'] == 'Celecoxib'
