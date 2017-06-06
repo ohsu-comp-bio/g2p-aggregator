@@ -6,7 +6,7 @@ from lxml import etree
 import requests
 from inflection import parameterize, underscore
 import json
-
+import evidence_label as el
 
 def _eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -184,6 +184,22 @@ def convert(evidence):
 
                 association = {}
                 association['description'] = evidence['interpretation']
+
+                # association['evidence_label'] = evidence['tier']
+                for item in el.ev_lab:
+                    for opt in el.ev_lab[item]:
+                        if opt in evidence['interpretation'].lower():
+                            association['evidence_label'] = item
+                if 'evidence_label' not in association:
+                    association['evidence_label'] = 'NA'
+
+                for item in el.res_type:
+                    for opt in el.res_type[item]:
+                        if opt in evidence['interpretation'].lower():
+                            association['response_type'] = item
+                if 'response_type' not in association:
+                    association['response_type'] = 'NA'
+
                 # TODO pmkb does not break out drug !?!?
                 # association['environmentalContexts'] = []
                 for tumor in evidence['tumors']:
@@ -203,7 +219,7 @@ def convert(evidence):
                         }
                     }]
                     # add summary fields for Display
-                    association['evidence_label'] = evidence['tier']
+                    
                     if len(evidence['citations']) > 0:
                         association['publication_url'] = evidence['citations'][0]['url']
                     association['drug_labels'] = 'NA'
