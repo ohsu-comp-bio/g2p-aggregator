@@ -113,19 +113,8 @@ def convert(evidence):
     # add summary fields for Display
     
     # association['evidence_label'] = direction
-    for item in el.ev_lab:
-        for opt in el.ev_lab[item]:
-            if opt in narrative.lower():
-                 association['evidence_label'] = item
-    if 'evidence_label' not in association:
-        association['evidence_label'] = 'NA'
-
-    for item in ed.res_type:
-        for opt in ed.res_type[item]:
-            if opt in narrative.lower():
-                 association['response_type'] = item
-    if 'response_type' not in association:
-        association['response_type'] = 'NA'
+    association = el.evidence_label(narrative, association, na=True)
+    association = ed.evidence_direction(narrative, association, na=True)
 
     association['publication_url'] = pubs[0]
     association['drug_labels'] = drug_label

@@ -126,7 +126,6 @@ def convert(jax_evidence):
             association['phenotype'] = {
                 'description': evidence['indication_tumor_type']
             }
-<<<<<<< HEAD
             association['evidence'] = [{
                 "evidenceType": {
                     "sourceName": "jax"
@@ -139,20 +138,9 @@ def convert(jax_evidence):
                 }
             }]
             # add summary fields for Display
+            association = el.evidence_label(evidence['approval_status'], association)
+            association = ed.evidence_direction(evidence['response_type'], association)
             
-            for item in el.ev_lab:
-                for opt in el.ev_lab[item]:
-                    if opt in evidence['approval_status'].lower():
-                         association['evidence_label'] = item
-            if 'evidence_label' not in association:
-                association['evidence_label'] = evidence['approval_status']
-            for item in ed.res_type:
-                for opt in ed.res_type[item]:
-                    if opt in evidence['response_type'].lower():
-                        association['response_type'] = item
-            if 'response_type' not in association:
-                association['response_type'] = evidence['response_type']
-
             if len(evidence['references']) > 0:
                 association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(evidence['references'][0])  # NOQA
             association['drug_labels'] = evidence['therapy_name']

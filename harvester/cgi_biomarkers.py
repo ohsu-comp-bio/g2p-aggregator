@@ -134,19 +134,8 @@ def convert(evidence):
     }]
     # add summary fields for Display
 
-    for item in el.ev_lab:
-        for opt in el.ev_lab[item]:
-            if opt in evidence['Evidence level'].lower():
-                association['evidence_label'] = item
-    if 'evidence_label' not in association:
-        association['evidence_label'] = evidence['Evidence level']
-
-    for item in ed.res_type:
-        for opt in ed.res_type[item]:
-            if opt in evidence['Association'].lower():
-                association['response_type'] = item
-    if 'response_type' not in association:
-        association['response_type'] = evidence['Association']
+    association = el.evidence_label(evidence['Evidence level'], association)
+    association  = ed.evidence_direction(evidence['Association'], association)
 
     association['publication_url'] = pubs[0]
     association['drug_labels'] = evidence['Drug full name']

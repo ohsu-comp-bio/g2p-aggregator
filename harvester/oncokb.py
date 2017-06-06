@@ -89,21 +89,10 @@ def convert(gene_data):
         }]
         # add summary fields for Display
         association['evidence_label'] = clinical['level_label']
+
+        association = el.evidence_label(clinical['level_label'], association, na=True)
+        association = ed.evidence_direction(clinical['level_label'], association, na=True)
         
-        for item in el.ev_lab:
-            for opt in el.ev_lab[item]:
-                if opt in clinical['level_label'].lower():
-                    association['evidence_label'] = item
-        if 'evidence_label' not in association:
-            association['evidence_label'] = 'NA'
-
-        for item in ed.res_type:
-            for opt in ed.res_type[item]:
-                if opt in clinical['level_label'].lower():
-                    association['response_type'] = item
-        if 'response_type' not in association:
-            association['response_type'] = 'NA'
-
         if len(clinical['drugAbstracts']) > 0:
             association['publication_url'] = clinical['drugAbstracts'][0]['link']
         else:
