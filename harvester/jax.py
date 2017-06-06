@@ -7,6 +7,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from inflection import parameterize, underscore
 import json
 import evidence_label as el
+import evidence_direction as ed
 
 import cosmic_lookup_table
 
@@ -145,8 +146,8 @@ def convert(jax_evidence):
                          association['evidence_label'] = item
             if 'evidence_label' not in association:
                 association['evidence_label'] = evidence['approval_status']
-            for item in el.res_type:
-                for opt in el.res_type[item]:
+            for item in ed.res_type:
+                for opt in ed.res_type[item]:
                     if opt in evidence['response_type'].lower():
                         association['response_type'] = item
             if 'response_type' not in association:

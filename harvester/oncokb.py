@@ -8,6 +8,7 @@ import cosmic_lookup_table
 LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup("./cosmic_lookup_table.tsv")
 
 import evidence_label as el
+import evidence_direction as ed 
 
 def harvest(genes):
     r = requests.get('http://oncokb.org/api/v1/levels')
@@ -96,8 +97,8 @@ def convert(gene_data):
         if 'evidence_label' not in association:
             association['evidence_label'] = 'NA'
 
-        for item in el.res_type:
-            for opt in el.res_type[item]:
+        for item in ed.res_type:
+            for opt in ed.res_type[item]:
                 if opt in clinical['level_label'].lower():
                     association['response_type'] = item
         if 'response_type' not in association:

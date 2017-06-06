@@ -3,6 +3,7 @@
 import requests
 import copy
 import evidence_label as el
+import evidence_direction as ed
 
 def harvest(genes):
     """ given an array of gene symbols, harvest them from civic"""
@@ -84,8 +85,8 @@ def convert(gene_data):
                 if 'evidence_label' not in association:
                     association['evidence_label'] = 'NA'
                 
-                for item in el.res_type:
-                    for opt in el.res_type[item]:
+                for item in ed.res_type:
+                    for opt in ed.res_type[item]:
                         if opt in evidence_item['clinical_significance'].lower():
                             association['response_type'] = item
                 if 'response_type' not in association:

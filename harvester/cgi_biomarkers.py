@@ -5,7 +5,7 @@ import copy
 
 import cosmic_lookup_table
 import evidence_label as el
-
+import evidence_direction as ed 
 
 
 """ https://www.cancergenomeinterpreter.org/biomarkers """
@@ -141,8 +141,8 @@ def convert(evidence):
     if 'evidence_label' not in association:
         association['evidence_label'] = evidence['Evidence level']
 
-    for item in el.res_type:
-        for opt in el.res_type[item]:
+    for item in ed.res_type:
+        for opt in ed.res_type[item]:
             if opt in evidence['Association'].lower():
                 association['response_type'] = item
     if 'response_type' not in association:
