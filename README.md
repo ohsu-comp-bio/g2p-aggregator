@@ -47,7 +47,7 @@ JUST GOOGLE IT:
 
 1. [Start up an elastic search container](#docker)
 2. [Register and download CosmicMutantExport.csv](https://grch37-cancer.sanger.ac.uk/cosmic/files?data=/files/grch37/cosmic/v81/CosmicMutantExport.tsv.gz) into the harvester directory
-3. Make the required index files from the harvester Makefile
+3. Make the required files from the harvester Makefile
 
 ```
 $ cd harvester
