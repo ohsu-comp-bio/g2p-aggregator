@@ -45,6 +45,9 @@ JUST GOOGLE IT:
 
 ## How do I import new data into it?
 
+1. [Start up an elastic search container](#docker)
+2. Run the harvester (below)
+
 ```
 $ cd harvester
 $ python harvester.py  -h
@@ -130,16 +133,15 @@ tests/integration/test_pb_deserialize.py::test_cgi_pb PASSED
 ```
 
 ## How do I launch the database, bring up the website, etc. ?
-
+<a name="docker"></a>
 There is a [docker compose](https://docs.docker.com/compose/) configuration file in the root directory.
 
 Launch it by:
 
 ```
-docker-compose up -d
+ELASTIC_PORT=9200 KIBANA_PORT=5601 docker-compose up -d
 ```
 This will automatically download elastic search etc. and will expose the standard elastic search and kibana ports (9200 and 5601)
-
 
 If you would like to host an instance, launch docker-compose with an additional nginx file.
 ```
