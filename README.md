@@ -54,7 +54,13 @@ $ cd harvester
 $ make oncokb_all_actionable_variants.tsv cgi_biomarkers_per_variant.tsv cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv benchmark_results.txt
 ```
 
-3. Run the harvester
+4. Install required python packages
+
+```
+pip install -r requirements.txt
+```
+
+5. Run the harvester
 
 ```
 $ python harvester.py  -h
