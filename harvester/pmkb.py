@@ -88,7 +88,6 @@ def convert(interpretation):
                     association['evidence_label'] = interpretation['tier']
                     if len(interpretation['citations']) > 0:
                         association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])
-                    association['drug_labels'] = 'NA'
                     feature_association = {'gene': gene,
                                            'feature': feature,
                                            'association': association,

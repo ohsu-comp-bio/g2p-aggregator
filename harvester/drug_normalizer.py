@@ -136,20 +136,22 @@ def normalize(name):
         name = name.encode('utf8')
     except Exception as e:
         pass
-    print 'normalize_biothings'
-    drugs = normalize_biothings(name)
-    if len(drugs) == 0:
+    try:
+        print 'normalize_biothings'
+        drugs = normalize_biothings(name)
+        if len(drugs) == 0:
+            print 'normalize_pubchem'
+            drugs = normalize_pubchem(name)
+        if len(drugs) == 0:
+            print 'normalize_pubchem_substance'
+            drugs = normalize_pubchem_substance(name)
+        # if len(drugs) == 0:
+        #     print 'normalize_chembl'
+        #     drugs = normalize_chembl(name)
+        print 'DONE normalize drugs'
+        return drugs
+    except Exception as e:
         return []
-        print 'normalize_pubchem'
-        drugs = normalize_pubchem(name)
-    if len(drugs) == 0:
-        print 'normalize_pubchem_substance'
-        drugs = normalize_pubchem_substance(name)
-    if len(drugs) == 0:
-        print 'normalize_chembl'
-        drugs = normalize_chembl(name)
-    print 'DONE normalize drugs'
-    return drugs
 
 
 def normalize_feature_association(feature_association):
@@ -166,7 +168,7 @@ def normalize_feature_association(feature_association):
             compounds.extend(ctx_drugs)
     # nothing found?, return
     if len(compounds) == 0:
-        feature_association['dev-tags'].append('no-pubchem')
+        feature_association['dev_tags'].append('no-pubchem')
         return
     environmental_contexts = []
     drug_labels = []
@@ -178,4 +180,5 @@ def normalize_feature_association(feature_association):
         if (compound['synonym']):
             drug_labels.append(compound['synonym'])
     association['environmentalContexts'] = environmental_contexts
-    association['drug_labels'] = ','.join(drug_labels)
+    if len(drug_labels) > 0:
+        association['drug_labels'] = ','.join(drug_labels)

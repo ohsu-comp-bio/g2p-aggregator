@@ -123,7 +123,7 @@ def main():
     for feature_association in harvest(args.genes):
         for silo in silos:
             feature_association['tags'] = []
-            feature_association['dev-tags'] = []
+            feature_association['dev_tags'] = []
             normalize(feature_association)
             silo.save(feature_association)
 
