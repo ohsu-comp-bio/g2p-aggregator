@@ -45,8 +45,24 @@ JUST GOOGLE IT:
 
 ## How do I import new data into it?
 
+1. [Start up an elastic search container](#docker)
+2. [Register and download CosmicMutantExport.csv](https://grch37-cancer.sanger.ac.uk/cosmic/files?data=/files/grch37/cosmic/v81/CosmicMutantExport.tsv.gz) into the harvester directory
+3. Make the required files from the harvester Makefile
+
 ```
 $ cd harvester
+$ make oncokb_all_actionable_variants.tsv cgi_biomarkers_per_variant.tsv cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv benchmark_results.txt
+```
+
+4. Install required python packages
+
+```
+pip install -r requirements.txt
+```
+
+5. Run the harvester
+
+```
 $ python harvester.py  -h
 usage: harvester.py [-h] [--elastic_search ELASTIC_SEARCH]
                     [--elastic_index ELASTIC_INDEX] [--delete_index]
@@ -130,16 +146,15 @@ tests/integration/test_pb_deserialize.py::test_cgi_pb PASSED
 ```
 
 ## How do I launch the database, bring up the website, etc. ?
-
+<a name="docker"></a>
 There is a [docker compose](https://docs.docker.com/compose/) configuration file in the root directory.
 
 Launch it by:
 
 ```
-docker-compose up -d
+ELASTIC_PORT=9200 KIBANA_PORT=5601 docker-compose up -d
 ```
 This will automatically download elastic search etc. and will expose the standard elastic search and kibana ports (9200 and 5601)
-
 
 If you would like to host an instance, launch docker-compose with an additional nginx file.
 ```

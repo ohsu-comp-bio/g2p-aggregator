@@ -32,9 +32,9 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('--harvesters',  nargs='+',
                        help='''harvest from these sources. default:
                                [cgi_biomarkers,jax,civic,oncokb,
-                               molecularmatch, pmkb]''',
+                               pmkb]''',
                        default=['cgi_biomarkers', 'jax', 'civic',
-                                'oncokb', 'molecularmatch', 'pmkb'])
+                                'oncokb', 'pmkb'])
 
 
 argparser.add_argument('--silos',  nargs='+',
@@ -123,6 +123,7 @@ def main():
     for feature_association in harvest(args.genes):
         for silo in silos:
             feature_association['tags'] = []
+            feature_association['dev_tags'] = []
             normalize(feature_association)
             silo.save(feature_association)
 

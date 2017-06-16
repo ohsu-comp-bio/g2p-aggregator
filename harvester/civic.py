@@ -75,14 +75,13 @@ def convert(gene_data):
                             evidence_item['source']['source_url']
                         ]
                     }
-                },
+                }
                 # add summary fields for Display
-
                 association = el.evidence_label(evidence_item['description'], association, na=True)
                 association = ed.evidence_direction(evidence_item['clinical_significance'], association)
-                
-                association['drug_labels'] = ','.join([drug['name'] for drug in evidence_item['drugs']])   # NOQA
                 association['publication_url'] = evidence_item['source']['source_url'],   # NOQA
+                if len(evidence_item['drugs']) > 0:
+                    association['drug_labels'] = ','.join([drug['name'] for drug in evidence_item['drugs']])   # NOQA
                 # create snapshot of original data
                 v = copy.deepcopy(variant)
                 del v['evidence_items']

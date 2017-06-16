@@ -59,10 +59,11 @@ def normalize_feature_association(feature_association):
         return
     diseases = normalize(association['phenotype']['description'])
     if len(diseases) == 0:
-        feature_association['tags'].append('no-doid')
+        feature_association['dev_tags'].append('no-doid')
         return
     # TODO we are only looking for exact match of one disease right now
     association['phenotype']['type'] = {
         'id': diseases[0]['ontology_term'],
         'term': diseases[0]['label']
     }
+    association['phenotype']['description'] = diseases[0]['label']
