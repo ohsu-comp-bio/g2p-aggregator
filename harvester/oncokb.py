@@ -3,6 +3,12 @@
 import requests
 import json
 
+import cosmic_lookup_table
+
+LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup("./cosmic_lookup_table.tsv")
+
+import evidence_label as el
+import evidence_direction as ed 
 
 def harvest(genes):
     r = requests.get('http://oncokb.org/api/v1/levels')
@@ -39,11 +45,25 @@ def convert(gene_data):
         oncokb = gene_data['oncokb']
     for clinical in oncokb['clinical']:
         variant = clinical['variant']
+        alteration = variant['alteration']
         gene_data = variant['gene']
         feature = {}
         feature['geneSymbol'] = gene
         feature['name'] = variant['name']
         feature['entrez_id'] = gene_data['entrezGeneId']
+
+        # Look up variant and add position information.
+        matches = LOOKUP_TABLE.get_entries(gene, alteration)
+        if len(matches) > 0:
+            # FIXME: just using the first match for now;
+            # it's not clear what to do if there are multiple matches.
+            match = matches[0]
+            feature['chromosome'] = str(match['chrom'])
+            feature['start'] = match['start']
+            feature['end'] = match['end']
+            feature['ref'] = match['ref']
+            feature['alt'] = match['alt']
+            feature['referenceName'] = str(match['build'])
 
         association = {}
         association['description'] = clinical['level_label']
@@ -60,7 +80,7 @@ def convert(gene_data):
                 "id": '{}-{}'.format(gene,
                                      clinical['cancerType']['mainType']['id'])
             },
-            'description': clinical['level_label'],
+            'description': clinical['level'],
             'info': {
                 'publications': [
                     [drugAbstracts['link'] for drugAbstracts in clinical['drugAbstracts']]
@@ -69,6 +89,10 @@ def convert(gene_data):
         }]
         # add summary fields for Display
         association['evidence_label'] = clinical['level_label']
+
+        association = el.evidence_label(clinical['level_label'], association, na=True)
+        association = ed.evidence_direction(clinical['level_label'], association, na=True)
+        
         if len(clinical['drugAbstracts']) > 0:
             association['publication_url'] = clinical['drugAbstracts'][0]['link']
         else:

@@ -1,10 +1,19 @@
 
+import sys
 from lxml import html
 from lxml import etree
 import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from inflection import parameterize, underscore
 import json
+import evidence_label as el
+import evidence_direction as ed
 
+import cosmic_lookup_table
+
+LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup("./cosmic_lookup_table.tsv")
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def harvest(genes):
     """ get data from jax """
@@ -81,40 +90,66 @@ def convert(jax_evidence):
     jax = jax_evidence['jax_id']
     evidence_array = jax_evidence['evidence']
     for evidence in evidence_array:
-        feature = {}
-        feature['geneSymbol'] = gene
-        feature['name'] = evidence['molecular_profile']
 
-        association = {}
-        association['description'] = evidence['efficacy_evidence']
-        association['environmentalContexts'] = []
-        association['environmentalContexts'].append({
-            'description': evidence['therapy_name']})
-        association['phenotype'] = {
-            'description': evidence['indication_tumor_type']
-        }
-        association['evidence'] = [{
-            "evidenceType": {
-                "sourceName": "jax"
-            },
-            'description': evidence['response_type'],
-            'info': {
-                'publications': [
-                    ['http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(r) for r in evidence['references']]  # NOQA
-                ]
+        # TODO: alterations are treated individually right now, but they are
+        # actually combinations and should be treated accordingly.
+
+        # Parse molecular profile and use for variant-level information.
+        molecular_profile_fields = evidence['molecular_profile'].split()
+        for index in range(0, len(molecular_profile_fields), 2):
+            feature = {}
+            feature['geneSymbol'] = gene
+            feature['name'] = evidence['molecular_profile']
+
+            try:
+                gene, alteration = molecular_profile_fields[index:index+2]
+                # Look up variant and add position information.
+                matches = LOOKUP_TABLE.get_entries(gene, alteration)
+                if len(matches) > 0:
+                    # FIXME: just using the first match for now;
+                    # it's not clear what to do if there are multiple matches.
+                    match = matches[0]
+                    feature['chromosome'] = str(match['chrom'])
+                    feature['start'] = match['start']
+                    feature['end'] = match['end']
+                    feature['ref'] = match['ref']
+                    feature['alt'] = match['alt']
+                    feature['referenceName'] = str(match['build'])
+            except:
+                pass
+
+            association = {}
+            association['description'] = evidence['efficacy_evidence']
+            association['environmentalContexts'] = []
+            association['environmentalContexts'].append({
+                'description': evidence['therapy_name']})
+            association['phenotype'] = {
+                'description': evidence['indication_tumor_type']
             }
-        }]
-        # add summary fields for Display
-        association['evidence_label'] = evidence['response_type']
-        if len(evidence['references']) > 0:
-            association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(evidence['references'][0])  # NOQA
-        association['drug_labels'] = evidence['therapy_name']
-        feature_association = {'gene': gene,
-                               'feature': feature,
-                               'association': association,
-                               'source': 'jax',
-                               'jax': evidence}
-        yield feature_association
+            association['evidence'] = [{
+                "evidenceType": {
+                    "sourceName": "jax"
+                },
+                'description': evidence['response_type'],
+                'info': {
+                    'publications': [
+                        ['http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(r) for r in evidence['references']]  # NOQA
+                    ]
+                }
+            }]
+            # add summary fields for Display
+            association = el.evidence_label(evidence['approval_status'], association)
+            association = ed.evidence_direction(evidence['response_type'], association)
+            
+            if len(evidence['references']) > 0:
+                association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(evidence['references'][0])  # NOQA
+            association['drug_labels'] = evidence['therapy_name']
+            feature_association = {'gene': gene,
+                                   'feature': feature,
+                                   'association': association,
+                                   'source': 'jax',
+                                   'jax': evidence}
+            yield feature_association
 
 
 def harvest_and_convert(genes):

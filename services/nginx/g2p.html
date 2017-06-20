@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>G2P</title>
+    <title>G2P 0.3</title>
 
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
@@ -100,11 +100,13 @@
       if (user_query == '') {
         user_query = '*';
       }
+      console.log('update_kibana',  user_query) ;
       user_query = "'" + encodeURIComponent( user_query ) +"'";
-      query = 'query:(query_string:(analyze_wildcard:!t,query:'+user_query+')),title' ;
-      re = /query:\(query_string:\(analyze_wildcard:!t,query:(.*)\)\),title/ ;
-      s = s.replace(re,query) ;
+      query = '_a=(query:(query_string:(analyze_wildcard:!t,query:'+user_query+')))' ;
+      s = '/kibana/app/kibana#/dashboard/9e921030-37aa-11e7-b744-3f569d1a1d0c?embed=true&' + query ;
       // force update
+      console.log('update_kibana',  s) ;
+
       $('#kibana')[0].src = s ;
       $('#kibana')[0].contentDocument.location.reload(true);
       history.pushState(null, null, '#' + user_query.replace(/'/g,''));
@@ -125,12 +127,13 @@
       });
       // did they pass anything?, if so, set it
       user_query = window.location.hash.substr(1);
-      if (user_query.length > 0) {
+      if (user_query.length === 0) {
         user_query = '*';
       }
       // wait until iframe is loaded
       $('#kibana').load(function() {
         // only do this once
+        console.log('user_query',user_query);
         if (!document.initialized_from_url) {
           $('#user_query')[0].value = decodeURIComponent(user_query);
           update_kibana();

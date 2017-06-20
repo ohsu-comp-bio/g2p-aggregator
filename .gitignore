@@ -2,14 +2,21 @@
 *.pyc
 esdata
 *.DS_Store
-compbio-tls
 __pycache__/
 *.py[cod]
 *$py.class
 harvester/tests/integration/bioschemas
+harvester/cgi_biomarkers_*
 attic
 .plotly
 .htpasswd
 util/elastic/backups
 harvester/cosmic_lookup_table.tsv
 harvester/CosmicMutantExport.tsv.gz
+compbio-tls
+certs
+letsencrypt_certs
+harvester/oncokb_all_actionable_variants*.*
+
+# requests-cache(s)
+harvester/*.sqlite

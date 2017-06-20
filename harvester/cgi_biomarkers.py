@@ -1,15 +1,40 @@
+import re
 import pandas
 import json
 import copy
 
 import cosmic_lookup_table
+import evidence_label as el
+import evidence_direction as ed 
+
 
 """ https://www.cancergenomeinterpreter.org/biomarkers """
 
-LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup("./cosmic_lookup_table.tsv")
+def _get_biomarker_type(alteration_type, biomarker):
+    """ Map alteration type to standardized biomarker type. """
+
+    # Dictionary to look up simple types.
+    ALTERATION_TYPE_TO_BIOMARKER_TYPE = {
+        "BIA":  "biallelic inactivation",
+        "EXPR": "overexpression",
+        "FUS": "fusion",
+        "MUT": "snp"
+    }
+
+    rval = ''
+    if alteration_type in ALTERATION_TYPE_TO_BIOMARKER_TYPE:
+        rval = ALTERATION_TYPE_TO_BIOMARKER_TYPE[alteration_type]
+    elif alteration_type == "CNA":
+        # Copy number alteration, either amplification or deletion.
+        if "amplification" in biomarker:
+            rval = "amplification"
+        elif "deletion" in biomarker:
+            rval = "deletion"
+
+    return rval
 
 
-def _get_evidence(gene_ids, path='./cgi_biomarkers_20170208.tsv'):
+def _get_evidence(gene_ids, path='./cgi_biomarkers_per_variant.tsv'):
     """ load tsv """
     df = pandas.read_table(path)
     # change nan to blank string
@@ -44,8 +69,31 @@ def convert(evidence):
      'Gene': 'KIT', 'Metastatic Tumor Type': nan,
      'Association': 'Responsive'}
     """
+
+    def split_gDNA(gDNA):
+        ''' Split gDNA field of the form 'chr9:g.133747588G>C' and return dictionary. '''
+
+        # TODO: handle non-SNPs like chr1:g.43815009_43815010delGGinsTT
+        try:
+            chrom, remainder = gDNA.split(':g.')
+            if chrom.startswith('chr'):
+                chrom = chrom[3:]
+            start = re.search(r'(\d+)', remainder).group()
+            ref, alt = remainder[len(start):].split(">")
+            return {
+                'chromosome': str(chrom),
+                'start': start,
+                'ref': ref,
+                'alt': alt
+            }
+        except Exception as e:
+            return {}
+
+    # Create document for insertion.
     gene = evidence['Gene']
-    feature = {}
+    feature = split_gDNA(evidence['gDNA'])
+
+    feature['biomarker_type'] = _get_biomarker_type(evidence['Alteration type'], evidence['Biomarker'])
     feature['geneSymbol'] = gene
     feature['name'] = evidence['Biomarker']
     feature['description'] = evidence['Alteration']
@@ -85,8 +133,10 @@ def convert(evidence):
         }
     }]
     # add summary fields for Display
-    association['evidence_label'] = '{} {}'.format(evidence['Association'],
-                                                   evidence['Evidence level'])
+
+    association = el.evidence_label(evidence['Evidence level'], association)
+    association  = ed.evidence_direction(evidence['Association'], association)
+
     association['publication_url'] = pubs[0]
     association['drug_labels'] = evidence['Drug full name']
     feature_association = {'gene': gene,
@@ -95,29 +145,7 @@ def convert(evidence):
                            'source': 'cgi',
                            'cgi': evidence}
 
-    # For each biomarker, add more feature information and yield.
-    fields = evidence['Alteration'].split(':')
-    if len(fields) == 2:
-        gene, hgvs_p = fields
-        for protein_change in hgvs_p.split(','):
-            matches = LOOKUP_TABLE.get_entries(gene, protein_change)
-            if len(matches) > 0:
-
-                # FIXME: just using the first match for now;
-                # it's not clear what to do if there are multiple matches.
-                match = matches[0]
-                detailed_feature = copy.deepcopy(feature)
-                detailed_feature['chromosome'] = match['chrom']
-                detailed_feature['start'] = match['start']
-                detailed_feature['end'] = match['end']
-                detailed_feature['referenceName'] = match['build']
-                # TODO: add alteration type.
-
-                feature_association['feature'] = detailed_feature
-
-            yield feature_association
-    else:
-        yield feature_association
+    yield feature_association
 
 
 def harvest(genes=None, drugs=None):

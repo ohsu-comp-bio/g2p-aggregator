@@ -13,11 +13,18 @@ import oncokb
 import cgi_biomarkers
 import molecularmatch
 import pmkb
+import drug_normalizer
+import disease_normalizer
 
 from elastic_silo import ElasticSilo
 import elastic_silo
 from kafka_silo import KafkaSilo
 import kafka_silo
+
+import requests
+import requests_cache
+# cache responses
+requests_cache.install_cache('harvester')
 
 
 argparser = argparse.ArgumentParser()
@@ -25,9 +32,9 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('--harvesters',  nargs='+',
                        help='''harvest from these sources. default:
                                [cgi_biomarkers,jax,civic,oncokb,
-                               molecularmatch, pmkb]''',
+                               pmkb]''',
                        default=['cgi_biomarkers', 'jax', 'civic',
-                                'oncokb', 'molecularmatch', 'pmkb'])
+                                'oncokb', 'pmkb'])
 
 
 argparser.add_argument('--silos',  nargs='+',
@@ -103,19 +110,31 @@ def harvest(genes):
             yield feature_association
 
 
+def normalize(feature_association):
+    """ standard representation of drugs,disease etc. """
+    drug_normalizer.normalize_feature_association(feature_association)
+    disease_normalizer.normalize_feature_association(feature_association)
+
+
 def main():
     if args.delete_index:
         for silo in silos:
             silo.delete_all()
     for feature_association in harvest(args.genes):
         for silo in silos:
-            try:
-                # add tags field for downstream tagger use cases
-                feature_association['tags'] = []
-                silo.save(feature_association)
-            except Exception as e:
-                _eprint(e)
-                _eprint(feature_association)
+            feature_association['tags'] = []
+            feature_association['dev_tags'] = []
+            normalize(feature_association)
+            silo.save(feature_association)
+
+            # try:
+            #     # add tags field for downstream tagger use cases
+            #     feature_association['tags'] = []
+            #     normalize(feature_association)
+            #     silo.save(feature_association)
+            # except Exception as e:
+            #     _eprint(e)
+            #     # _eprint(feature_association)
 
 
 if __name__ == '__main__':

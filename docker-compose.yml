@@ -38,21 +38,6 @@ services:
     environment:
       - xpack.security.enabled=false
       - XPACK_MONITORING_REPORT_STATS=false
-      - SERVER_BASEPATH=/kibana
+      # - SERVER_BASEPATH=/kibana  # for set in proxy 
 
-  nginx:
-    container_name: nginx_g2p
-    image: nginx:latest
-    volumes:
-      - "./util:/util/"
-      - "./services/nginx/default:/etc/nginx/conf.d/default.conf:ro"
-      - "./services/nginx/.htpasswd:/etc/nginx/.htpasswd"
-      - "./compbio-tls:/compbio-tls"
-      - "./services/nginx/g2p.html:/var/www/static-html/g2p.html"
-
-    ports:
-      - "443:443"
-      - "80:80"
-    links:
-      - elastic
-      - kibana
+# see docker-compose-nginx.yml for nginx proxy

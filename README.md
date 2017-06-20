@@ -1,8 +1,11 @@
-# smmart-g2p
+# g2p-aggregator
 
-A prototype of the Genotype to phenotype user interface exists [here](https://g2p-ohsu.ddns.net/).   
+A prototype of the Genotype to phenotype user interface exists [here](https://g2p-ohsu.ddns.net/g2p).   
 
-![image](https://cloud.githubusercontent.com/assets/47808/24819664/66139700-1b9a-11e7-85ee-d49841486f0a.png)
+
+![image](https://cloud.githubusercontent.com/assets/47808/26114835/35b36864-3a13-11e7-9297-7aa996bd965e.png) 
+![image](https://cloud.githubusercontent.com/assets/47808/26114916/6d4ff44a-3a13-11e7-8c5f-09eda59955ac.png) 
+
 
 ## What is it?  Why use it?
 
@@ -22,6 +25,7 @@ Now:
 * oncokb [Precision Oncology Knowledge Base](http://oncokb.org/#/)
 * Cancer Genome Interpreter Cancer [bioMarkers database](https://www.cancergenomeinterpreter.org/biomarkers)
 * GA4GH [reference server](https://github.com/ga4gh/ga4gh-server)
+* Cornell [pmkb](https://pmkb.weill.cornell.edu)
 
 In  progress:
 
@@ -38,15 +42,27 @@ JUST GOOGLE IT:
 * The charts and list are all tied to the search. Click to constrain your results
 
 
-## Why are there a limited number of genes?
-
-* We've constrained the data sets to a single use case from SMMART
-
 
 ## How do I import new data into it?
 
+1. [Start up an elastic search container](#docker)
+2. [Register and download CosmicMutantExport.csv](https://grch37-cancer.sanger.ac.uk/cosmic/files?data=/files/grch37/cosmic/v81/CosmicMutantExport.tsv.gz) into the harvester directory
+3. Make the required files from the harvester Makefile
+
 ```
 $ cd harvester
+$ make oncokb_all_actionable_variants.tsv cgi_biomarkers_per_variant.tsv cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv benchmark_results.txt
+```
+
+4. Install required python packages
+
+```
+pip install -r requirements.txt
+```
+
+5. Run the harvester
+
+```
 $ python harvester.py  -h
 usage: harvester.py [-h] [--elastic_search ELASTIC_SEARCH]
                     [--elastic_index ELASTIC_INDEX] [--delete_index]
@@ -128,6 +144,24 @@ tests/integration/test_pb_deserialize.py::test_oncokb_pb PASSED
 tests/integration/test_pb_deserialize.py::test_molecular_match_pb PASSED
 tests/integration/test_pb_deserialize.py::test_cgi_pb PASSED
 ```
+
+## How do I launch the database, bring up the website, etc. ?
+<a name="docker"></a>
+There is a [docker compose](https://docs.docker.com/compose/) configuration file in the root directory.
+
+Launch it by:
+
+```
+ELASTIC_PORT=9200 KIBANA_PORT=5601 docker-compose up -d
+```
+This will automatically download elastic search etc. and will expose the standard elastic search and kibana ports (9200 and 5601)
+
+If you would like to host an instance, launch docker-compose with an additional nginx file.
+```
+docker-compose -f docker-compose.yml -f cloud-setup/docker-compose-nginx.yml up -d
+```
+This will do the same setup, but will also include an nginx proxy to map http and https ports.  
+
 
 ## What else do I need to know?
 
