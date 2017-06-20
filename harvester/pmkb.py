@@ -6,7 +6,8 @@ from lxml import etree
 import requests
 from inflection import parameterize, underscore
 import json
-
+import evidence_label as el
+import evidence_direction as ed
 
 def _eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -64,6 +65,13 @@ def convert(interpretation):
                 gene = variant['gene']['name']
 
                 association = {}
+
+                # association['evidence_label'] = interpretation['tier']
+                association = el.evidence_label(str(interpretation['tier']),
+                                                association, na=True)
+                association = ed.evidence_direction(str(interpretation['tier']),
+                                                    association, na=True)
+
                 association['description'] = interpretation['interpretation']
                 # TODO pmkb does not break out drug !?!?
                 # association['environmentalContexts'] = []
@@ -85,7 +93,6 @@ def convert(interpretation):
                         }
                     }]
                     # add summary fields for Display
-                    association['evidence_label'] = interpretation['tier']
                     if len(interpretation['citations']) > 0:
                         association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])
                     feature_association = {'gene': gene,
