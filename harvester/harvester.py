@@ -38,8 +38,8 @@ argparser.add_argument('--harvesters',  nargs='+',
 
 
 argparser.add_argument('--silos',  nargs='+',
-                       help='''save to these silos. default:[elastic,kafka]''',
-                       default=['elastic'])
+                       help='''save to these silos. default:[elastic]''',
+                       default=['elastic'], choices=['elastic', 'kafka'])
 
 
 argparser.add_argument('--delete_index', '-d',
