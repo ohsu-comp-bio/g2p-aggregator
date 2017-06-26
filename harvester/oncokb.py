@@ -9,6 +9,7 @@ LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup("./cosmic_lookup_table.tsv")
 
 import evidence_label as el
 import evidence_direction as ed 
+import mutation_type as mut
 
 def harvest(genes):
     r = requests.get('http://oncokb.org/api/v1/levels')
@@ -47,10 +48,12 @@ def convert(gene_data):
         variant = clinical['variant']
         alteration = variant['alteration']
         gene_data = variant['gene']
+
         feature = {}
         feature['geneSymbol'] = gene
         feature['name'] = variant['name']
         feature['entrez_id'] = gene_data['entrezGeneId']
+        feature['biomarker_type'] = mut.norm_biomarker(variant['consequence']['term']) # NOQA
 
         # Look up variant and add position information.
         matches = LOOKUP_TABLE.get_entries(gene, alteration)

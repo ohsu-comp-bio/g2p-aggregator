@@ -8,6 +8,7 @@ from inflection import parameterize, underscore
 import json
 import evidence_label as el
 import evidence_direction as ed
+import mutation_type as mut
 
 import cosmic_lookup_table
 
@@ -100,6 +101,7 @@ def convert(jax_evidence):
             feature = {}
             feature['geneSymbol'] = gene
             feature['name'] = evidence['molecular_profile']
+            feature['biomarker_type'] = mut.norm_biomarker(None)
 
             try:
                 gene, alteration = molecular_profile_fields[index:index+2]
