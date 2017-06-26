@@ -3,6 +3,11 @@ import pandas
 import json
 import copy
 
+import cosmic_lookup_table
+import evidence_label as el
+import evidence_direction as ed 
+
+
 """ https://www.cancergenomeinterpreter.org/biomarkers """
 
 def _get_biomarker_type(alteration_type, biomarker):
@@ -128,8 +133,10 @@ def convert(evidence):
         }
     }]
     # add summary fields for Display
-    association['evidence_label'] = '{} {}'.format(evidence['Association'],
-                                                   evidence['Evidence level'])
+
+    association = el.evidence_label(evidence['Evidence level'], association)
+    association  = ed.evidence_direction(evidence['Association'], association)
+
     association['publication_url'] = pubs[0]
     association['drug_labels'] = evidence['Drug full name']
     feature_association = {'gene': gene,

@@ -2,7 +2,8 @@
 import requests
 import json
 import os
-
+import evidence_label as el
+import evidence_direction as ed
 
 # curl 'http://api-demo.molecularmatch.com/v2/search/assertions' --data 'apiKey=xxxxxxxxx' --data-urlencode 'filters=[{"facet":"MUTATION","term":"KIT"}]'
 resourceURLs = {
@@ -110,7 +111,11 @@ def convert(evidence):
         }
     }]
     # add summary fields for Display
-    association['evidence_label'] = direction
+    
+    # association['evidence_label'] = direction
+    association = el.evidence_label(narrative, association, na=True)
+    association = ed.evidence_direction(narrative, association, na=True)
+
     association['publication_url'] = pubs[0]
     association['drug_labels'] = drug_label
     feature_association = {'gene': gene,

@@ -7,6 +7,8 @@ import cosmic_lookup_table
 
 LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup("./cosmic_lookup_table.tsv")
 
+import evidence_label as el
+import evidence_direction as ed 
 
 def harvest(genes):
     r = requests.get('http://oncokb.org/api/v1/levels')
@@ -87,6 +89,10 @@ def convert(gene_data):
         }]
         # add summary fields for Display
         association['evidence_label'] = clinical['level_label']
+
+        association = el.evidence_label(clinical['level_label'], association, na=True)
+        association = ed.evidence_direction(clinical['level_label'], association, na=True)
+        
         if len(clinical['drugAbstracts']) > 0:
             association['publication_url'] = clinical['drugAbstracts'][0]['link']
         else:
