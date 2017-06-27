@@ -14,6 +14,10 @@ mmService = "http://api.molecularmatch.com"
 
 apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
 
+# TODO this is an anomaly: in order to get all genes query with string
+# that is not matched by anything?
+DEFAULT_GENES = ['XXXX']
+
 
 def get_evidence(gene_ids):
     """ load from remote api """
@@ -21,29 +25,42 @@ def get_evidence(gene_ids):
         raise ValueError('Please set MOLECULAR_MATCH_API_KEY in environment')
     # first look for all drugs that impact this gene
     if not gene_ids:
-        gene_ids = ['']
+        gene_ids = DEFAULT_GENES
     for gene in gene_ids:
+        start = 2280
+        limit = 20
         url = mmService + resourceURLs["assertions"]
         filters = [{'facet': 'MUTATION',
-                    'term': '{}.*'.format(gene)
+                    'term': '{}'.format(gene)
                     }]
-        payload = {
-            'apiKey': apiKey,
-            'filters': json.dumps(filters)
-        }
-        try:
-            print url, payload
-            r = requests.post(url, data=payload)
-            assertions = r.json()
+        while start >= 0:
+            payload = {
+                'apiKey': apiKey,
+                'limit': limit,
+                'start': start,
+                'filters': json.dumps(filters)
+            }
+            try:
+                print url, json.dumps(payload)
+                r = requests.post(url, data=payload)
+                assertions = r.json()
+                if assertions['total'] == 0:
+                    # no more pages
+                    start = -1
+                else:
+                    start = start + limit
+                print "page {} of {}".format(assertions['page'],
+                                             assertions['totalPages'])
+                # filter those drugs, only those with diseases
+                for hit in assertions['rows']:
+                    # do not process rows without drugs
+                    if len(hit['therapeuticContext']) > 0:
+                        yield hit
 
-            # filter those drugs, only those with diseases
-            for hit in assertions['rows']:
-                # do not process rows without drugs
-                if len(hit['therapeuticContext']) > 0:
-                    yield hit
-        except Exception as e:
-            print "molecularmatch error fetching {} {}".format(gene, e)
-            print r.text.encode('utf-8')
+            except Exception as e:
+                print "molecularmatch error fetching {} {}".format(gene, e)
+                print r.text.encode('utf-8')
+                start = -1
 
 
 def convert(evidence):
@@ -51,7 +68,7 @@ def convert(evidence):
 
     """
     sources = evidence['sources']
-    # tier = evidence['tier']
+    tier = evidence['tier']
     direction = evidence['direction']
     narrative = evidence['narrative']
     therapeuticContext = evidence['therapeuticContext']
@@ -86,7 +103,11 @@ def convert(evidence):
     except:
         pass
 
-    drug_label = therapeuticContext[0]['name']
+    # create a drug label that normalization will process
+    drug_names = []
+    for tc in therapeuticContext:
+        drug_names.append(tc['name'])
+    drug_label = '+'.join(drug_names)
 
     association = {}
     association['description'] = narrative
@@ -111,10 +132,10 @@ def convert(evidence):
         }
     }]
     # add summary fields for Display
-    
+
     # association['evidence_label'] = direction
-    association = el.evidence_label(narrative, association, na=True)
-    association = ed.evidence_direction(narrative, association, na=True)
+    association = el.evidence_label(tier, association, na=True)
+    association = ed.evidence_direction(tier, association, na=True)
 
     association['publication_url'] = pubs[0]
     association['drug_labels'] = drug_label
