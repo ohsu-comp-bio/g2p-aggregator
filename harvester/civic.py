@@ -88,8 +88,9 @@ def convert(gene_data):
                 v = copy.deepcopy(variant)
                 del v['evidence_items']
                 v['evidence_items'] = [evidence_item]
-                feature_association = {'gene': gene_data['gene'],
-                                       'feature': feature,
+                feature_association = {'genes': [gene_data['gene']],
+                                       'features': [feature],
+                                       'feature_names': evidence['name'],
                                        'association': association,
                                        'source': 'civic',
                                        'civic': v}

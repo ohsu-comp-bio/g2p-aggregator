@@ -28,8 +28,11 @@ def normalize_ebi(name):
         }
       ]
     }
+
+    also see http://www.disease-ontology.org/api/metadata/DOID:1909/ to get hierarchy ???
+    or see http://www.ebi.ac.uk/ols/docs/api to get ancestors?
     """  # NOQA
-    r = requests.get(url)
+    r = requests.get(url, timeout=20)
     rsp = r.json()
     if 'response' not in rsp:
         return []
@@ -47,7 +50,11 @@ def normalize(name):
         name = name.encode('utf8')
     except Exception as e:
         pass
-    return normalize_ebi(name)
+    try:
+        return normalize_ebi(name)
+    except Exception as e:
+        print "Could not normalize {}".format(name)
+        return []
 
 
 def normalize_feature_association(feature_association):

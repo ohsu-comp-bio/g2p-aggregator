@@ -12,9 +12,12 @@ import mutation_type as mut
 
 import cosmic_lookup_table
 
-LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup("./cosmic_lookup_table.tsv")
+LOOKUP_TABLE = None
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+# see https://ckb.jax.org/about/curationMethodology
+
 
 def harvest(genes):
     """ get data from jax """
@@ -96,17 +99,32 @@ def convert(jax_evidence):
         # actually combinations and should be treated accordingly.
 
         # Parse molecular profile and use for variant-level information.
-        molecular_profile_fields = evidence['molecular_profile'].split()
-        for index in range(0, len(molecular_profile_fields), 2):
+        genes_from_profile, tuples = _parse(evidence['molecular_profile'])
+
+        features = []
+        for tuple in tuples:
             feature = {}
-            feature['geneSymbol'] = gene
-            feature['name'] = evidence['molecular_profile']
+            feature['geneSymbol'] = tuple[0]
+            feature['name'] = ' '.join(tuple[1:])
             feature['biomarker_type'] = mut.norm_biomarker(None)
 
             try:
-                gene, alteration = molecular_profile_fields[index:index+2]
-                # Look up variant and add position information.
-                matches = LOOKUP_TABLE.get_entries(gene, alteration)
+                """
+                 filter out
+                 "FLT3 D835X FLT3 exon 14 ins"
+                """
+                exceptions = set(["exon", "ins", "amp", "del", "exp", "dec"])
+                profile = set(tuple)
+                if len(exceptions.intersection(profile)) > 0:
+                    print 'skipping ', evidence['molecular_profile']
+                    matches = []
+                else:
+                    # Look up variant and add position information.
+                    if not LOOKUP_TABLE:
+                        LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
+                                        "./cosmic_lookup_table.tsv")
+                    matches = LOOKUP_TABLE.get_entries(tuple[0],
+                                                       ' '.join(tuple[1:]))
                 if len(matches) > 0:
                     # FIXME: just using the first match for now;
                     # it's not clear what to do if there are multiple matches.
@@ -119,39 +137,43 @@ def convert(jax_evidence):
                     feature['referenceName'] = str(match['build'])
             except:
                 pass
+            features.append(feature)
 
-            association = {}
-            association['description'] = evidence['efficacy_evidence']
-            association['environmentalContexts'] = []
-            association['environmentalContexts'].append({
-                'description': evidence['therapy_name']})
-            association['phenotype'] = {
-                'description': evidence['indication_tumor_type']
+        association = {}
+        association['description'] = evidence['efficacy_evidence']
+        association['environmentalContexts'] = []
+        association['environmentalContexts'].append({
+            'description': evidence['therapy_name']})
+        association['phenotype'] = {
+            'description': evidence['indication_tumor_type']
+        }
+        association['evidence'] = [{
+            "evidenceType": {
+                "sourceName": "jax"
+            },
+            'description': evidence['response_type'],
+            'info': {
+                'publications': [
+                    ['http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(r) for r in evidence['references']]  # NOQA
+                ]
             }
-            association['evidence'] = [{
-                "evidenceType": {
-                    "sourceName": "jax"
-                },
-                'description': evidence['response_type'],
-                'info': {
-                    'publications': [
-                        ['http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(r) for r in evidence['references']]  # NOQA
-                    ]
-                }
-            }]
-            # add summary fields for Display
-            association = el.evidence_label(evidence['approval_status'], association)
-            association = ed.evidence_direction(evidence['response_type'], association)
-            
-            if len(evidence['references']) > 0:
-                association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(evidence['references'][0])  # NOQA
-            association['drug_labels'] = evidence['therapy_name']
-            feature_association = {'gene': gene,
-                                   'feature': feature,
-                                   'association': association,
-                                   'source': 'jax',
-                                   'jax': evidence}
-            yield feature_association
+        }]
+        # add summary fields for Display
+        association = el.evidence_label(evidence['approval_status'],
+                                        association)
+        association = ed.evidence_direction(evidence['response_type'],
+                                            association)
+
+        if len(evidence['references']) > 0:
+            association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(evidence['references'][0])  # NOQA
+        association['drug_labels'] = evidence['therapy_name']
+        feature_association = {'genes': genes_from_profile,
+                               'feature_names': evidence['molecular_profile'],
+                               'features': features,
+                               'association': association,
+                               'source': 'jax',
+                               'jax': evidence}
+        yield feature_association
 
 
 def harvest_and_convert(genes):
@@ -161,6 +183,88 @@ def harvest_and_convert(genes):
         for feature_association in convert(jax_evidence):
             # print "jax convert_yield {}".format(feature_association.keys())
             yield feature_association
+
+
+def _parse(molecular_profile):
+    """ returns gene, tuples[] """
+    molecular_profile = molecular_profile.replace(' - ', '-')
+    parts = molecular_profile.split()
+    gene = None
+    # gene_complete = True
+
+    tuples = []
+    tuple = None
+    fusion_modifier = ''
+    for idx, part in enumerate(parts):
+        if not gene:
+            gene = part
+        # # deal with 'GENE - GENE '
+        # if part == '-':
+        #     gene += part
+        #     gene_complete = False
+        #     continue
+        # elif not gene_complete:
+        #     gene += part
+        #     gene_complete = True
+        #     continue
+
+        if not tuple:
+            tuple = []
+        # build first tuple
+        if len(tuples) == 0:
+            if len(tuple) == 0 and '-' not in gene:
+                tuple.append(gene)
+
+        if idx == 0:
+            continue
+
+        # ignore standalone plus
+        if not part == '+':
+            tuple.append(part)
+
+        # we know there is at least one more to fetch before terminating tuple
+        if len(tuple) == 1 and idx < len(parts)-1:
+            continue
+
+        # is the current tuple complete?
+        if (
+                (len(tuple) > 1 and part.isupper()) or
+                idx == len(parts)-1 or
+                parts[idx+1].isupper()
+           ):
+                if len(tuple) == 1 and tuple[0].islower():
+                    fusion_modifier = ' {}'.format(tuple[0])
+                else:
+                    tuples.append(tuple)
+                tuple = None
+
+    # if gene is a fusion, render genes separately
+    if ('-' in gene):
+        fusion = gene
+        first_gene, second_gene = gene.split('-')
+        tuples.append([first_gene, fusion + fusion_modifier])
+        tuples.append([second_gene, fusion + fusion_modifier])
+        gene = first_gene
+
+    # if gene in tuples is fusion re-render
+    def is_fusion(tuple):
+        return '-' in tuple[0]
+
+    non_fusion_tuples = [x for x in tuples if not is_fusion(x)]
+    fusion_tuples = [x for x in tuples if is_fusion(x)]
+    for tuple in fusion_tuples:
+        fusion = tuple[0]
+        first_gene, second_gene = fusion.split('-')
+        non_fusion_tuples.append([first_gene, fusion])
+        non_fusion_tuples.append([second_gene, fusion])
+    tuples = non_fusion_tuples
+
+    # get set of all genes
+    genes = set([])
+    for tuple in tuples:
+        genes.add(tuple[0])
+
+    return sorted(list(genes)), tuples
 
 
 def _test():

@@ -5,11 +5,13 @@ import json
 
 import cosmic_lookup_table
 
-LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup("./cosmic_lookup_table.tsv")
 
 import evidence_label as el
-import evidence_direction as ed 
+import evidence_direction as ed
 import mutation_type as mut
+
+LOOKUP_TABLE = None
+
 
 def harvest(genes):
     r = requests.get('http://oncokb.org/api/v1/levels')
@@ -40,6 +42,7 @@ def harvest(genes):
 
 
 def convert(gene_data):
+    global LOOKUP_TABLE
     gene = gene_data['gene']
     oncokb = {'clinical': []}
     if 'oncokb' in gene_data:
@@ -53,9 +56,13 @@ def convert(gene_data):
         feature['geneSymbol'] = gene
         feature['name'] = variant['name']
         feature['entrez_id'] = gene_data['entrezGeneId']
-        feature['biomarker_type'] = mut.norm_biomarker(variant['consequence']['term']) # NOQA
+        feature['biomarker_type'] = mut.norm_biomarker(
+            variant['consequence']['term'])
 
         # Look up variant and add position information.
+        if not LOOKUP_TABLE:
+            LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
+                    "./cosmic_lookup_table.tsv")
         matches = LOOKUP_TABLE.get_entries(gene, alteration)
         if len(matches) > 0:
             # FIXME: just using the first match for now;
@@ -86,26 +93,31 @@ def convert(gene_data):
             'description': clinical['level'],
             'info': {
                 'publications': [
-                    [drugAbstracts['link'] for drugAbstracts in clinical['drugAbstracts']]
+                    [drugAbstracts['link']
+                        for drugAbstracts in clinical['drugAbstracts']]
                 ]
             }
         }]
         # add summary fields for Display
         association['evidence_label'] = clinical['level_label']
 
-        association = el.evidence_label(clinical['level_label'], association, na=True)
-        association = ed.evidence_direction(clinical['level_label'], association, na=True)
-        
+        association = el.evidence_label(clinical['level_label'],
+                                        association, na=True)
+        association = ed.evidence_direction(clinical['level_label'],
+                                            association, na=True)
+
         if len(clinical['drugAbstracts']) > 0:
-            association['publication_url'] = clinical['drugAbstracts'][0]['link']
+            association['publication_url'] = clinical['drugAbstracts'][0]['link']  # NOQA
         else:
             for drugPmid in clinical['drugPmids']:
-                association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(drugPmid)
+                association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(drugPmid)  # NOQA
                 break
 
-        association['drug_labels'] = ','.join([drug for drug in clinical['drug']])
-        feature_association = {'gene': gene ,
-                               'feature': feature,
+        association['drug_labels'] = ','.join([drug for drug in clinical['drug']])   # NOQA
+        feature_names = feature["geneSymbol"] + ' ' + feature["name"]
+        feature_association = {'genes': [gene],
+                               'features': [feature],
+                               'feature_names': feature_names,
                                'association': association,
                                'source': 'oncokb',
                                'oncokb': {'clinical': clinical}}

@@ -104,7 +104,7 @@ def harvest(genes):
 
         for feature_association in harvester.harvest_and_convert(genes):
             _eprint(harvester.__name__,
-                    feature_association['gene'],
+                    feature_association['genes'],
                     feature_association['association']['evidence_label']
                     )
             yield feature_association

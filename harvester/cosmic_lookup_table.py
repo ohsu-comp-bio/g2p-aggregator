@@ -23,7 +23,16 @@ class CosmicLookup(object):
         """
         Returns a dataframe of results from filtering on gene and hgvs_p
         """
-
+        """
+         filter out
+         "FLT3 D835X FLT3 exon 14 ins"
+        """
+        if gene.islower() or gene.isdigit():
+            # return null
+            print '*******'
+            print 'get_entries', gene, hgvs_p
+            print '*******'
+            return []
         # Get lookup table.
         if gene in self.gene_df_cache:
             # Found gene-filtered lookup table in cache.
@@ -34,7 +43,7 @@ class CosmicLookup(object):
             lt = self.lookup_table
             lt = lt[lt['gene'] == gene]
             self.gene_df_cache['gene'] = lt
-            
+
         hgvs_p = "p." + hgvs_p
         result = lt[(lt['gene'] == gene) & (lt['hgvs_p'].str.contains(hgvs_p))]
         return result.to_dict(orient='records')
