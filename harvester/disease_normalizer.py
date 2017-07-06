@@ -28,6 +28,9 @@ def normalize_ebi(name):
         }
       ]
     }
+
+    also see http://www.disease-ontology.org/api/metadata/DOID:1909/ to get hierarchy ???
+    or see http://www.ebi.ac.uk/ols/docs/api to get ancestors?
     """  # NOQA
     r = requests.get(url, timeout=20)
     rsp = r.json()
