@@ -4,6 +4,7 @@ import requests
 import copy
 import evidence_label as el
 import evidence_direction as ed
+import mutation_type as mut
 
 def harvest(genes):
     """ given an array of gene symbols, harvest them from civic"""
@@ -50,6 +51,7 @@ def convert(gene_data):
             feature['referenceName'] = str(variant['coordinates']['reference_build'])  # NOQA
             feature['chromosome'] = str(variant['coordinates']['chromosome'])
             feature['name'] = variant['name']
+            feature['biomarker_type'] = mut.norm_biomarker(variant['variant_types'][0]['display_name']) # NOQA
             for evidence_item in variant['evidence_items']:
                 association = {}
                 association['description'] = evidence_item['description']

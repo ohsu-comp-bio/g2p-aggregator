@@ -8,6 +8,7 @@ from inflection import parameterize, underscore
 import json
 import evidence_label as el
 import evidence_direction as ed
+import mutation_type as mut
 
 def _eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -56,6 +57,8 @@ def convert(interpretation):
                 feature['end'] = stop
                 feature['chromosome'] = str(chromosome)
                 feature['referenceName'] = 'GRCh37/hg19'
+                feature['biomarker_type'] = mut.norm_biomarker(variant['variant_type'])
+
                 attributes = {}
                 for key in variant.keys():
                     if key not in ['coordinates', 'name', 'gene']:
