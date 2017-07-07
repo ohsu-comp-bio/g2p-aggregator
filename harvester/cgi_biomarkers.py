@@ -117,7 +117,7 @@ def convert(evidence):
     # add summary fields for Display
 
     association = el.evidence_label(evidence['Evidence level'], association)
-    association  = ed.evidence_direction(evidence['Association'], association)
+    association = ed.evidence_direction(evidence['Association'], association)
 
     association['publication_url'] = pubs[0]
     association['drug_labels'] = evidence['Drug full name']
