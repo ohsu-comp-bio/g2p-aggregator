@@ -8,6 +8,7 @@ from inflection import parameterize, underscore
 import json
 import evidence_label as el
 import evidence_direction as ed
+import mutation_type as mut
 
 def _eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -56,6 +57,8 @@ def convert(interpretation):
                 feature['end'] = stop
                 feature['chromosome'] = str(chromosome)
                 feature['referenceName'] = 'GRCh37/hg19'
+                feature['biomarker_type'] = mut.norm_biomarker(variant['variant_type'])
+
                 attributes = {}
                 for key in variant.keys():
                     if key not in ['coordinates', 'name', 'gene']:
@@ -80,7 +83,7 @@ def convert(interpretation):
                     association['phenotype'] = {
                         'description': tumor['name']
                     }
-
+                    association['drug_labels'] = 'NA'
                     association['evidence'] = [{
                         "evidenceType": {
                             "sourceName": "pmkb"
@@ -95,8 +98,9 @@ def convert(interpretation):
                     # add summary fields for Display
                     if len(interpretation['citations']) > 0:
                         association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])
-                    feature_association = {'gene': gene,
-                                           'feature': feature,
+                    feature_association = {'genes': [gene],
+                                           'features': [feature],
+                                           'feature_names': feature["geneSymbol"] + ' ' + feature["name"] ,
                                            'association': association,
                                            'source': 'pmkb',
                                            'pmkb': {
