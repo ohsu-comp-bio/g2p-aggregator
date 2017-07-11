@@ -3,6 +3,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 import sys
 import json
+from elasticsearch import Elasticsearch, RequestsHttpConnection, serializer, compat, exceptions  # NQQA
 
 # module level funtions
 
@@ -28,7 +29,7 @@ class ElasticSilo:
 
     def __init__(self, args):
         """ initialize, set endpoint & index name """
-        self._es = Elasticsearch([args.elastic_search])
+        self._es = Elasticsearch([args.elastic_search], serializer=JSONSerializerPython2())  # NOQA
         self._index = args.elastic_index
 
     def __str__(self):
@@ -64,7 +65,8 @@ class ElasticSilo:
         thousands on fields in a document. So, for now at least,
         maintain it as a string.
         """
-        sources = ['cgi', 'jax', 'civic', 'oncokb', 'molecularmatch', 'pmkb']
+        # sources = ['cgi', 'jax', 'civic', 'oncokb', 'molecularmatch', 'pmkb']
+        sources = ['molecularmatch']
         for source in sources:
             if source in feature_association:
                 if not isinstance(feature_association[source], basestring):
@@ -75,6 +77,7 @@ class ElasticSilo:
         """ write to es """
         # prevent field explosion
         feature_association = self._stringify_sources(feature_association)
+
         result = self._es.index(index=self._index,
                                 body=feature_association,
                                 doc_type='association',
@@ -82,3 +85,19 @@ class ElasticSilo:
         if result['_shards']['failed'] > 0:
             _eprint('failure updating association {}'
                     .format(gene_feature['gene']))
+
+
+class JSONSerializerPython2(serializer.JSONSerializer):
+    """Override elasticsearch library serializer to ensure it encodes utf characters during json dump.
+    See original at: https://github.com/elastic/elasticsearch-py/blob/master/elasticsearch/serializer.py#L42
+    A description of how ensure_ascii encodes unicode characters to ensure they can be sent across the wire
+    as ascii can be found here: https://docs.python.org/2/library/json.html#basic-usage
+    """  # NOQA
+    def dumps(self, data):
+        # don't serialize strings
+        if isinstance(data, compat.string_types):
+            return data
+        try:
+            return json.dumps(data, default=self.default, ensure_ascii=True)
+        except (ValueError, TypeError) as e:
+            raise exceptions.SerializationError(data, e)

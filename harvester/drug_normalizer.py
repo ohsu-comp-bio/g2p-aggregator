@@ -59,7 +59,7 @@ def normalize_biothings(name):
     for name_part in name_parts:
         if len(name_part) < 2:
             continue
-        url = 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:{}&fields=pubchem.cid,chembl.molecule_synonyms'.format(name_part)  # NOQA
+        url = 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:{}&fields=pubchem.cid,chembl.molecule_synonyms,drugbank.pharmacology.toxicity'.format(name_part)  # NOQA
         r = requests.get(url)
         rsp = r.json()
         if 'hits' in rsp:
@@ -80,10 +80,16 @@ def normalize_biothings(name):
                 if molecule_synonym['syn_type'] == 'INN':
                     synonym_inn = molecule_synonym['synonyms'].encode('utf8')
 
+            toxicity = 'unknown'
+            if 'drugbank' in hit:
+                toxicity = hit['drugbank']['pharmacology']['toxicity']
+
             compounds.append({'ontology_term':
                               'compound:{}'.format(hit['pubchem']['cid']),
                               'synonym': synonym_fda or synonym_usan or
-                              synonym_inn})
+                              synonym_inn or name_part,
+                              'toxicity': toxicity
+                              })
     return compounds
 
 
@@ -128,7 +134,6 @@ def normalize_chembl(name):
 
 def normalize(name):
     """ given a drug name """
-    print name
     if name == "N/A":
         print 'DONE normalize drugs'
         return []
@@ -137,18 +142,20 @@ def normalize(name):
     except Exception as e:
         pass
     try:
-        print 'normalize_biothings'
+        # print 'normalize_biothings'
         drugs = normalize_biothings(name)
         if len(drugs) == 0:
-            print 'normalize_pubchem'
+            # print 'normalize_pubchem', name
             drugs = normalize_pubchem(name)
         if len(drugs) == 0:
-            print 'normalize_pubchem_substance'
+            # print 'normalize_pubchem_substance', name
             drugs = normalize_pubchem_substance(name)
+        if len(drugs) == 0:
+            print 'normalize_drugs NOFIND', name
         # if len(drugs) == 0:
         #     print 'normalize_chembl'
         #     drugs = normalize_chembl(name)
-        print 'DONE normalize drugs'
+        # print 'DONE normalize drugs'
         return drugs
     except Exception as e:
         return []
@@ -173,10 +180,14 @@ def normalize_feature_association(feature_association):
     environmental_contexts = []
     drug_labels = []
     for compound in compounds:
-        environmental_contexts.append({
+        ctx = {
             'id': compound['ontology_term'],
-            'term': compound['synonym']
-        })
+            'term': compound['synonym'],
+            'description': compound['synonym']
+        }
+        if 'toxicity' in compound:
+            ctx['toxicity'] = compound['toxicity']
+        environmental_contexts.append(ctx)
         if (compound['synonym']):
             drug_labels.append(compound['synonym'])
     association['environmentalContexts'] = environmental_contexts

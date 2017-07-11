@@ -5,10 +5,11 @@ import copy
 
 import cosmic_lookup_table
 import evidence_label as el
-import evidence_direction as ed 
+import evidence_direction as ed
 import mutation_type as mut
 
 """ https://www.cancergenomeinterpreter.org/biomarkers """
+
 
 def _get_evidence(gene_ids, path='./cgi_biomarkers_per_variant.tsv'):
     """ load tsv """
@@ -66,13 +67,18 @@ def convert(evidence):
             return {}
 
     # Create document for insertion.
-    gene = evidence['Gene']
-    feature = split_gDNA(evidence['gDNA'])
-
-    feature['biomarker_type'] = mut.norm_biomarker(evidence['Alteration type'], evidence['Biomarker'])
-    feature['geneSymbol'] = gene
-    feature['name'] = evidence['Biomarker']
-    feature['description'] = evidence['Alteration']
+    genes = re.split('\W+', evidence['Gene'])
+    genes = filter(len, genes)
+    features = []
+    for gene in genes:
+        feature = split_gDNA(evidence['gDNA'])
+        feature['biomarker_type'] = mut.norm_biomarker(
+                                    evidence['Alteration type'],
+                                    evidence['Biomarker'])
+        feature['geneSymbol'] = gene
+        feature['name'] = evidence['individual_mutation']
+        feature['description'] = evidence['Alteration']
+        features.append(feature)
 
     association = {}
     association['description'] = '{} {} {}'.format(gene,
@@ -111,12 +117,13 @@ def convert(evidence):
     # add summary fields for Display
 
     association = el.evidence_label(evidence['Evidence level'], association)
-    association  = ed.evidence_direction(evidence['Association'], association)
+    association = ed.evidence_direction(evidence['Association'], association)
 
     association['publication_url'] = pubs[0]
     association['drug_labels'] = evidence['Drug full name']
-    feature_association = {'gene': gene,
-                           'feature': feature,
+    feature_association = {'genes': genes,
+                           'features': features,
+                           'feature_names': evidence['Biomarker'],
                            'association': association,
                            'source': 'cgi',
                            'cgi': evidence}

@@ -83,7 +83,7 @@ def convert(interpretation):
                     association['phenotype'] = {
                         'description': tumor['name']
                     }
-
+                    association['drug_labels'] = 'NA'
                     association['evidence'] = [{
                         "evidenceType": {
                             "sourceName": "pmkb"
@@ -98,8 +98,9 @@ def convert(interpretation):
                     # add summary fields for Display
                     if len(interpretation['citations']) > 0:
                         association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])
-                    feature_association = {'gene': gene,
-                                           'feature': feature,
+                    feature_association = {'genes': [gene],
+                                           'features': [feature],
+                                           'feature_names': feature["geneSymbol"] + ' ' + feature["name"] ,
                                            'association': association,
                                            'source': 'pmkb',
                                            'pmkb': {
