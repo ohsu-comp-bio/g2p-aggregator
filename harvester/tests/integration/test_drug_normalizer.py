@@ -5,7 +5,7 @@ from drug_normalizer import normalize, normalize_chembl
 import requests
 import requests_cache
 import logging
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 # cache responses
 requests_cache.install_cache('harvester')
@@ -50,7 +50,6 @@ def test_chembl_bayer():
 
 def test_chembl_ASN003():
     compounds = normalize_chembl('ASN003')
-    print compounds
     assert len(compounds) == 0
 
 
@@ -76,12 +75,12 @@ def test_cgi_drug_plus_drug():
 
 def test_gefintinib():
     compounds = normalize('gefintinib')
-    assert len(compounds) == 1
+    assert len(compounds) == 0
 
 
 def test_gefitnib():
     compounds = normalize('gefitnib')
-    assert len(compounds) == 1
+    assert len(compounds) == 0
 
 
 def test_dacomitinib():
