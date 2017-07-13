@@ -5,6 +5,8 @@ import os
 import evidence_label as el
 import evidence_direction as ed
 import logging
+import mutation_type as mut
+from warnings import warn
 
 # curl 'http://api-demo.molecularmatch.com/v2/search/assertions' --data 'apiKey=xxxxxxxxx' --data-urlencode 'filters=[{"facet":"MUTATION","term":"KIT"}]'
 resourceURLs = {
@@ -76,6 +78,9 @@ def convert(evidence):
     tier = evidence['tier']
     direction = evidence['direction']
     narrative = evidence['narrative']
+    if len(evidence['mutations']) > 1:
+        warn('Unexpected; two mutations in one entry; please check')
+    mutations = evidence['mutations'][0]
     therapeuticContext = evidence['therapeuticContext']
     clinicalSignificance = evidence['clinicalSignificance']
     tags = evidence['tags']
@@ -120,14 +125,32 @@ def convert(evidence):
         # TODO: only looks at first location, not all locations.
         try:
             grch37_mutation = mutation_evidence['GRCh37_location'][0]
+            feature['ref'] = grch37_mutation['ref']
             feature['chromosome'] = str(grch37_mutation['chr'])
             feature['start'] = grch37_mutation['start']
-            feature['ref'] = grch37_mutation['ref']
             feature['alt'] = grch37_mutation['alt']
             #  TODO: add build/reference information
         except:
-            pass
+            try:
+                grch37_mutation = mutations['GRCh37_location'][1]
+                feature['chromosome'] = str(grch37_mutation['chr'])
+                feature['start'] = grch37_mutation['start']
+                feature['ref'] = grch37_mutation['ref']
+                feature['alt'] = grch37_mutation['alt']
+            except:
+                pass
         features.append(feature)
+
+    if len(mutations['mutation_type']) == 1:
+        feature['biomarker_type'] = mut.norm_biomarker(mutations['mutation_type'][0])
+    elif 'Fusion' in mutations['mutation_type']:
+        feature['biomarker_type'] = 'fusion'
+    elif ('Insertion' in mutations['mutation_type'] or 'Deletion' in mutations['mutation_type']) and len(feature['ref']) < len(feature['alt']):
+        feature['biomarker_type'] = 'insertion'
+    elif ('Insertion' in mutations['mutation_type'] or 'Deletion' in mutations['mutation_type']) and len(feature['alt']) < len(feature['ref']):
+        feature['biomarker_type'] = 'deletion'
+    else:
+        feature['biomarker_type'] = mut.norm_biomarker('NA')
 
     # create a drug label that normalization will process
     drug_names = []
