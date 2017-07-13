@@ -6,6 +6,7 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from inflection import parameterize, underscore
 import json
+import logging
 import evidence_label as el
 import evidence_direction as ed
 import mutation_type as mut
@@ -57,8 +58,6 @@ def get_evidence(gene_ids):
 
         # so, we grab the table heading
         thead_ths = tree.xpath(xpath_thead_ths)
-        if len(thead_ths) == 0:
-            print 'no table header found'
         evidence_property_names = []
         for th in thead_ths:
             evidence_property_names.append(
@@ -69,7 +68,7 @@ def get_evidence(gene_ids):
         # grab all the TD's and load an array of evidence
         tds = tree.xpath(xpath_tbody_tds)
         if len(tds) == 0:
-            print 'no table tds found. skipping'
+            logging.info('no table tds found. skipping')
             break
         td_texts = [td.text_content().strip() for td in tds]
         cell_limit = len(td_texts)

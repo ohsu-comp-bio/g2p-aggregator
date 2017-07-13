@@ -8,6 +8,7 @@ import sys
 import re
 import argparse
 import pandas
+import logging
 
 
 class CosmicLookup(object):
@@ -29,9 +30,7 @@ class CosmicLookup(object):
         """
         if gene.islower() or gene.isdigit():
             # return null
-            print '*******'
-            print 'get_entries', gene, hgvs_p
-            print '*******'
+            logging.warning('get_entries gene: %s, hgvs_p: %s', gene, hgvs_p)
             return []
         # Get lookup table.
         if gene in self.gene_df_cache:
