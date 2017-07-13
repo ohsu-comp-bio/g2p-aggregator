@@ -53,14 +53,23 @@ def evidence_label(evidence, association, na=False):
         'D': cgi_d + jax_d + pmkb_d + civic_d + oncokb_d
     }
 
+    ev_lev = {
+        'A' : 1,
+        'B' : 2,
+        'C' : 3,
+        'D' : 4
+    }
+
     for item in ev_lab:
         for opt in ev_lab[item]:
             if evidence and opt == evidence.lower():
                 association['evidence_label'] = item
+                association['evidence_level'] = ev_lev[item]
     if 'evidence_label' not in association:
         if na:
             association['evidence_label'] = 'NA'
+            association['evidence_level'] = 'NA'
         else:
             association['evidence_label'] = evidence
-
+            association['evidence_level'] = evidence
     return association
