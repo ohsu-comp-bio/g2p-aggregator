@@ -99,9 +99,7 @@ def convert(gene_data):
             }
         }]
         # add summary fields for Display
-        association['evidence_label'] = clinical['level_label']
-
-        association = el.evidence_label(clinical['level_label'],
+        association = el.evidence_label(clinical['level'],
                                         association, na=True)
         association = ed.evidence_direction(clinical['level_label'],
                                             association, na=True)

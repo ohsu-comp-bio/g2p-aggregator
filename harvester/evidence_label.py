@@ -7,34 +7,55 @@
 
 
 def evidence_label(evidence, association, na=False):
-    fda = ['fda guidelines', 'fda-approved', 'fda approved', '1', 'guideline']
-    nccn = ['nccn guidelines', 'nccn-approved', 'nccn approved',
-            'nccn/cap guidelines']
-    eln = ['european leukemianet guidelines']
-    preclinical = ['preclinical', 'pre-clinical', '3']
-    trials_c = ['early trials', 'late trials', 'phase 2', '2',
-                'phase ii', 'phase 1', 'phase i', 'clinical trial',
-                'clinical study']
-    trials_b = ['phase 3', 'phase iii']
+
+    # CGI
+    # Drug status?? VICC group??
+    # cgi_a = ['clinical practice']
+    # cgi_b = ['clinical trials iii', 'clinical trials iv']
+    # cgi_c = ['clinical trials i', 'clinical trials ii', 'case reports']
+    # cgi_d = ['pre-clinical data']
+
+    # CGI
+    # Evidence level
+    cgi_a = ['cpic guidelines', 'european leukemianet guidelines', 'fda guidelines', 'nccn guidelines', 'nccn/cap guidelines'] # NOQA
+    cgi_b = ['late trials']
+    cgi_c = ['early trials', 'case report', 'clinical trial']
+    cgi_d = ['pre-clinical']
+
+    # JAX
+    jax_a = ['guideline', 'fda approved']
+    jax_b = ['phase iii']
+    jax_c = ['phase i', 'phase ib', 'phase ib/ii', 'phase ii', 'clinical study']
+    jax_d = ['phase 0', 'preclinical', 'preclinical - cell line xenograft', 'preclinical - cell culture', 'preclinical - pdx', 'preclinical - patient cell culture', 'preclinical - pdx & cell culture'] # NOQA
+
+    # PMKB
+    pmkb_a = ['1']
+    pmkb_b = []
+    pmkb_c = ['2']
+    pmkb_d = ['3']
+
+    # CIVIC
     civic_a = ['a']
     civic_b = ['b']
     civic_c = ['c']
     civic_d = ['d', 'e']
 
-    cr = ['case report']
-    oncokb_b = ['compelling clinical evidence supports the biomarker as being predictive of response to a drug in this indication but neither biomarker and drug are standard of care']  # NOQA
-    oncokb_c = ['compelling biological evidence supports the biomarker as being predictive of response to a drug but neither biomarker and drug are standard of care']  # NOQA
+    # ONCOKB
+    oncokb_a = ['1', 'r1']
+    oncokb_b = ['2a']
+    oncokb_c = ['2b', '3a', '3b']
+    oncokb_d = ['4']
 
     ev_lab = {
-        'A': fda + nccn + eln + civic_a,
-        'B': trials_b + oncokb_b + civic_b,
-        'C': trials_c + oncokb_c + civic_c,
-        'D': cr + preclinical + civic_d
+        'A': cgi_a + jax_a + pmkb_a + civic_a + oncokb_a,
+        'B': cgi_b + jax_b + pmkb_b + civic_b + oncokb_b,
+        'C': cgi_c + jax_c + pmkb_c + civic_c + oncokb_c,
+        'D': cgi_d + jax_d + pmkb_d + civic_d + oncokb_d
     }
 
     for item in ev_lab:
         for opt in ev_lab[item]:
-            if evidence and opt in evidence.lower():
+            if evidence and opt == evidence.lower():
                 association['evidence_label'] = item
     if 'evidence_label' not in association:
         if na:
