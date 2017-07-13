@@ -93,7 +93,6 @@ def convert(jax_evidence):
     jax = jax_evidence['jax_id']
     evidence_array = jax_evidence['evidence']
     for evidence in evidence_array:
-
         # TODO: alterations are treated individually right now, but they are
         # actually combinations and should be treated accordingly.
 
@@ -104,8 +103,11 @@ def convert(jax_evidence):
         for tuple in tuples:
             feature = {}
             feature['geneSymbol'] = tuple[0]
-            feature['name'] = ' '.join(tuple[1:])
-            feature['biomarker_type'] = mut.norm_biomarker(None)
+            feature['name'] = tuple[0]
+            # feature['name'] = ' '.join(tuple[1:])
+            feature['biomarker_type'] = mut.norm_biomarker(' '.join(tuple[1:]))
+            print feature['biomarker_type']
+            # feature['biomarker_type'] = mut.norm_biomarker(None)
 
             try:
                 """
