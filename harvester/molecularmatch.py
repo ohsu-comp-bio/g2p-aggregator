@@ -4,6 +4,7 @@ import json
 import os
 import evidence_label as el
 import evidence_direction as ed
+import logging
 
 # curl 'http://api-demo.molecularmatch.com/v2/search/assertions' --data 'apiKey=xxxxxxxxx' --data-urlencode 'filters=[{"facet":"MUTATION","term":"KIT"}]'
 resourceURLs = {
@@ -41,7 +42,7 @@ def get_evidence(gene_ids):
                 'filters': json.dumps(filters)
             }
             try:
-                print url, json.dumps(payload)
+                logging.info('%s %s', url, json.dumps(payload))
                 r = requests.post(url, data=payload)
                 assertions = r.json()
                 if assertions['total'] == 0:
@@ -49,8 +50,10 @@ def get_evidence(gene_ids):
                     start = -1
                 else:
                     start = start + limit
-                print "page {} of {}".format(assertions['page'],
-                                             assertions['totalPages'])
+                logging.info(
+                    "page {} of {}".format(assertions['page'],
+                                           assertions['totalPages'])
+                )
                 # filter those drugs, only those with diseases
                 for hit in assertions['rows']:
                     # do not process rows without drugs
@@ -58,8 +61,10 @@ def get_evidence(gene_ids):
                         yield hit
 
             except Exception as e:
-                print "molecularmatch error fetching {} {}".format(gene, e)
-                print r.text.encode('utf-8')
+                logging.error(
+                    "molecularmatch error fetching {}".format(gene),
+                    exc_info=1
+                )
                 start = -1
 
 
@@ -78,14 +83,19 @@ def convert(evidence):
     condition = None
     mutation = None
     for tag in tags:
-        if tag['facet'] == 'GENE':
+        if tag['facet'] == 'GENE' and tag['priority'] == 1:
             gene = tag['term']
         if tag['facet'] == 'CONDITION':
             condition = tag['term']
-        if tag['facet'] == 'MUTATION':
+        if tag['facet'] == 'MUTATION' and tag['priority'] == 1:
             mutation = tag['term']
         if tag['facet'] == 'PHRASE' and 'ISOFORM EXPRESSION' in tag['term']:
             mutation = tag['term']
+
+    if not gene:
+        for tag in tags:
+            if tag['facet'] == 'GENE':
+                gene = tag['term']
 
     if not gene and mutation:
         gene = mutation.split(' ')[0]
@@ -93,6 +103,16 @@ def convert(evidence):
     features = []
     for mutation_evidence in evidence['mutations']:
         feature = {}
+
+        # mmatch uses location as a key, this in turn causes a field explosion
+        # in ES since we are analysing all keys
+        if 'wgsaData' in mutation_evidence:
+            wgsaData = mutation_evidence['wgsaData']
+            for idx, key in enumerate(wgsaData.keys()):
+                wgsaData[key]['_key'] = key
+                wgsaData['location{}'.format(idx)] = wgsaData[key]
+                del wgsaData[key]
+
         feature['geneSymbol'] = gene
         feature['name'] = mutation
 
@@ -140,15 +160,39 @@ def convert(evidence):
     # add summary fields for Display
 
     # association['evidence_label'] = direction
-    association = el.evidence_label(tier, association, na=True)
-    association = ed.evidence_direction(tier, association, na=True)
+    association = el.evidence_label(tier, association, na=False)
+    association = ed.evidence_direction(tier, association, na=False)
 
     association['publication_url'] = pubs[0]
     association['drug_labels'] = drug_label
+
+    genes = []
+    for mutation_evidence in evidence['mutations']:
+        geneSymbol = mutation_evidence['geneSymbol']
+        if geneSymbol not in genes:
+            genes.append(geneSymbol)
+
     if (mutation):
-        genes, ignore = _parse(mutation)
+        genes_from_features, ignore = _parse(mutation)
     else:
-        genes = [gene]
+        genes_from_features, minimal_features = _parse(gene)
+        if len(features) == 0:
+            for feature_tuple in minimal_features:
+                feature = {}
+                feature['geneSymbol'] = feature_tuple[0]
+                if not feature['geneSymbol'].isupper() and len(genes) > 0:
+                    feature['geneSymbol'] = genes[0]
+                try:
+                    feature['name'] = feature_tuple[1]
+                except IndexError:
+                    pass
+                features.append(feature)
+
+    if len(genes) == 0:
+        genes = genes_from_features
+
+    logging.warning(features)
+
     feature_association = {'genes': genes,
                            'features': features,
                            'feature_names': mutation,
@@ -176,13 +220,23 @@ def harvest_and_convert(genes):
 
 def _parse(mutation):
     """ given a mutation expression, return array of genes and tuples """
+    logging.warning('_parse mutation %s' % mutation)
+    if not mutation:
+        return [], []
     parts = mutation.split()
     if not parts[0].isupper():
         parts = parts[::-1]
+
     if '-' in parts[0]:
         genes = sorted(parts[0].split('-'))
     else:
-        genes = [parts[0]]
+        if parts[0].isupper():
+            genes = [parts[0]]
+        else:
+            genes = [mutation.split()[0]]
+            parts = mutation.split()
+            logging.warning('default genes %s' % [genes, parts])
+
     tuples = []
     for gene in genes:
         if len(parts[1:]) > 0:
@@ -193,7 +247,8 @@ def _parse(mutation):
 
 
 def _test():
-    # gene_ids = ["CCND1", "CDKN2A", "CHEK1", "DDR2", "FGF19", "FGF3", "FGF4", "FGFR1", "MDM4", "PALB2", "RAD51D"]
+    # gene_ids = ["CCND1", "CDKN2A", "CHEK1", "DDR2", "FGF19", "FGF3",
+    #  "FGF4", "FGFR1", "MDM4", "PALB2", "RAD51D"]
     gene_ids = None
     for feature_association in harvest_and_convert(gene_ids):
         print feature_association.keys()

@@ -11,11 +11,11 @@ def evidence_label(evidence, association, na=False):
     nccn = ['nccn guidelines', 'nccn-approved', 'nccn approved',
             'nccn/cap guidelines']
     eln = ['european leukemianet guidelines']
-    preclinical = ['preclinical', 'pre-clinical', '3']
+    preclinical = ['preclinical', 'pre-clinical', '4', '5']
     trials_c = ['early trials', 'late trials', 'phase 2', '2',
                 'phase ii', 'phase 1', 'phase i', 'clinical trial',
                 'clinical study']
-    trials_b = ['phase 3', 'phase iii']
+    trials_b = ['phase 3', 'phase iii', '3']
     civic_a = ['a']
     civic_b = ['b']
     civic_c = ['c']
