@@ -7,7 +7,6 @@
 
 
 def evidence_label(evidence, association, na=False):
-
     # CGI
     # Drug status?? VICC group??
     # cgi_a = ['clinical practice']

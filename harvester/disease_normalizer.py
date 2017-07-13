@@ -1,5 +1,6 @@
 import requests
 import urllib
+import logging
 
 
 def normalize_ebi(name):
@@ -53,7 +54,7 @@ def normalize(name):
     try:
         return normalize_ebi(name)
     except Exception as e:
-        print "Could not normalize {}".format(name)
+        logging.warning("Could not normalize {}".format(name))
         return []
 
 

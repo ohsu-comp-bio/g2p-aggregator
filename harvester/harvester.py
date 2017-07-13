@@ -6,6 +6,9 @@ sys.path.append('silos')  # NOQA
 
 import json
 import argparse
+import logging
+import logging.config
+import yaml
 
 import jax
 import civic
@@ -62,19 +65,21 @@ args = argparser.parse_args()
 for h in args.harvesters:
     assert h in sys.modules, "harvester is not a module: %r" % h
 
+path = 'logging.yml'
+with open(path) as f:
+    config = yaml.load(f)
+logging.config.dictConfig(config)
 
-def _eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
 
-_eprint("harvesters: %r" % args.harvesters)
-_eprint("silos: %r" % args.silos)
-_eprint("elastic_search: %r" % args.elastic_search)
-_eprint("elastic_index: %r" % args.elastic_index)
-_eprint("delete_index: %r" % args.delete_index)
+logging.info("harvesters: %r" % args.harvesters)
+logging.info("silos: %r" % args.silos)
+logging.info("elastic_search: %r" % args.elastic_search)
+logging.info("elastic_index: %r" % args.elastic_index)
+logging.info("delete_index: %r" % args.delete_index)
 if not args.genes:
-    _eprint("genes: all")
+    logging.info("genes: all")
 else:
-    _eprint("genes: %r" % args.genes)
+    logging.info("genes: %r" % args.genes)
 
 
 def _make_silos(args):
@@ -103,10 +108,13 @@ def harvest(genes):
                 silo.delete_source(h)
 
         for feature_association in harvester.harvest_and_convert(genes):
-            _eprint(harvester.__name__,
+            logging.info(
+                '{} {} {}'.format(
+                    harvester.__name__,
                     feature_association['genes'],
                     feature_association['association']['evidence_label']
-                    )
+                )
+            )
             yield feature_association
 
 
@@ -133,8 +141,8 @@ def main():
             #     normalize(feature_association)
             #     silo.save(feature_association)
             # except Exception as e:
-            #     _eprint(e)
-            #     # _eprint(feature_association)
+            #     logging.info(e)
+            #     # logging.info(feature_association)
 
 
 if __name__ == '__main__':

@@ -4,6 +4,9 @@ sys.path.append('.')  # NOQA
 from drug_normalizer import normalize, normalize_chembl
 import requests
 import requests_cache
+import logging
+# logging.basicConfig(level=logging.DEBUG)
+
 # cache responses
 requests_cache.install_cache('harvester')
 
@@ -47,7 +50,6 @@ def test_chembl_bayer():
 
 def test_chembl_ASN003():
     compounds = normalize_chembl('ASN003')
-    print compounds
     assert len(compounds) == 0
 
 
@@ -59,3 +61,28 @@ def test_chembl_DHM25():
 def test_chembl_HDAC_inhibitors():
     compounds = normalize_chembl('HDAC inhibitors')
     assert len(compounds) == 0
+
+
+def test_cgi_drug_full_name():
+    compounds = normalize('Imatinib (BCR-ABL inhibitor 1st gen&KIT inhibitor)')
+    assert len(compounds) == 1
+
+
+def test_cgi_drug_plus_drug():
+    compounds = normalize('Cetuximab+Vemurafenib')
+    assert len(compounds) == 2
+
+
+def test_gefintinib():
+    compounds = normalize('gefintinib')
+    assert len(compounds) == 0
+
+
+def test_gefitnib():
+    compounds = normalize('gefitnib')
+    assert len(compounds) == 0
+
+
+def test_dacomitinib():
+    compounds = normalize('Dacomitinib')
+    assert len(compounds) == 1

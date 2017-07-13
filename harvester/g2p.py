@@ -75,7 +75,6 @@ def convert(gene_feature):
     ga4gh = gene_feature['ga4gh']
     if 'features' in ga4gh:
         for f in ga4gh['features']:
-            print f.keys()
             associations = f['associations']
             del f['associations']
             for a in associations:

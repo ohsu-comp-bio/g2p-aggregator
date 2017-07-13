@@ -2,6 +2,7 @@ import re
 import pandas
 import json
 import copy
+import logging
 
 import cosmic_lookup_table
 import evidence_label as el
@@ -149,7 +150,7 @@ def harvest_and_convert(genes=None, drugs=None):
 
 def _test():
     for feature_association in harvest_and_convert(['KIT']):
-        print feature_association.keys()
+        logging.info(feature_association.keys())
 
 if __name__ == '__main__':
     _test()

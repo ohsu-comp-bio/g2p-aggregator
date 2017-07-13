@@ -6,7 +6,7 @@ import evidence_label as el
 import evidence_direction as ed
 import mutation_type as mut
 import sys
-import traceback
+import logging
 
 
 def harvest(genes):
@@ -87,9 +87,12 @@ def convert(gene_data):
                     }
                 }
                 # add summary fields for Display
-                association = el.evidence_label(evidence_item['evidence_level'],
-                                                association, na=True)
-                association = ed.evidence_direction(evidence_item['clinical_significance'], association)
+                association = el.evidence_label(
+                    evidence_item['evidence_level'], association, na=True
+                )
+                association = ed.evidence_direction(
+                    evidence_item['clinical_significance'], association
+                )
                 association['publication_url'] = evidence_item['source']['source_url'],   # NOQA
                 if len(evidence_item['drugs']) > 0:
                     association['drug_labels'] = ','.join([drug['name'] for drug in evidence_item['drugs']])   # NOQA
@@ -105,11 +108,7 @@ def convert(gene_data):
                                        'civic': v}
                 yield feature_association
     except Exception as e:
-        print 'CIVIC', gene_data['gene'], e
-        print "Exception in user code:"
-        print '-'*60
-        traceback.print_exc(file=sys.stdout)
-        print '-'*60
+        logging.error(gene_data['gene'], exc_info=1)
 
 
 def harvest_and_convert(genes):
@@ -123,4 +122,4 @@ def harvest_and_convert(genes):
 # main
 if __name__ == '__main__':
     for feature_association in harvest_and_convert(["MDM2"]):
-        print feature_association
+        logging.info(feature_association)
