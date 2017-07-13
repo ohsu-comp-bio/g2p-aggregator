@@ -2782,7 +2782,8 @@ def test_convert_TP53():
     assert len(evidences) == 1
     evidence = evidences[0]
     assert evidence['genes'] == ['TP53']
-    assert evidence['features'] == [{'geneSymbol': 'TP53', 'name': 'Wild-Type'}]
+    assert evidence['features'] == [{'geneSymbol': 'TP53',
+                                     'name': 'Wild-Type'}]
 
 
 def test_convert_EGFR():
@@ -2791,4 +2792,6 @@ def test_convert_EGFR():
     assert len(evidences) == 1
     evidence = evidences[0]
     assert evidence['genes'] == ['EGFR']
-    assert evidence['features'] == [{'geneSymbol': 'EGFR', 'name': 'Cetuximab resistance mutations'}]
+    assert evidence['features'] == [{'biomarker_type': 'unspecified',
+                                     'geneSymbol': 'EGFR',
+                                     'name': 'Cetuximab resistance mutations'}]

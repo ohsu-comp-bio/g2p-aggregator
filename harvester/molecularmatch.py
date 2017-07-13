@@ -78,9 +78,9 @@ def convert(evidence):
     tier = evidence['tier']
     direction = evidence['direction']
     narrative = evidence['narrative']
-    if len(evidence['mutations']) > 1:
-        warn('Unexpected; two mutations in one entry; please check')
-    mutations = evidence['mutations'][0]
+    # if len(evidence['mutations']) > 1:
+    #     warn('Unexpected; two mutations in one entry; please check')
+    # mutations = evidence['mutations'][0]
     therapeuticContext = evidence['therapeuticContext']
     clinicalSignificance = evidence['clinicalSignificance']
     tags = evidence['tags']
@@ -132,25 +132,43 @@ def convert(evidence):
             #  TODO: add build/reference information
         except:
             try:
-                grch37_mutation = mutations['GRCh37_location'][1]
+                grch37_mutation = mutation_evidence['GRCh37_location'][1]
                 feature['chromosome'] = str(grch37_mutation['chr'])
                 feature['start'] = grch37_mutation['start']
                 feature['ref'] = grch37_mutation['ref']
                 feature['alt'] = grch37_mutation['alt']
             except:
                 pass
+
+        biomarker_types = []
+        if 'mutation_type' in mutation_evidence:
+            for mutation_type in mutation_evidence['mutation_type']:
+                if 'Fusion' in mutation_type:
+                    biomarker_types.append('fusion')
+                elif ('Insertion' in mutation_type or 'Deletion' in mutation_type) and len(feature.get('ref', '')) < len(feature.get('alt', '')):  # NOQA
+                    biomarker_types.append('insertion')
+                elif ('Insertion' in mutation_type or 'Deletion' in mutation_type) and len(feature.get('alt', '')) < len(feature.get('ref', '')):  # NOQA
+                    biomarker_types.append('deletion')
+                else:
+                    biomarker_types.append(mut.norm_biomarker(mutation_type))
+            biomarker_types = list(set(biomarker_types))
+            if len(biomarker_types) == 0:
+                feature['biomarker_type'] = mut.norm_biomarker('NA')
+            else:
+                feature['biomarker_type'] = ','.join(biomarker_types)
+
         features.append(feature)
 
-    if len(mutations['mutation_type']) == 1:
-        feature['biomarker_type'] = mut.norm_biomarker(mutations['mutation_type'][0])
-    elif 'Fusion' in mutations['mutation_type']:
-        feature['biomarker_type'] = 'fusion'
-    elif ('Insertion' in mutations['mutation_type'] or 'Deletion' in mutations['mutation_type']) and len(feature['ref']) < len(feature['alt']):
-        feature['biomarker_type'] = 'insertion'
-    elif ('Insertion' in mutations['mutation_type'] or 'Deletion' in mutations['mutation_type']) and len(feature['alt']) < len(feature['ref']):
-        feature['biomarker_type'] = 'deletion'
-    else:
-        feature['biomarker_type'] = mut.norm_biomarker('NA')
+    # if len(mutations['mutation_type']) == 1:
+    #     feature['biomarker_type'] = mut.norm_biomarker(mutations['mutation_type'][0])
+    # elif 'Fusion' in mutations['mutation_type']:
+    #     feature['biomarker_type'] = 'fusion'
+    # elif ('Insertion' in mutations['mutation_type'] or 'Deletion' in mutations['mutation_type']) and len(feature['ref']) < len(feature['alt']):
+    #     feature['biomarker_type'] = 'insertion'
+    # elif ('Insertion' in mutations['mutation_type'] or 'Deletion' in mutations['mutation_type']) and len(feature['alt']) < len(feature['ref']):
+    #     feature['biomarker_type'] = 'deletion'
+    # else:
+    #     feature['biomarker_type'] = mut.norm_biomarker('NA')
 
     # create a drug label that normalization will process
     drug_names = []
@@ -214,8 +232,6 @@ def convert(evidence):
     if len(genes) == 0:
         genes = genes_from_features
 
-    logging.warning(features)
-
     feature_association = {'genes': genes,
                            'features': features,
                            'feature_names': mutation,
@@ -243,7 +259,6 @@ def harvest_and_convert(genes):
 
 def _parse(mutation):
     """ given a mutation expression, return array of genes and tuples """
-    logging.warning('_parse mutation %s' % mutation)
     if not mutation:
         return [], []
     parts = mutation.split()
@@ -258,7 +273,6 @@ def _parse(mutation):
         else:
             genes = [mutation.split()[0]]
             parts = mutation.split()
-            logging.warning('default genes %s' % [genes, parts])
 
     tuples = []
     for gene in genes:
