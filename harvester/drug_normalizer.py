@@ -1,4 +1,6 @@
 import requests
+import re
+import logging
 
 """
 curl 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/Bayer/synonyms/JSON' | jq '.InformationList.Information[] | [.CID, .Synonym[0]] '
@@ -52,40 +54,66 @@ def normalize_pubchem(name):
 
 def normalize_biothings(name):
     """
-     curl 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:aspirin&fields=pubchem.cid,chembl.molecule_synonyms' | jq .
+     curl 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:aspirin&fields=pubchem.cid,chembl.molecule_synonyms,chembl.molecule_chembl_id,chebi.chebi_id' | jq .
     """  # NOQA
-    name_parts = name.split()  # split on whitespace
+    # name_parts = name.split()  # split on whitespace
+    name_parts = re.split('\W+', name)
     compounds = []
     for name_part in name_parts:
         if len(name_part) < 2:
             continue
-        url = 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:{}&fields=pubchem.cid,chembl.molecule_synonyms,drugbank.pharmacology.toxicity'.format(name_part)  # NOQA
+        url = 'http://c.biothings.io/v1/query?q=chembl.pref_name:{}&fields=pubchem.cid,chebi.chebi_id,chembl.molecule_chembl_id, chembl.molecule_synonyms,drugbank.pharmacology.toxicity'.format(name_part)  # NOQA
+        logging.debug(url)
         r = requests.get(url)
         rsp = r.json()
+        logging.debug(rsp)
+        hits = rsp['hits']
+        if len(hits) == 0:
+            url = 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:{}&fields=pubchem.cid,chebi.chebi_id,chembl.molecule_chembl_id, chembl.molecule_synonyms,drugbank.pharmacology.toxicity'.format(name_part)  # NOQA
+            logging.debug(url)
+            r = requests.get(url)
+            rsp = r.json()
+            logging.debug(rsp)
+
         if 'hits' in rsp:
             hits = rsp['hits']
             if len(hits) == 0:
                 continue
+            # sort to get best hit
+            hits = sorted(hits, key=lambda k: k['_score'], reverse=True)
             hit = hits[0]
-            if 'pubchem' not in hit:
+            if 'pubchem' not in hit and 'chebi' not in hit and 'chembl' not in hit:  # NOQA
+                logging.warning('no pubchem or chebi or chembl for {}'
+                                .format(name))
+                continue
+            # The higher the _score, the more relevant the document.
+            if hit['_score'] < 8.8:
                 continue
             chembl = hit['chembl']
-            molecule_synonyms = chembl['molecule_synonyms']
             synonym_fda = synonym_usan = synonym_inn = None
-            for molecule_synonym in molecule_synonyms:
-                if molecule_synonym['syn_type'] == 'FDA':
-                    synonym_fda = molecule_synonym['synonyms'].encode('utf8')
-                if molecule_synonym['syn_type'] == 'USAN':
-                    synonym_usan = molecule_synonym['synonyms'].encode('utf8')
-                if molecule_synonym['syn_type'] == 'INN':
-                    synonym_inn = molecule_synonym['synonyms'].encode('utf8')
+            if 'molecule_synonyms' in chembl:
+                molecule_synonyms = chembl['molecule_synonyms']
+                for molecule_synonym in molecule_synonyms:
+                    if molecule_synonym['syn_type'] == 'FDA':
+                        synonym_fda = molecule_synonym['synonyms'].encode('utf8')
+                    if molecule_synonym['syn_type'] == 'USAN':
+                        synonym_usan = molecule_synonym['synonyms'].encode('utf8')
+                    if molecule_synonym['syn_type'] == 'INN':
+                        synonym_inn = molecule_synonym['synonyms'].encode('utf8')
 
             toxicity = 'unknown'
             if 'drugbank' in hit:
                 toxicity = hit['drugbank']['pharmacology']['toxicity']
 
-            compounds.append({'ontology_term':
-                              'compound:{}'.format(hit['pubchem']['cid']),
+            ontology_term = None
+            if 'pubchem' in hit:
+                ontology_term = 'compound:{}'.format(hit['pubchem']['cid'])
+            if not ontology_term and 'chebi' in hit:
+                ontology_term = hit['chebi']['chebi_id']
+            if not ontology_term and 'chembl' in hit:
+                ontology_term = hit['chembl']['molecule_chembl_id']
+
+            compounds.append({'ontology_term': ontology_term,
                               'synonym': synonym_fda or synonym_usan or
                               synonym_inn or name_part,
                               'toxicity': toxicity
@@ -135,7 +163,6 @@ def normalize_chembl(name):
 def normalize(name):
     """ given a drug name """
     if name == "N/A":
-        print 'DONE normalize drugs'
         return []
     try:
         name = name.encode('utf8')
@@ -151,7 +178,8 @@ def normalize(name):
             # print 'normalize_pubchem_substance', name
             drugs = normalize_pubchem_substance(name)
         if len(drugs) == 0:
-            print 'normalize_drugs NOFIND', name
+            logging.warning('normalize_drugs NOFIND {}'
+                            .format(name))
         # if len(drugs) == 0:
         #     print 'normalize_chembl'
         #     drugs = normalize_chembl(name)
