@@ -67,8 +67,8 @@ def evidence_label(evidence, association, na=False):
     if 'evidence_label' not in association:
         if na:
             association['evidence_label'] = 'NA'
-            association['evidence_level'] = 'NA'
+            # association['evidence_level'] = 'NA'
         else:
             association['evidence_label'] = evidence
-            association['evidence_level'] = evidence
+            # association['evidence_level'] = evidence
     return association
