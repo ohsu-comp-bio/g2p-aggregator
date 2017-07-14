@@ -57,7 +57,9 @@ def convert(interpretation):
                 feature['end'] = stop
                 feature['chromosome'] = str(chromosome)
                 feature['referenceName'] = 'GRCh37/hg19'
-                feature['biomarker_type'] = mut.norm_biomarker(variant['variant_type'])
+                feature['biomarker_type'] = mut.norm_biomarker(
+                                                variant['variant_type']
+                                            )
 
                 attributes = {}
                 for key in variant.keys():
@@ -72,8 +74,9 @@ def convert(interpretation):
                 # association['evidence_label'] = interpretation['tier']
                 association = el.evidence_label(str(interpretation['tier']),
                                                 association, na=True)
-                association = ed.evidence_direction(str(interpretation['tier']),
-                                                    association, na=True)
+                association = ed.evidence_direction(
+                                str(interpretation['tier']),
+                                association, na=True)
 
                 association['description'] = interpretation['interpretation']
                 # TODO pmkb does not break out drug !?!?
@@ -88,7 +91,7 @@ def convert(interpretation):
                         "evidenceType": {
                             "sourceName": "pmkb"
                         },
-                        'description': interpretation['tier'],
+                        'description': str(interpretation['tier']),
                         'info': {
                             'publications': [
                                 ['http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(c['pmid']) for c in interpretation['citations']]  # NOQA

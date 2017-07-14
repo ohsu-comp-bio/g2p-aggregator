@@ -74,7 +74,7 @@ def convert(gene_data):
                     'description': evidence_item['disease']['name'],
                     'id': evidence_item['disease']['url']
                 }
-                association['evidence'] = {
+                association['evidence'] = [{
                     "evidenceType": {
                         "sourceName": "CIVIC",
                         "id": '{}'.format(evidence_item['id'])
@@ -85,7 +85,7 @@ def convert(gene_data):
                             evidence_item['source']['source_url']
                         ]
                     }
-                }
+                }]
                 # add summary fields for Display
                 association = el.evidence_label(
                     evidence_item['evidence_level'], association, na=True
