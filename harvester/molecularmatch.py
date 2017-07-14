@@ -112,11 +112,13 @@ def convert(evidence):
         # mmatch uses location as a key, this in turn causes a field explosion
         # in ES since we are analysing all keys
         if 'wgsaData' in mutation_evidence:
+            locations = []
             wgsaData = mutation_evidence['wgsaData']
             for idx, key in enumerate(wgsaData.keys()):
                 wgsaData[key]['_key'] = key
-                wgsaData['location{}'.format(idx)] = wgsaData[key]
+                locations.append(wgsaData[key])
                 del wgsaData[key]
+            wgsaData['locations'] = locations
 
         feature['geneSymbol'] = gene
         feature['name'] = mutation
