@@ -1,6 +1,7 @@
 import requests
 import re
 import logging
+import pydash
 
 """
 curl 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/Bayer/synonyms/JSON' | jq '.InformationList.Information[] | [.CID, .Synonym[0]] '
@@ -62,14 +63,20 @@ def normalize_biothings(name):
     for name_part in name_parts:
         if len(name_part) < 2:
             continue
-        url = 'http://c.biothings.io/v1/query?q=chembl.pref_name:{}&fields=pubchem.cid,chebi.chebi_id,chembl.molecule_chembl_id, chembl.molecule_synonyms,drugbank.pharmacology.toxicity'.format(name_part)  # NOQA
+        fields = 'fields=pubchem.cid,chebi.chebi_id,chembl.molecule_chembl_id'\
+            ',chembl.molecule_synonyms,drugbank.pharmacology.toxicity,' \
+            'drugbank.products.approved,drugbank.products.country,' \
+            'drugbank.taxonomy.class,drugbank.taxonomy.direct-parent,' \
+            'drugbank.taxonomy.kingdom,drugbank.taxonomy.subclass,' \
+            'drugbank.taxonomy.superclass'
+        url = 'http://c.biothings.io/v1/query?q=chembl.pref_name:{}&{}'.format(name_part, fields)  # NOQA
         logging.debug(url)
         r = requests.get(url)
         rsp = r.json()
         logging.debug(rsp)
         hits = rsp['hits']
         if len(hits) == 0:
-            url = 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:{}&fields=pubchem.cid,chebi.chebi_id,chembl.molecule_chembl_id, chembl.molecule_synonyms,drugbank.pharmacology.toxicity'.format(name_part)  # NOQA
+            url = 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:{}&'.format(name_part, fields)  # NOQA
             logging.debug(url)
             r = requests.get(url)
             rsp = r.json()
@@ -101,9 +108,20 @@ def normalize_biothings(name):
                     if molecule_synonym['syn_type'] == 'INN':
                         synonym_inn = molecule_synonym['synonyms'].encode('utf8')
 
-            toxicity = 'unknown'
-            if 'drugbank' in hit:
-                toxicity = hit['drugbank']['pharmacology']['toxicity']
+            toxicity = pydash.get(hit,
+                                  'drugbank.pharmacology.toxicity',
+                                  None)
+            taxonomy = pydash.get(hit,
+                                  'drugbank.taxonomy',
+                                  None)
+
+
+            approved_countries = []
+            products = pydash.get(hit, 'drugbank.products', [])
+            for product in products:
+                if product['approved'] == 'true':
+                    approved_countries.append(product['country'])
+            approved_countries = list(set(approved_countries))
 
             ontology_term = None
             if 'pubchem' in hit:
@@ -113,11 +131,17 @@ def normalize_biothings(name):
             if not ontology_term and 'chembl' in hit:
                 ontology_term = hit['chembl']['molecule_chembl_id']
 
-            compounds.append({'ontology_term': ontology_term,
-                              'synonym': synonym_fda or synonym_usan or
-                              synonym_inn or name_part,
-                              'toxicity': toxicity
-                              })
+            compound = {'ontology_term': ontology_term,
+                        'synonym': synonym_fda or synonym_usan or
+                        synonym_inn or name_part,
+                        }
+            if toxicity:
+                compound['toxicity'] = toxicity
+            if taxonomy:
+                compound['taxonomy'] = taxonomy
+            if len(approved_countries) > 0:
+                compound['approved_countries'] = approved_countries
+            compounds.append(compound)
     return compounds
 
 
@@ -215,6 +239,10 @@ def normalize_feature_association(feature_association):
         }
         if 'toxicity' in compound:
             ctx['toxicity'] = compound['toxicity']
+        if 'approved_countries' in compound:
+            ctx['approved_countries'] = compound['approved_countries']
+        if 'taxonomy' in compound:
+            ctx['taxonomy'] = compound['taxonomy']
         environmental_contexts.append(ctx)
         if (compound['synonym']):
             drug_labels.append(compound['synonym'])

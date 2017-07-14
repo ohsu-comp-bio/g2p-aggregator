@@ -5,7 +5,7 @@ from drug_normalizer import normalize, normalize_chembl
 import requests
 import requests_cache
 import logging
-# logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.WARNING)
 
 # cache responses
 requests_cache.install_cache('harvester')
@@ -86,3 +86,18 @@ def test_gefitnib():
 def test_dacomitinib():
     compounds = normalize('Dacomitinib')
     assert len(compounds) == 1
+
+
+def test_Vemurafenib():
+    compounds = normalize('Vemurafenib')
+    assert len(compounds) == 1
+    assert compounds[0] == {'approved_countries': ['Canada', 'US'],
+                            'synonym': 'Vemurafenib',
+                            'ontology_term': 'compound:CID42611257',
+                            'taxonomy': {'class': 'Pyridines and derivatives',
+                                         'direct-parent': 'Phenylpyridines',
+                                         'kingdom': 'Organic compounds',
+                                         'subclass': 'Phenylpyridines',
+                                         'superclass':
+                                         'Organoheterocyclic compounds'}
+                            }
