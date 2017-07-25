@@ -30,9 +30,8 @@ def normalize_ebi(name):
       ]
     }
 
-    also see http://www.disease-ontology.org/api/metadata/DOID:1909/ to get hierarchy ???
-    or see http://www.ebi.ac.uk/ols/docs/api to get ancestors?
     """  # NOQA
+
     r = requests.get(url, timeout=20)
     rsp = r.json()
     if 'response' not in rsp:
@@ -42,8 +41,48 @@ def normalize_ebi(name):
     if numFound == 0:
         return []
     doc = response['docs'][0]
-    return [{'ontology_term': doc['obo_id'].encode('utf8'),
-             'label': doc['label'].encode('utf8')}]
+    term = {'ontology_term': doc['obo_id'].encode('utf8'),
+            'label': doc['label'].encode('utf8')}
+
+    family = get_family(doc['obo_id'])
+    if family:
+        term['family'] = family
+
+    return [term]
+
+
+def get_family(doid):
+    # get the hierarchy
+    try:
+        url = 'http://disease-ontology.org/query_tree?search=True&node={}'.format(doid)  # NOQA
+        r = requests.get(url, timeout=20)
+        rsp = r.json()
+        return get_hierarchy_family(get_hierarchy(rsp[0], []))['text']
+    except Exception as e:
+        logging.error('{} {} {}'.format(url, r, e))
+        return None
+
+
+def get_hierarchy(node, hierarchy_list):
+    if (
+        node.get('iconCls', '') == 'search-select-icon' or
+        node.get('expanded', False)
+    ):
+        hierarchy_list.append({'text': node['text'], 'id': node['id']})
+        for n in node.get('children', []):
+            get_hierarchy(n, hierarchy_list)
+    return hierarchy_list
+
+
+def print_hierarchy(hierarchy_list, indent=0):
+    for node in hierarchy_list:
+        print ''.ljust(indent), node['text'], node['id']
+        indent = indent + 2
+
+
+def get_hierarchy_family(_a):
+    midpoint = int(len(_a)/2) + 1
+    return _a[midpoint]
 
 
 def normalize(name):
@@ -74,4 +113,7 @@ def normalize_feature_association(feature_association):
         'id': diseases[0]['ontology_term'],
         'term': diseases[0]['label']
     }
+    if 'family' in diseases[0]:
+        association['phenotype']['family'] = diseases[0]['family']
+
     association['phenotype']['description'] = diseases[0]['label']
