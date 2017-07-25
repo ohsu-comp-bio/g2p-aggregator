@@ -10,6 +10,7 @@ import evidence_label as el
 import evidence_direction as ed
 import mutation_type as mut
 
+
 def _eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
@@ -94,22 +95,27 @@ def convert(interpretation):
                         'description': str(interpretation['tier']),
                         'info': {
                             'publications': [
-                                ['http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(c['pmid']) for c in interpretation['citations']]  # NOQA
+                                'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(c['pmid']) for c in interpretation['citations']  # NOQA
                             ]
                         }
                     }]
                     # add summary fields for Display
                     if len(interpretation['citations']) > 0:
-                        association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])
+                        association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])  # NOQA
                     feature_association = {'genes': [gene],
                                            'features': [feature],
-                                           'feature_names': feature["geneSymbol"] + ' ' + feature["name"] ,
+                                           'feature_names':
+                                           '{} {}'.format(
+                                                feature["geneSymbol"],
+                                                feature["name"]
+                                            ),
                                            'association': association,
                                            'source': 'pmkb',
                                            'pmkb': {
                                             'variant': variant,
                                             'tumor': tumor,
-                                            'tissues': interpretation['tissues']
+                                            'tissues':
+                                            interpretation['tissues']
                                            }}
                     yield feature_association
 
