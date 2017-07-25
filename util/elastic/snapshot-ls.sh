@@ -9,4 +9,4 @@ if [ -z "$1" ]
 fi
 
 
-curl  $ES'/_snapshot/backups/_all'
+curl -s $ES'/_snapshot/backups/_all' | jq .snapshots[].snapshot
