@@ -68,7 +68,8 @@ def normalize_biothings(name):
             'drugbank.products.approved,drugbank.products.country,' \
             'drugbank.taxonomy.class,drugbank.taxonomy.direct-parent,' \
             'drugbank.taxonomy.kingdom,drugbank.taxonomy.subclass,' \
-            'drugbank.taxonomy.superclass'
+            'drugbank.taxonomy.superclass,' \
+            'chembl.usan_stem_definition'
         url = 'http://c.biothings.io/v1/query?q=chembl.pref_name:{}&{}'.format(name_part, fields)  # NOQA
         logging.debug(url)
         r = requests.get(url)
@@ -76,7 +77,7 @@ def normalize_biothings(name):
         logging.debug(rsp)
         hits = rsp['hits']
         if len(hits) == 0:
-            url = 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:{}&'.format(name_part, fields)  # NOQA
+            url = 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:{}&{}'.format(name_part, fields)  # NOQA
             logging.debug(url)
             r = requests.get(url)
             rsp = r.json()
@@ -115,7 +116,10 @@ def normalize_biothings(name):
                                   'drugbank.taxonomy',
                                   None)
 
-
+            usan_stem = pydash.get(hit,
+                                   'chembl.usan_stem_definition',
+                                   None)
+            print url, hit
             approved_countries = []
             products = pydash.get(hit, 'drugbank.products', [])
             for product in products:
@@ -141,6 +145,8 @@ def normalize_biothings(name):
                 compound['taxonomy'] = taxonomy
             if len(approved_countries) > 0:
                 compound['approved_countries'] = approved_countries
+            if usan_stem:
+                compound['usan_stem'] = usan_stem
             compounds.append(compound)
     return compounds
 
@@ -243,6 +249,8 @@ def normalize_feature_association(feature_association):
             ctx['approved_countries'] = compound['approved_countries']
         if 'taxonomy' in compound:
             ctx['taxonomy'] = compound['taxonomy']
+        if 'usan_stem' in compound:
+            ctx['usan_stem'] = compound['usan_stem']
         environmental_contexts.append(ctx)
         if (compound['synonym']):
             drug_labels.append(compound['synonym'])
