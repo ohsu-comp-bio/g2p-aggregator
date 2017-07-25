@@ -99,5 +99,7 @@ def test_Vemurafenib():
                                          'kingdom': 'Organic compounds',
                                          'subclass': 'Phenylpyridines',
                                          'superclass':
-                                         'Organoheterocyclic compounds'}
+                                         'Organoheterocyclic compounds'},
+                            'usan_stem': 'raf kinase inhibitors'
                             }
+    print compounds
