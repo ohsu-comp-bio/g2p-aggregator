@@ -16,10 +16,14 @@ def evidence_label(evidence, association, na=False):
 
     # CGI
     # Evidence level
-    cgi_a = ['cpic guidelines', 'european leukemianet guidelines', 'fda guidelines', 'nccn guidelines', 'nccn/cap guidelines'] # NOQA
-    cgi_b = ['late trials']
-    cgi_c = ['early trials', 'case report', 'clinical trial']
+    cgi_a = ['cpic guidelines', 'european leukemianet guidelines', 'fda guidelines', 'nccn guidelines', 'nccn/cap guidelines']  # NOQA
+    cgi_b = ['late trials', 'late trials,pre-clinical']
+    cgi_c = ['early trials', 'case report', 'clinical trial',
+             'early trials,case report']
     cgi_d = ['pre-clinical']
+
+
+
 
     # JAX
     jax_a = ['guideline', 'fda approved']
@@ -45,11 +49,17 @@ def evidence_label(evidence, association, na=False):
     oncokb_c = ['2b', '3a', '3b']
     oncokb_d = ['4']
 
+    # molecularmatch
+    molecularmatch_a = ['1']
+    molecularmatch_b = ['2']
+    molecularmatch_c = ['3']
+    molecularmatch_d = ['4', '5']
+
     ev_lab = {
-        'A': cgi_a + jax_a + pmkb_a + civic_a + oncokb_a,
-        'B': cgi_b + jax_b + pmkb_b + civic_b + oncokb_b,
-        'C': cgi_c + jax_c + pmkb_c + civic_c + oncokb_c,
-        'D': cgi_d + jax_d + pmkb_d + civic_d + oncokb_d
+        'A': cgi_a + jax_a + pmkb_a + civic_a + oncokb_a + molecularmatch_a,
+        'B': cgi_b + jax_b + pmkb_b + civic_b + oncokb_b + molecularmatch_b,
+        'C': cgi_c + jax_c + pmkb_c + civic_c + oncokb_c + molecularmatch_c,
+        'D': cgi_d + jax_d + pmkb_d + civic_d + oncokb_d + molecularmatch_d
     }
 
     ev_lev = {
