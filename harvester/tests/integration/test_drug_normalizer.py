@@ -8,7 +8,7 @@ import logging
 # logging.basicConfig(level=logging.WARNING)
 
 # cache responses
-requests_cache.install_cache('harvester')
+# requests_cache.install_cache('harvester')
 
 
 def test_nonsense():
@@ -103,3 +103,14 @@ def test_Vemurafenib():
                             'usan_stem': 'raf kinase inhibitors'
                             }
     print compounds
+
+
+def test_Parthenolide():
+    compounds = normalize('Parthenolide')
+    assert len(compounds) == 1
+
+
+def test_NSC_87877():
+    compounds = normalize('NSC-87877')
+    print compounds
+    assert len(compounds) == 1

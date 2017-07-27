@@ -101,13 +101,22 @@ def normalize_biothings(name):
             synonym_fda = synonym_usan = synonym_inn = None
             if 'molecule_synonyms' in chembl:
                 molecule_synonyms = chembl['molecule_synonyms']
-                for molecule_synonym in molecule_synonyms:
-                    if molecule_synonym['syn_type'] == 'FDA':
-                        synonym_fda = molecule_synonym['synonyms'].encode('utf8')
-                    if molecule_synonym['syn_type'] == 'USAN':
-                        synonym_usan = molecule_synonym['synonyms'].encode('utf8')
-                    if molecule_synonym['syn_type'] == 'INN':
-                        synonym_inn = molecule_synonym['synonyms'].encode('utf8')
+                if type(molecule_synonyms) is list:
+                    for molecule_synonym in molecule_synonyms:
+                        if molecule_synonym['syn_type'] == 'FDA':
+                            synonym_fda = molecule_synonym['synonyms'].encode('utf8')
+                        if molecule_synonym['syn_type'] == 'USAN':
+                            synonym_usan = molecule_synonym['synonyms'].encode('utf8')
+                        if molecule_synonym['syn_type'] == 'INN':
+                            synonym_inn = molecule_synonym['synonyms'].encode('utf8')
+                else:
+                    if molecule_synonyms['syn_type'] == 'FDA':
+                        synonym_fda = molecule_synonyms['synonyms'].encode('utf8')
+                    if molecule_synonyms['syn_type'] == 'USAN':
+                        synonym_usan = molecule_synonyms['synonyms'].encode('utf8')
+                    if molecule_synonyms['syn_type'] == 'INN':
+                        synonym_inn = molecule_synonyms['synonyms'].encode('utf8')
+
 
             toxicity = pydash.get(hit,
                                   'drugbank.pharmacology.toxicity',
@@ -119,7 +128,6 @@ def normalize_biothings(name):
             usan_stem = pydash.get(hit,
                                    'chembl.usan_stem_definition',
                                    None)
-            print url, hit
             approved_countries = []
             products = pydash.get(hit, 'drugbank.products', [])
             for product in products:
@@ -208,14 +216,15 @@ def normalize(name):
             # print 'normalize_pubchem_substance', name
             drugs = normalize_pubchem_substance(name)
         if len(drugs) == 0:
+            # print 'normalize_chembl'
+            drugs = normalize_chembl(name)
+        if len(drugs) == 0:
             logging.warning('normalize_drugs NOFIND {}'
                             .format(name))
-        # if len(drugs) == 0:
-        #     print 'normalize_chembl'
-        #     drugs = normalize_chembl(name)
-        # print 'DONE normalize drugs'
         return drugs
     except Exception as e:
+        logging.exception(e)
+        raise e
         return []
 
 
