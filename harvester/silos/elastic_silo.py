@@ -63,8 +63,8 @@ class ElasticSilo:
         thousands on fields in a document. So, for now at least,
         maintain it as a string.
         """
-        sources = ['cgi', 'jax', 'civic', 'oncokb', 'molecularmatch', 'pmkb']
-        # sources = ['molecularmatch']
+        sources = ['cgi', 'jax', 'civic', 'oncokb',
+                   'molecularmatch', 'pmkb', 'sage']
         for source in sources:
             if source in feature_association:
                 if not isinstance(feature_association[source], basestring):

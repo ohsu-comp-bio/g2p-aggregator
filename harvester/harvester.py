@@ -18,6 +18,7 @@ import molecularmatch
 import pmkb
 import drug_normalizer
 import disease_normalizer
+import sage
 
 from elastic_silo import ElasticSilo
 import elastic_silo
