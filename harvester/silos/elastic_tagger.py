@@ -55,7 +55,7 @@ class ElasticTagger:
     GENE_QUERY = {
      "query": {
        "wildcard": {
-           "gene.keyword": None
+           "genes.keyword": None
        }
      },
      "script": {
@@ -89,7 +89,7 @@ class ElasticTagger:
         try:
             for gene in self._genes:
                 q = self.GENE_QUERY
-                q['query']['wildcard']['gene.keyword'] = gene
+                q['query']['wildcard']['genes.keyword'] = gene
                 q['script']['params']['tag'] = self._tag_name
                 q['script']['inline'] = q['script']['inline'].format(self._tag_property)  # NOQA
                 self._es.update_by_query(index=self._index, body=q)

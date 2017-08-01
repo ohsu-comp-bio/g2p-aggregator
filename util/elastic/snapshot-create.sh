@@ -10,4 +10,9 @@ fi
 
 TS=$(date +"%Y%m%dt%H%M")
 
-curl -XPUT $ES'/_snapshot/backups/snapshot_'$TS'?wait_for_completion=true&pretty'
+curl -XPUT $ES'/_snapshot/backups/snapshot_'$TS'?wait_for_completion=true&pretty' -d'
+{
+  "indices": ".kibana,associations-new",
+  "ignore_unavailable": true,
+  "include_global_state": false
+}'

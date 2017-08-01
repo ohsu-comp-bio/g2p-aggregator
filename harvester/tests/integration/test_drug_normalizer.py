@@ -4,8 +4,11 @@ sys.path.append('.')  # NOQA
 from drug_normalizer import normalize, normalize_chembl
 import requests
 import requests_cache
+import logging
+# logging.basicConfig(level=logging.WARNING)
+
 # cache responses
-requests_cache.install_cache('harvester')
+# requests_cache.install_cache('harvester')
 
 
 def test_nonsense():
@@ -47,7 +50,6 @@ def test_chembl_bayer():
 
 def test_chembl_ASN003():
     compounds = normalize_chembl('ASN003')
-    print compounds
     assert len(compounds) == 0
 
 
@@ -59,3 +61,56 @@ def test_chembl_DHM25():
 def test_chembl_HDAC_inhibitors():
     compounds = normalize_chembl('HDAC inhibitors')
     assert len(compounds) == 0
+
+
+def test_cgi_drug_full_name():
+    compounds = normalize('Imatinib (BCR-ABL inhibitor 1st gen&KIT inhibitor)')
+    assert len(compounds) == 1
+
+
+def test_cgi_drug_plus_drug():
+    compounds = normalize('Cetuximab+Vemurafenib')
+    assert len(compounds) == 2
+
+
+def test_gefintinib():
+    compounds = normalize('gefintinib')
+    assert len(compounds) == 0
+
+
+def test_gefitnib():
+    compounds = normalize('gefitnib')
+    assert len(compounds) == 0
+
+
+def test_dacomitinib():
+    compounds = normalize('Dacomitinib')
+    assert len(compounds) == 1
+
+
+def test_Vemurafenib():
+    compounds = normalize('Vemurafenib')
+    assert len(compounds) == 1
+    assert compounds[0] == {'approved_countries': ['Canada', 'US'],
+                            'synonym': 'Vemurafenib',
+                            'ontology_term': 'compound:CID42611257',
+                            'taxonomy': {'class': 'Pyridines and derivatives',
+                                         'direct-parent': 'Phenylpyridines',
+                                         'kingdom': 'Organic compounds',
+                                         'subclass': 'Phenylpyridines',
+                                         'superclass':
+                                         'Organoheterocyclic compounds'},
+                            'usan_stem': 'raf kinase inhibitors'
+                            }
+    print compounds
+
+
+def test_Parthenolide():
+    compounds = normalize('Parthenolide')
+    assert len(compounds) == 1
+
+
+def test_NSC_87877():
+    compounds = normalize('NSC-87877')
+    print compounds
+    assert len(compounds) == 1
