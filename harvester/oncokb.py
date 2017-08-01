@@ -92,10 +92,9 @@ def convert(gene_data):
             },
             'description': clinical['level'],
             'info': {
-                'publications': [
+                'publications':
                     [drugAbstracts['link']
                         for drugAbstracts in clinical['drugAbstracts']]
-                ]
             }
         }]
         # add summary fields for Display
