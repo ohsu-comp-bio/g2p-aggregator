@@ -17,7 +17,7 @@ def evidence_direction(evidence, association, na=False):
 
     for item in res_type:
         for opt in res_type[item]:
-            if opt in evidence.lower():
+            if evidence and opt in evidence.lower():
                 association['response_type'] = item
 
     if 'response_type' not in association:

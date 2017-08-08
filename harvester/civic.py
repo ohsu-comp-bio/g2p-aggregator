@@ -5,6 +5,9 @@ import copy
 import evidence_label as el
 import evidence_direction as ed
 import mutation_type as mut
+import sys
+import logging
+
 
 def harvest(genes):
     """ given an array of gene symbols, harvest them from civic"""
@@ -51,7 +54,11 @@ def convert(gene_data):
             feature['referenceName'] = str(variant['coordinates']['reference_build'])  # NOQA
             feature['chromosome'] = str(variant['coordinates']['chromosome'])
             feature['name'] = variant['name']
-            feature['biomarker_type'] = mut.norm_biomarker(variant['variant_types'][0]['display_name']) # NOQA
+            if (
+                'variant_types' in variant and
+                len(variant['variant_types']) > 0
+            ):
+                feature['biomarker_type'] = mut.norm_biomarker(variant['variant_types'][0]['display_name'])  # NOQA
             for evidence_item in variant['evidence_items']:
                 association = {}
                 association['description'] = evidence_item['description']
@@ -59,14 +66,15 @@ def convert(gene_data):
                 environmentalContexts = association['environmentalContexts']
                 for drug in evidence_item['drugs']:
                     environmentalContexts.append({
+                        'term': drug['name'],
                         'description': drug['name'],
-                        'pubchem_id': drug['pubchem_id']
+                        'id': drug['pubchem_id']
                     })
                 association['phenotype'] = {
                     'description': evidence_item['disease']['name'],
                     'id': evidence_item['disease']['url']
                 }
-                association['evidence'] = {
+                association['evidence'] = [{
                     "evidenceType": {
                         "sourceName": "CIVIC",
                         "id": '{}'.format(evidence_item['id'])
@@ -77,10 +85,14 @@ def convert(gene_data):
                             evidence_item['source']['source_url']
                         ]
                     }
-                }
+                }]
                 # add summary fields for Display
-                association = el.evidence_label(evidence_item['description'], association, na=True)
-                association = ed.evidence_direction(evidence_item['clinical_significance'], association)
+                association = el.evidence_label(
+                    evidence_item['evidence_level'], association, na=True
+                )
+                association = ed.evidence_direction(
+                    evidence_item['clinical_significance'], association
+                )
                 association['publication_url'] = evidence_item['source']['source_url'],   # NOQA
                 if len(evidence_item['drugs']) > 0:
                     association['drug_labels'] = ','.join([drug['name'] for drug in evidence_item['drugs']])   # NOQA
@@ -90,13 +102,13 @@ def convert(gene_data):
                 v['evidence_items'] = [evidence_item]
                 feature_association = {'genes': [gene_data['gene']],
                                        'features': [feature],
-                                       'feature_names': evidence['name'],
+                                       'feature_names': evidence_item['name'],
                                        'association': association,
                                        'source': 'civic',
                                        'civic': v}
                 yield feature_association
     except Exception as e:
-        print 'CIVIC', gene_data['gene'], e
+        logging.error(gene_data['gene'], exc_info=1)
 
 
 def harvest_and_convert(genes):
@@ -110,4 +122,4 @@ def harvest_and_convert(genes):
 # main
 if __name__ == '__main__':
     for feature_association in harvest_and_convert(["MDM2"]):
-        print feature_association
+        logging.info(feature_association)

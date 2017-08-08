@@ -11,9 +11,10 @@ def norm_biomarker(evidence, cgi_biomarker=None):
     # of CGI and directed in for loop below. 
     mut_types = {
         'fusion' : ['fusion', 'fus'],
-        'snp' : ['snp', 'mut', 'missense', 'protein altering', 'coding sequence', 'nonsense'],
+        'snp' : ['snp', 'mut', 'mutant', 'missense', 'protein altering', 'coding sequence', 'nonsense'],
         'biallelic inactivation' : ['bia'],
-        'overexpression' : ['expr'],
+        'overexpression' : ['expr', 'over exp'],
+        'decreased expression' : ['dec exp'],
         'unspecified' : ['na', 'n/a', 'gene variant', 'wild type', 'any'], # civic
         'exon' : ['exon'], # civic
         'transcript': ['transcript'], # civic
@@ -26,7 +27,7 @@ def norm_biomarker(evidence, cgi_biomarker=None):
         '3 Prime UTR' : ['3 prime utr'],
         'stopgain' : ['stop gained'],
         'startloss' : ['start lost'],
-        'silent' : ['silent mutation', 'synonymous'],
+        'silent' : ['silent mutation', 'synonymous', 'inact mut'],
         'intron' : ['intron variant'],
         'indel' : ['indel']
     }

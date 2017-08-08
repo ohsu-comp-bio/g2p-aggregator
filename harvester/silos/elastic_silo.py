@@ -3,13 +3,10 @@ from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 import sys
 import json
+import logging
 from elasticsearch import Elasticsearch, RequestsHttpConnection, serializer, compat, exceptions  # NQQA
 
 # module level funtions
-
-
-def _eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
 
 
 def populate_args(argparser):
@@ -41,7 +38,7 @@ class ElasticSilo:
             indices_client = IndicesClient(self._es)
             indices_client.delete(index=self._index)
         except Exception as e:
-            _eprint("exception on delete_index {}".format(e))
+            logging.error("exception on delete_index {}".format(e))
             pass
 
     def delete_source(self, source):
@@ -57,7 +54,8 @@ class ElasticSilo:
             }
             self._es.delete_by_query(index=self._index, body=query)
         except Exception as e:
-            _eprint(e, query)
+            logging.exception
+            logging.error(query)
             pass
 
     def _stringify_sources(self, feature_association):
@@ -65,8 +63,8 @@ class ElasticSilo:
         thousands on fields in a document. So, for now at least,
         maintain it as a string.
         """
-        # sources = ['cgi', 'jax', 'civic', 'oncokb', 'molecularmatch', 'pmkb']
-        sources = ['molecularmatch']
+        sources = ['cgi', 'jax', 'civic', 'oncokb',
+                   'molecularmatch', 'pmkb', 'sage']
         for source in sources:
             if source in feature_association:
                 if not isinstance(feature_association[source], basestring):
@@ -78,13 +76,18 @@ class ElasticSilo:
         # prevent field explosion
         feature_association = self._stringify_sources(feature_association)
 
+        # try:
         result = self._es.index(index=self._index,
                                 body=feature_association,
                                 doc_type='association',
                                 op_type='index')
+
         if result['_shards']['failed'] > 0:
-            _eprint('failure updating association {}'
-                    .format(gene_feature['gene']))
+            logging.error('failure updating association {}'
+                          .format(gene_feature['gene']))
+        # except Exception as e:
+        #     logging.error(json.dumps(feature_association))
+        #     raise e
 
 
 class JSONSerializerPython2(serializer.JSONSerializer):

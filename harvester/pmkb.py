@@ -10,6 +10,7 @@ import evidence_label as el
 import evidence_direction as ed
 import mutation_type as mut
 
+
 def _eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
@@ -57,7 +58,9 @@ def convert(interpretation):
                 feature['end'] = stop
                 feature['chromosome'] = str(chromosome)
                 feature['referenceName'] = 'GRCh37/hg19'
-                feature['biomarker_type'] = mut.norm_biomarker(variant['variant_type'])
+                feature['biomarker_type'] = mut.norm_biomarker(
+                                                variant['variant_type']
+                                            )
 
                 attributes = {}
                 for key in variant.keys():
@@ -72,8 +75,9 @@ def convert(interpretation):
                 # association['evidence_label'] = interpretation['tier']
                 association = el.evidence_label(str(interpretation['tier']),
                                                 association, na=True)
-                association = ed.evidence_direction(str(interpretation['tier']),
-                                                    association, na=True)
+                association = ed.evidence_direction(
+                                str(interpretation['tier']),
+                                association, na=True)
 
                 association['description'] = interpretation['interpretation']
                 # TODO pmkb does not break out drug !?!?
@@ -88,25 +92,30 @@ def convert(interpretation):
                         "evidenceType": {
                             "sourceName": "pmkb"
                         },
-                        'description': interpretation['tier'],
+                        'description': str(interpretation['tier']),
                         'info': {
                             'publications': [
-                                ['http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(c['pmid']) for c in interpretation['citations']]  # NOQA
+                                'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(c['pmid']) for c in interpretation['citations']  # NOQA
                             ]
                         }
                     }]
                     # add summary fields for Display
                     if len(interpretation['citations']) > 0:
-                        association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])
+                        association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])  # NOQA
                     feature_association = {'genes': [gene],
                                            'features': [feature],
-                                           'feature_names': feature["geneSymbol"] + ' ' + feature["name"] ,
+                                           'feature_names':
+                                           '{} {}'.format(
+                                                feature["geneSymbol"],
+                                                feature["name"]
+                                            ),
                                            'association': association,
                                            'source': 'pmkb',
                                            'pmkb': {
                                             'variant': variant,
                                             'tumor': tumor,
-                                            'tissues': interpretation['tissues']
+                                            'tissues':
+                                            interpretation['tissues']
                                            }}
                     yield feature_association
 

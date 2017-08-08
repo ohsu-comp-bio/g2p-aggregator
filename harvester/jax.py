@@ -6,6 +6,7 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from inflection import parameterize, underscore
 import json
+import logging
 import evidence_label as el
 import evidence_direction as ed
 import mutation_type as mut
@@ -57,8 +58,6 @@ def get_evidence(gene_ids):
 
         # so, we grab the table heading
         thead_ths = tree.xpath(xpath_thead_ths)
-        if len(thead_ths) == 0:
-            print 'no table header found'
         evidence_property_names = []
         for th in thead_ths:
             evidence_property_names.append(
@@ -69,7 +68,7 @@ def get_evidence(gene_ids):
         # grab all the TD's and load an array of evidence
         tds = tree.xpath(xpath_tbody_tds)
         if len(tds) == 0:
-            print 'no table tds found. skipping'
+            logging.info('no table tds found. skipping')
             break
         td_texts = [td.text_content().strip() for td in tds]
         cell_limit = len(td_texts)
@@ -94,7 +93,6 @@ def convert(jax_evidence):
     jax = jax_evidence['jax_id']
     evidence_array = jax_evidence['evidence']
     for evidence in evidence_array:
-
         # TODO: alterations are treated individually right now, but they are
         # actually combinations and should be treated accordingly.
 
@@ -105,8 +103,11 @@ def convert(jax_evidence):
         for tuple in tuples:
             feature = {}
             feature['geneSymbol'] = tuple[0]
-            feature['name'] = ' '.join(tuple[1:])
-            feature['biomarker_type'] = mut.norm_biomarker(None)
+            feature['name'] = tuple[0]
+            # feature['name'] = ' '.join(tuple[1:])
+            feature['biomarker_type'] = mut.norm_biomarker(' '.join(tuple[1:]))
+            print feature['biomarker_type']
+            # feature['biomarker_type'] = mut.norm_biomarker(None)
 
             try:
                 """
@@ -153,9 +154,8 @@ def convert(jax_evidence):
             },
             'description': evidence['response_type'],
             'info': {
-                'publications': [
+                'publications':
                     ['http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(r) for r in evidence['references']]  # NOQA
-                ]
             }
         }]
         # add summary fields for Display
