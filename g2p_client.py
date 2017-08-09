@@ -3,6 +3,7 @@ Python client interface to G2P database.
 '''
 
 import sys
+import argparse
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
@@ -11,7 +12,10 @@ from collections import OrderedDict
 import pandas as pd
 
 
-class G2PDatabase():
+class G2PDatabase(object):
+    '''
+    The G2P database.
+    '''
 
     def __init__(self, es_host, index='associations'):
         self.client = Elasticsearch(host=es_host)
@@ -28,7 +32,7 @@ class G2PDatabase():
         '''
         Returns all matches for a gene.
         '''
-        s = Search(index=self.index).using(self.client).query("match", gene=gene)
+        s = Search(index=self.index).using(self.client).query("match", genes=gene)
         s.execute()
         return s
 
@@ -38,8 +42,8 @@ class G2PDatabase():
         '''
         pass
 
-    def _hits_to_dataframe(self, s):
-        start_columns = ['source', 'gene', 'drug']
+    def hits_to_dataframe(self, s):
+        start_columns = ['source', 'genes', 'drug']
         end_columns = ['description']
         feature_cols = ['feature_geneSymbol', 'feature_name', 'feature_entrez_id',
                         'feature_chromosome', 'feature_start', 'feature_end',
@@ -58,13 +62,16 @@ class G2PDatabase():
         for _, hit in enumerate(s.scan()):
             hit_dict = {
                 'source': hit['source'],
-                'gene': hit['gene'],
+                'genes': ':'.join(hit['genes']),
                 'drug': hit['association'].to_dict().get('drug_labels', ''),
                 'description': hit['association']['description']
             }
-            feature_dict = feature_dict_base.copy()
-            feature_dict.update(_prepend_str_to_key(hit['feature'].to_dict(), 'feature_'))
-            hit_dict.update(feature_dict)
+
+            # FIXME: this yields only the last feature of association, not all features.
+            for i, feature in enumerate(hit['features']):
+                feature_dict = feature_dict_base.copy()
+                feature_dict.update(_prepend_str_to_key(feature.to_dict(), 'feature_'))
+                hit_dict.update(feature_dict)
             data.append(hit_dict)
 
         df = pd.DataFrame(data)
@@ -74,6 +81,11 @@ class G2PDatabase():
 
 
 if __name__ == '__main__':
-    database = G2PDatabase(sys.argv[1])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--host", help="ES host")
+    args = parser.parse_args()
+
+
+    database = G2PDatabase(args.host)
     s = database.query_all()
-    print database._hits_to_dataframe(s).to_csv(sep='\t', index=False, encoding='utf-8')
+    print database.hits_to_dataframe(s).to_csv(sep='\t', index=False, encoding='utf-8')

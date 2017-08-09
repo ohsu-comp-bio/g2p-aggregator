@@ -24,8 +24,9 @@ if __name__ == '__main__':
     filtered = args.filtered
 
     # Read table.
-    variants = pd.read_csv(args.in_file, sep=",")
+    variants = pd.read_csv(args.in_file, sep="\t")
     variants = variants.fillna('')
+
 
     # Annotate variants.
     database = G2PDatabase(host)
@@ -37,7 +38,7 @@ if __name__ == '__main__':
         if name in variants.columns.values.tolist():
             gene_col_name = name
             break
-
+    
     # Annotate variants by adding # of pieces of evidence + URL for each variant.
     variants['drug_evidence_count'] = 0
     variants['drug_evidence_url'] = ''
