@@ -6,7 +6,7 @@ import sys
 import argparse
 
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search
+from elasticsearch_dsl import Search, Q
 from collections import OrderedDict
 
 import pandas as pd
@@ -26,6 +26,19 @@ class G2PDatabase(object):
         Returns all documents in the database.
         '''
         s = Search(index=self.index).using(self.client).query("match_all")
+        return s
+
+    def query_by_variant(self, chromosome, start, end, ref, alt):
+        '''
+        Returns all matches for a variant.
+        '''
+        q = Q('match', **{'features.chromosome': str(chromosome)}) & \
+            Q('match', **{'features.start': start}) & \
+            Q('match', **{'features.end': end}) & \
+            Q('match', **{'features.ref': ref}) & \
+            Q('match', **{'features.alt': alt})
+        s = Search(index=self.index).using(self.client).query(q)
+        s.execute()
         return s
 
     def query_by_gene(self, gene):
