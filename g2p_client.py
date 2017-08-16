@@ -57,7 +57,7 @@ class G2PDatabase(object):
 
     def hits_to_dataframe(self, s):
         start_columns = ['source', 'genes', 'drug']
-        end_columns = ['description']
+        end_columns = ['description', 'evidence_label', 'evidence_url']
         feature_cols = ['feature_geneSymbol', 'feature_name', 'feature_entrez_id',
                         'feature_chromosome', 'feature_start', 'feature_end',
                         'feature_ref', 'feature_alt', 'feature_referenceName',
@@ -77,7 +77,9 @@ class G2PDatabase(object):
                 'source': hit['source'],
                 'genes': ':'.join(hit['genes']),
                 'drug': hit['association'].to_dict().get('drug_labels', ''),
-                'description': hit['association']['description']
+                'description': hit['association']['description'],
+                'evidence_label': hit['association']['evidence_label'],
+                'evidence_url': hit['association']['publication_url'],
             }
 
             # FIXME: this yields only the last feature of association, not all features.
