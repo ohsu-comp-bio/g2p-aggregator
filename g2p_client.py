@@ -8,6 +8,7 @@ import argparse
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from collections import OrderedDict
+from itertools import product
 
 import pandas as pd
 
@@ -20,6 +21,12 @@ class G2PDatabase(object):
     def __init__(self, es_host, index='associations'):
         self.client = Elasticsearch(host=es_host)
         self.index = index
+
+        # Get a list of sources in the database.
+        # TODO: there has to be a more efficient way to do this which
+        # doesn't require loading all results (faceted search? return only some
+        # fields? )
+        self.sources = list(set([h.source for h in self.query_all().scan()]))
 
     def query_all(self):
         '''
@@ -94,6 +101,31 @@ class G2PDatabase(object):
             df = df[start_columns + feature_cols + end_columns]
         return df
 
+    def summarize_results(self, s):
+        '''
+        Summarize results for a search by evidence level. Return value is a dict
+        with the following keys: total_[A/B/C/D/E] and [source]_[A/B/C/D/E]
+        '''
+
+        # Create base dictionary with all needed keys.
+        keys = ['%s_%s' % (source, evidence_label) \
+                for (source, evidence_label) in product(['total'] + self.sources, ['A', 'B', 'C', 'D'])]
+        rval = dict.fromkeys(keys, 0)
+
+        if s.count() == 0:
+            return rval
+
+        hits_df = self.hits_to_dataframe(s)
+
+        # Total counts for each evidence label.
+        for evidence_label, count in hits_df.groupby('evidence_label').size().iteritems():
+            rval['total_%s' % evidence_label] = count
+
+        # Counts for each evidence label by source.
+        size_series = hits_df.groupby(['source', 'evidence_label']).size()
+        for (source, evidence_label), count in size_series.iteritems():
+            rval['%s_%s' % (source, evidence_label)] = count
+        return rval
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
