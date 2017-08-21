@@ -60,7 +60,7 @@ def convert(gene_data):
                 'phenotype': {
                     'description': evidence_item['clinical_manifestation'],
                 },
-                'evidence': {
+                'evidence': [{
                     "evidenceType": {
                         "sourceName": "sage",
                         "id": '{}'.format(evidence_item['publication_url'])
@@ -69,7 +69,7 @@ def convert(gene_data):
                     'info': {
                         'publications': [evidence_item['publication_url']]
                     }
-                }
+                }]
             }
             association['environmentalContexts'] = [{
                 'description': evidence_item['drug_labels'],

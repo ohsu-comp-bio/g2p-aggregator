@@ -154,9 +154,8 @@ def convert(jax_evidence):
             },
             'description': evidence['response_type'],
             'info': {
-                'publications': [
+                'publications':
                     ['http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(r) for r in evidence['references']]  # NOQA
-                ]
             }
         }]
         # add summary fields for Display
