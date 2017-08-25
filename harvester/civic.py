@@ -53,6 +53,8 @@ def convert(gene_data):
             feature['end'] = variant['coordinates']['stop']
             feature['referenceName'] = str(variant['coordinates']['reference_build'])  # NOQA
             feature['chromosome'] = str(variant['coordinates']['chromosome'])
+            feature['ref'] = str(variant['coordinates']['reference_bases'])
+            feature['alt'] = str(variant['coordinates']['variant_bases'])
             feature['name'] = variant['name']
             if (
                 'variant_types' in variant and
