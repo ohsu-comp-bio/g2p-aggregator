@@ -8,7 +8,6 @@ import logging
 import mutation_type as mut
 from warnings import warn
 
-# curl 'http://api-demo.molecularmatch.com/v2/search/assertions' --data 'apiKey=xxxxxxxxx' --data-urlencode 'filters=[{"facet":"MUTATION","term":"KIT"}]'
 resourceURLs = {
     "assertions": "/v2/search/assertions"
 }
@@ -19,7 +18,12 @@ apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
 
 # TODO this is an anomaly: in order to get all genes query with string
 # that is not matched by anything?
-DEFAULT_GENES = ['XXXX']
+DEFAULT_GENES = ["XXXX"]
+
+
+# with open("gene_symbols.txt") as f:
+#     content = f.readlines()
+# DEFAULT_GENES = [x.strip() for x in content]
 
 
 def get_evidence(gene_ids):
@@ -33,7 +37,7 @@ def get_evidence(gene_ids):
         start = 0
         limit = 20
         url = mmService + resourceURLs["assertions"]
-        filters = [{'facet': 'MUTATION',
+        filters = [{'facet': 'GENE',
                     'term': '{}'.format(gene)
                     }]
         while start >= 0:
@@ -53,14 +57,35 @@ def get_evidence(gene_ids):
                 else:
                     start = start + limit
                 logging.info(
-                    "page {} of {}".format(assertions['page'],
-                                           assertions['totalPages'])
+                    "page {} of {}. total {}".format(
+                        assertions['page'],
+                        assertions['totalPages'],
+                        assertions['total']
+                        )
                 )
                 # filter those drugs, only those with diseases
                 for hit in assertions['rows']:
-                    # do not process rows without drugs
-                    if len(hit['therapeuticContext']) > 0:
-                        yield hit
+                    # # do not process rows without drugs
+                    # if len(hit['therapeuticContext']) > 0:
+                    #     yield hit
+
+                    # # do not process rows that do not match our query
+                    # returned_gene = None
+                    # for tag in hit['tags']:
+                    #     if tag['facet'] == 'GENE':
+                    #         returned_gene = tag['term']
+                    # if returned_gene == gene:
+                    #     yield hit
+                    # else:
+                    #     raise ValueError(
+                    #         'evidence for {}, not {} - skipping'.format(
+                    #             returned_gene,
+                    #             gene
+                    #         )
+                    #     )
+
+                    # process all rows
+                    yield hit
 
             except Exception as e:
                 logging.error(
@@ -74,10 +99,15 @@ def convert(evidence):
     """
 
     """
+    if 'tier' not in evidence:
+        logging.error('No tier?')
+        logging.error(evidence.keys())
+
     sources = evidence['sources']
-    tier = evidence['tier']
+    tier = evidence.get('tier')
     direction = evidence['direction']
     narrative = evidence['narrative']
+
     # if len(evidence['mutations']) > 1:
     #     warn('Unexpected; two mutations in one entry; please check')
     # mutations = evidence['mutations'][0]
@@ -206,7 +236,8 @@ def convert(evidence):
     association = el.evidence_label(tier, association, na=False)
     association = ed.evidence_direction(tier, association, na=False)
 
-    association['publication_url'] = pubs[0]
+    if len(pubs) > 0:
+        association['publication_url'] = pubs[0]
     association['drug_labels'] = drug_label
 
     genes = []
