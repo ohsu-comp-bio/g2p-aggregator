@@ -13,6 +13,9 @@ attic
 util/elastic/backups
 harvester/cosmic_lookup_table.tsv
 harvester/CosmicMutantExport.tsv.gz
+harvester/benchmark_results.txt
+harvester/cgi_mut_benchmarking.tsv
+harvester/oncokb_mut_benchmarking.tsv
 compbio-tls
 certs
 letsencrypt_certs
@@ -20,3 +23,6 @@ harvester/oncokb_all_actionable_variants*.*
 
 # requests-cache(s)
 harvester/*.sqlite
+harvester/*log
+
+*.swp

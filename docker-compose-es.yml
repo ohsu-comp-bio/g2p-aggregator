@@ -1,0 +1,26 @@
+################
+version: '2.1'
+
+services:
+  # Elastic Search
+  # note: on docker for mac, you may need to adjust the docker-machines' config
+  # if you get this error ....
+  # elastic    | ERROR: bootstrap checks failed
+  # elastic    | max virtual memory areas vm.max_map_count [65530] likely too low, increase to at least [262144]
+  # ... see this
+  # https://github.com/elastic/elasticsearch-docker/blob/master/README.md#osx-with-docker-toolbox
+  elastic:
+    container_name: elastic_g2p
+    build:
+      context: services/elastic/
+    volumes:
+      - "./util:/util/"
+    ports:
+      - "${ELASTIC_PORT}:${ELASTIC_PORT}"
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - xpack.security.enabled=false
+      - path.repo=/util/elastic/backups
+
+

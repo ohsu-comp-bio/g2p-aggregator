@@ -7,6 +7,11 @@ BENCHMARK_DATASET=oncokb
 
 CGI_VERSION=20170208
 
+all: oncokb_all_actionable_variants.tsv cgi_biomarkers_per_variant.tsv \
+		cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv \
+		benchmark_results.txt
+	
+
 ## Do bulk download of OncoKB and set up TSV for ingestion.
 oncokb_all_actionable_variants.tsv:
 	curl -o oncokb_all_actionable_variants_$(shell date +"%Y%m%d").tsv http://oncokb.org/api/v1/utils/allActionableVariants.txt
