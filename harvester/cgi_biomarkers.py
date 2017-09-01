@@ -60,7 +60,7 @@ def convert(evidence):
             ref, alt = remainder[len(start):].split(">")
             return {
                 'chromosome': str(chrom),
-                'start': start,
+                'start': int(start),
                 'ref': ref,
                 'alt': alt
             }
