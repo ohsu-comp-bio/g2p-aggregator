@@ -174,7 +174,8 @@ def convert(gene_data):
             'description': biological['mutationEffect'],
             'info': {
                 'publications':
-                    biological['mutationEffectPmids']
+                    ['http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(Pmid)
+                        for Pmid in biological['mutationEffectPmids']]
             }
         }]
         # add summary fields for Display
