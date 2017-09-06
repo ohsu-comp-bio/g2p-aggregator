@@ -49,3 +49,33 @@ def test_Her2_receptor_positive_breast_cancer():
     diseases = normalize("Her2-receptor positive breast cancer")
     assert diseases[0]['ontology_term'] == 'DOID:0060079'
     assert diseases[0]['label'] == 'Her2-receptor positive breast cancer'
+
+
+def test_comma_separator():
+    diseases = normalize("CML,stomach cancer")
+    assert len(diseases) == 2
+
+
+def test_semicolon_separator():
+    diseases = normalize("CML;stomach cancer")
+    assert len(diseases) == 2
+
+
+def test_LUAD_TH():
+    diseases = normalize("LUAD;TH")
+    assert len(diseases) == 2
+
+
+def test_BRCA_BOCA():
+    diseases = normalize("BRCA;BOCA")
+    assert len(diseases) == 2
+
+
+def test_Advanced_Solid_Tumor():
+    diseases = normalize("Advanced Solid Tumor")
+    print 'diseases', diseases
+
+
+def test_Astrocytoma_Anaplastic():
+    diseases = normalize("Astrocytoma, Anaplastic")
+    print 'diseases', diseases
