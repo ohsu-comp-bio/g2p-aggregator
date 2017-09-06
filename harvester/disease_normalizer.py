@@ -92,15 +92,16 @@ def normalize(name):
     except Exception as e:
         pass
     try:
-        names = re.split("[\,;]+", name)
         diseases = []
-        for name_part in names:
-            normalized_diseases = normalize_ebi(name_part)
-            diseases = diseases + normalized_diseases
+        if name:
+            names = re.split("[\,;]+", name)
+            for name_part in names:
+                normalized_diseases = normalize_ebi(name_part)
+                diseases = diseases + normalized_diseases
         return diseases
     except Exception as e:
-        raise e
         logging.warning("Could not normalize {}".format(name))
+        raise e
         return []
 
 
