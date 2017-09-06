@@ -1,0 +1,15 @@
+################
+version: '2.1'
+
+services:
+  # https://www.synapse.org/#!Synapse:syn7851250
+  jupyter:
+    container_name: jupyter_g2p
+    build:
+      context: services/jupyter/
+    ports:
+      - "8888:8888"
+    links:
+      - elastic:elasticsearch
+    volumes:
+      - "./util:/util/"
