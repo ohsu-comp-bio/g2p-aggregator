@@ -7,6 +7,20 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
+# Taken from https://stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
+def get_or_create(session, model, **kwargs):
+    '''
+    Get or create models based on kwargs.
+    '''
+    instance = session.query(model).filter_by(**kwargs).first()
+    if instance:
+        return instance
+    else:
+        instance = model(**kwargs)
+        session.add(instance)
+        session.commit()
+        return instance
+
 ######### Declarative definitions for objects and corresponding tables.
 
 Base = declarative_base()
@@ -92,13 +106,9 @@ class RDMSSilo(object):
         Session.configure(bind=self._engine)
         session = Session()
 
-        # Create gene.
+        # Create genes.
         for gene_name in feature_association['genes']:
-            gene = session.query(Gene).filter_by(name=gene_name).first()
-            if not gene:
-                gene = Gene(name=gene_name)
-                session.add(gene)
-
+            gene = get_or_create(session, Gene, name=gene_name)
 
         # Create variant.
 
