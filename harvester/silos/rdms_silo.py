@@ -25,6 +25,16 @@ def get_or_create(session, model, **kwargs):
 
 Base = declarative_base()
 
+class Source(Base):
+    '''
+    Source of association.
+    '''
+    __tablename__ = 'Source'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+
+
 class Gene(Base):
     '''
     A gene found in the genome.
@@ -56,6 +66,10 @@ class Variant(Base):
     name = Column(String)
     chromosome = Column(String)
     chromosome2 = Column(String)
+    start = Column(Integer)
+    stop = Column(Integer)
+    ref = Column(String)
+    alt = Column(String)
     deleted = Column(Boolean)
     deleted_at = Column(DateTime)
     description = Column(String)
@@ -68,7 +82,7 @@ class Variant(Base):
 
 def populate_args(argparser):
     """add arguments we expect """
-    argparser.add_argument('--database', '-db', help='''SQLite database''')
+    argparser.add_argument('--database', '-db', help='''SQLite database''', default='g2p.sqlite3')
 
 
 class RDMSSilo(object):
@@ -79,7 +93,7 @@ class RDMSSilo(object):
         """ initialize, set endpoint & index name """
         self._database_file = args.database
         # echo=True will echo all SQL statements issued by SQLAlchemy.
-        self._engine = create_engine('sqlite:///g2p.sqlite3', echo=False)
+        self._engine = create_engine('sqlite:///%s' % self._database_file, echo=False)
 
         # Create all tables associated with classes.
         Base.metadata.create_all(self._engine)
@@ -100,17 +114,26 @@ class RDMSSilo(object):
 
     def save(self, feature_association):
         """ Write to database """
-
+        
         # Create session.
         Session = sessionmaker(bind=self._engine)
         Session.configure(bind=self._engine)
         session = Session()
 
-        # Create genes.
+        # Add source.
+        get_or_create(session, Source, name=feature_association['source'])
+
+        # Add genes.
         for gene_name in feature_association['genes']:
             gene = get_or_create(session, Gene, name=gene_name)
 
-        # Create variant.
+        # Add variants.
+        for feature in feature_association['features']:
+            variant = get_or_create(session, Variant,
+                                    chromosome=feature.get('chromosome', ''),
+                                    start=feature.get('start', -1),
+                                    ref=feature.get('ref', ''),
+                                    alt=feature.get('alt', ''))
 
         # Create drug.
 
