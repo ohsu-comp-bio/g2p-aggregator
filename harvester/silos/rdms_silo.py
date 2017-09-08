@@ -34,7 +34,6 @@ class Source(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
-
 class Gene(Base):
     '''
     A gene found in the genome.
@@ -78,6 +77,47 @@ class Variant(Base):
 
     gene = relationship('Gene', back_populates='variants')
 
+class Drug(Base):
+    '''
+    A drug.
+    '''
+    __tablename__ = 'Drug'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+
+    evidence_items = relationship('EvidenceItem', back_populates='drug')
+
+class Disease(Base):
+    '''
+    A disease.
+    '''
+    __tablename__ = 'Disease'
+
+    id = Column(Integer, primary_key=True)
+    doid = Column(String)
+    name = Column(String)
+    family = Column(String)
+
+    evidence_items = relationship('EvidenceItem', back_populates='disease')
+
+class EvidenceItem(Base):
+    '''
+    Evidence items.
+    '''
+    __tablename__ = 'EvidenceItem'
+
+    id = Column(Integer, primary_key=True)
+    evidence_level = Column(Integer)
+    evidence_direction = Column(Integer)
+    evidence_type = Column(Integer)
+    source_id = Column(Integer, ForeignKey('Source.id'))
+    drug_id = Column(Integer, ForeignKey('Drug.id'))
+    disease_id = Column(Integer, ForeignKey('Disease.id'))
+
+    drug = relationship('Drug', back_populates='evidence_items')
+    disease = relationship('Disease', back_populates='evidence_items')
+    
 # module level funtions
 
 def populate_args(argparser):
@@ -93,7 +133,8 @@ class RDMSSilo(object):
         """ initialize, set endpoint & index name """
         self._database_file = args.database
         # echo=True will echo all SQL statements issued by SQLAlchemy.
-        self._engine = create_engine('sqlite:///%s' % self._database_file, echo=False)
+        self._engine = create_engine('sqlite:///%s' % self._database_file,
+                                     convert_unicode=True, echo=False)
 
         # Create all tables associated with classes.
         Base.metadata.create_all(self._engine)
@@ -114,14 +155,14 @@ class RDMSSilo(object):
 
     def save(self, feature_association):
         """ Write to database """
-        
+
         # Create session.
         Session = sessionmaker(bind=self._engine)
         Session.configure(bind=self._engine)
         session = Session()
 
         # Add source.
-        get_or_create(session, Source, name=feature_association['source'])
+        source = get_or_create(session, Source, name=feature_association['source'])
 
         # Add genes.
         for gene_name in feature_association['genes']:
@@ -135,8 +176,21 @@ class RDMSSilo(object):
                                     ref=feature.get('ref', ''),
                                     alt=feature.get('alt', ''))
 
-        # Create drug.
+        # Add drugs.
+        association = feature_association['association']
+        print association
+        drugs = association['drug_labels'].split(',')
+        drugs = [get_or_create(session, Drug, name=drug_name) for drug_name in drugs]
 
-        # Create association.
+        # Add disease.
+        phenotype = association['phenotype']
+        disease = get_or_create(session, Disease,
+                                doid=phenotype.get('id', ''),
+                                name=phenotype.get('description', ''),
+                                family=phenotype.get('family', ''))
+
+        # Create evidence items.
+
+        # Create associations between evidence items,
 
         session.commit()
