@@ -110,20 +110,25 @@ class EvidenceItem(Base):
     id = Column(Integer, primary_key=True)
     evidence_level = Column(Integer)
     evidence_direction = Column(Integer)
-    evidence_type = Column(Integer)
-    source_id = Column(Integer, ForeignKey('Source.id'))
     drug_id = Column(Integer, ForeignKey('Drug.id'))
     disease_id = Column(Integer, ForeignKey('Disease.id'))
 
     drug = relationship('Drug', back_populates='evidence_items')
     disease = relationship('Disease', back_populates='evidence_items')
-    
+
 # module level funtions
 
 def populate_args(argparser):
     """add arguments we expect """
     argparser.add_argument('--database', '-db', help='''SQLite database''', default='g2p.sqlite3')
 
+def evidence_direction_to_int(direction):
+    res_type = {
+        'resistant': -1,
+        'sensitive': 1,
+        'no benefit': 0
+    }
+    return res_type.get(direction, -100)
 
 class RDMSSilo(object):
     """ A silo is where we store stuff that has been harvested.
@@ -133,8 +138,7 @@ class RDMSSilo(object):
         """ initialize, set endpoint & index name """
         self._database_file = args.database
         # echo=True will echo all SQL statements issued by SQLAlchemy.
-        self._engine = create_engine('sqlite:///%s' % self._database_file,
-                                     convert_unicode=True, echo=False)
+        self._engine = create_engine('sqlite:///%s' % self._database_file, echo=False)
 
         # Create all tables associated with classes.
         Base.metadata.create_all(self._engine)
@@ -178,9 +182,8 @@ class RDMSSilo(object):
 
         # Add drugs.
         association = feature_association['association']
-        print association
         drugs = association['drug_labels'].split(',')
-        drugs = [get_or_create(session, Drug, name=drug_name) for drug_name in drugs]
+        drugs = [get_or_create(session, Drug, name=drug_name.decode('utf-8')) for drug_name in drugs]
 
         # Add disease.
         phenotype = association['phenotype']
@@ -189,7 +192,13 @@ class RDMSSilo(object):
                                 name=phenotype.get('description', ''),
                                 family=phenotype.get('family', ''))
 
-        # Create evidence items.
+        # Add evidence.
+        evidence = association['evidence']
+        evidence = get_or_create(session, EvidenceItem,
+                                 evidence_level=association['evidence_level'],
+                                 evidence_direction=evidence_direction_to_int(association['response_type']),
+                                 drug_id=drugs[0].id,
+                                 disease_id=disease.id)
 
         # Create associations between evidence items,
 
