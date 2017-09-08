@@ -76,6 +76,7 @@ class Variant(Base):
     gene_id = Column(Integer, ForeignKey('Gene.id'))
 
     gene = relationship('Gene', back_populates='variants')
+    evidence_items = relationship('VariantEvidenceItemAssociation')
 
 class Drug(Base):
     '''
@@ -116,6 +117,18 @@ class EvidenceItem(Base):
     drug = relationship('Drug', back_populates='evidence_items')
     disease = relationship('Disease', back_populates='evidence_items')
 
+class VariantEvidenceItemAssociation(Base):
+    '''
+    Association between variants and evidence items.
+    '''
+    __tablename__ = 'VariantEvidenceItemAssociation'
+
+    variant_id = Column(Integer, ForeignKey('Variant.id'), primary_key=True)
+    evidence_item_id = Column(Integer, ForeignKey('EvidenceItem.id'), primary_key=True)
+    source_id = Column(Integer, ForeignKey('Source.id'))
+
+    evidence_item = relationship('EvidenceItem')
+
 # module level funtions
 
 def populate_args(argparser):
@@ -128,7 +141,7 @@ def evidence_direction_to_int(direction):
         'sensitive': 1,
         'no benefit': 0
     }
-    return res_type.get(direction, -100)
+    return res_type.get(direction, -2)
 
 class RDMSSilo(object):
     """ A silo is where we store stuff that has been harvested.
@@ -173,12 +186,15 @@ class RDMSSilo(object):
             gene = get_or_create(session, Gene, name=gene_name)
 
         # Add variants.
-        for feature in feature_association['features']:
-            variant = get_or_create(session, Variant,
-                                    chromosome=feature.get('chromosome', ''),
-                                    start=feature.get('start', -1),
-                                    ref=feature.get('ref', ''),
-                                    alt=feature.get('alt', ''))
+        variants = [ \
+                    get_or_create(session, Variant,
+                                  chromosome=feature.get('chromosome', ''),
+                                  start=feature.get('start', -1),
+                                  ref=feature.get('ref', ''),
+                                  alt=feature.get('alt', ''),
+                                  gene_id=gene.id) \
+                    for feature in feature_association['features']
+                   ]
 
         # Add drugs.
         association = feature_association['association']
@@ -200,6 +216,9 @@ class RDMSSilo(object):
                                  drug_id=drugs[0].id,
                                  disease_id=disease.id)
 
-        # Create associations between evidence items,
-
-        session.commit()
+        # Create associations between variants and evidence items.
+        for variant in variants:
+            get_or_create(session, VariantEvidenceItemAssociation,
+                          variant_id=variant.id,
+                          evidence_item_id=evidence.id,
+                          source_id=source.id)
