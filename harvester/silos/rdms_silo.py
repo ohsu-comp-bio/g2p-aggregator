@@ -78,6 +78,10 @@ class Variant(Base):
     gene = relationship('Gene', back_populates='variants')
     evidence_items = relationship('VariantEvidenceItemAssociation')
 
+    def __repr__(self):
+        return "<Variant(chromosome='%s', start='%s', ref='%s', alt='%s', gene='%s')>" % (
+            self.chromosome, self.start, self.ref, self.alt, self.gene)
+
 class Drug(Base):
     '''
     A drug.
@@ -88,6 +92,9 @@ class Drug(Base):
     name = Column(String)
 
     evidence_items = relationship('EvidenceItem', back_populates='drug')
+
+    def __repr__(self):
+        return "<Drug(name='%s')>" % (self.name)
 
 class Disease(Base):
     '''
@@ -101,6 +108,10 @@ class Disease(Base):
     family = Column(String)
 
     evidence_items = relationship('EvidenceItem', back_populates='disease')
+
+    def __repr__(self):
+        return "<Disease(name='%s', doid='%s', family='%s')>" % (
+            self.name, self.doid, self.family)
 
 class EvidenceItem(Base):
     '''
@@ -116,6 +127,10 @@ class EvidenceItem(Base):
 
     drug = relationship('Drug', back_populates='evidence_items')
     disease = relationship('Disease', back_populates='evidence_items')
+
+    def __repr__(self):
+        return "<EvidenceItem(evidence_level='%i', evidence_direction='%i', drug='%s', disease='%s')>" % (
+            self.evidence_level, self.evidence_direction, self.drug, self.disease)
 
 class VariantEvidenceItemAssociation(Base):
     '''
