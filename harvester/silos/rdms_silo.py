@@ -7,6 +7,20 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
+######### Module level funtions
+
+def populate_args(argparser):
+    """add arguments we expect """
+    argparser.add_argument('--database', '-db', help='''SQLite database''', default='g2p.sqlite3')
+
+def evidence_direction_to_int(direction):
+    res_type = {
+        'resistant': -1,
+        'sensitive': 1,
+        'no benefit': 0
+    }
+    return res_type.get(direction, -2)
+
 # Taken from https://stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
 def get_or_create(session, model, **kwargs):
     '''
@@ -33,6 +47,8 @@ class Source(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+
+    evidence_associations = relationship('VariantEvidenceItemAssociation')
 
 class Gene(Base):
     '''
@@ -76,7 +92,7 @@ class Variant(Base):
     gene_id = Column(Integer, ForeignKey('Gene.id'))
 
     gene = relationship('Gene', back_populates='variants')
-    evidence_items = relationship('VariantEvidenceItemAssociation')
+    evidence_associations = relationship('VariantEvidenceItemAssociation')
 
     def __repr__(self):
         return "<Variant(chromosome='%s', start='%s', ref='%s', alt='%s', gene='%s')>" % (
@@ -143,20 +159,8 @@ class VariantEvidenceItemAssociation(Base):
     source_id = Column(Integer, ForeignKey('Source.id'))
 
     evidence_item = relationship('EvidenceItem')
-
-# module level funtions
-
-def populate_args(argparser):
-    """add arguments we expect """
-    argparser.add_argument('--database', '-db', help='''SQLite database''', default='g2p.sqlite3')
-
-def evidence_direction_to_int(direction):
-    res_type = {
-        'resistant': -1,
-        'sensitive': 1,
-        'no benefit': 0
-    }
-    return res_type.get(direction, -2)
+    variant = relationship('Variant')
+    source = relationship('Source')
 
 class RDMSSilo(object):
     """ A silo is where we store stuff that has been harvested.
