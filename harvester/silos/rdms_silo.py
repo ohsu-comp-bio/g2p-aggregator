@@ -217,8 +217,10 @@ class RDMSSilo(object):
 
         # Add drugs.
         association = feature_association['association']
-        drugs = association['drug_labels'].split(',')
-        drugs = [get_or_create(session, Drug, name=drug_name.decode('utf-8')) for drug_name in drugs]
+        drugs = []
+        if 'drug_labels' in association:
+            drugs = association['drug_labels'].split(',')
+            drugs = [get_or_create(session, Drug, name=drug_name.decode('utf-8')) for drug_name in drugs]
 
         # Add disease.
         phenotype = association['phenotype']
@@ -227,17 +229,18 @@ class RDMSSilo(object):
                                 name=phenotype.get('description', ''),
                                 family=phenotype.get('family', ''))
 
-        # Add evidence.
-        evidence = association['evidence']
-        evidence = get_or_create(session, EvidenceItem,
-                                 evidence_level=association['evidence_level'],
-                                 evidence_direction=evidence_direction_to_int(association['response_type']),
-                                 drug_id=drugs[0].id,
-                                 disease_id=disease.id)
+        # Add evidence items and associations b/t variants and evidence items.
+        for drug in drugs:
+            evidence = association['evidence']
+            evidence = get_or_create(session, EvidenceItem,
+                                    evidence_level=association['evidence_level'],
+                                    evidence_direction=evidence_direction_to_int(association['response_type']),
+                                    drug_id=drug.id,
+                                    disease_id=disease.id)
 
-        # Create associations between variants and evidence items.
-        for variant in variants:
-            get_or_create(session, VariantEvidenceItemAssociation,
-                          variant_id=variant.id,
-                          evidence_item_id=evidence.id,
-                          source_id=source.id)
+            # Create associations between variants and evidence items.
+            for variant in variants:
+                get_or_create(session, VariantEvidenceItemAssociation,
+                              variant_id=variant.id,
+                              evidence_item_id=evidence.id,
+                              source_id=source.id)
