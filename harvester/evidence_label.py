@@ -50,8 +50,8 @@ def evidence_label(evidence, association, na=False):
     oncokb_d = ['4']
 
     # molecularmatch
-    molecularmatch_a = ['1']
-    molecularmatch_b = ['2']
+    molecularmatch_a = ['1', '1a', '1b']
+    molecularmatch_b = ['2', '2c', '2d']
     molecularmatch_c = ['3']
     molecularmatch_d = ['4', '5']
 

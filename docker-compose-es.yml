@@ -24,20 +24,3 @@ services:
       - path.repo=/util/elastic/backups
 
 
-
-  kibana:
-    container_name: kibana_g2p
-    build:
-      context: services/kibana/
-    volumes:
-      - "./util:/util/"
-    ports:
-      - "${KIBANA_PORT}:${KIBANA_PORT}"
-    links:
-      - elastic:elasticsearch
-    environment:
-      - xpack.security.enabled=false
-      - XPACK_MONITORING_REPORT_STATS=false
-      # - SERVER_BASEPATH=/kibana  # set in nginx-proxy
-
-# see docker-compose-nginx.yml for nginx proxy
