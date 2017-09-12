@@ -106,7 +106,6 @@ def convert(jax_evidence):
             feature['name'] = tuple[0]
             # feature['name'] = ' '.join(tuple[1:])
             feature['biomarker_type'] = mut.norm_biomarker(' '.join(tuple[1:]))
-            print feature['biomarker_type']
             # feature['biomarker_type'] = mut.norm_biomarker(None)
 
             try:
