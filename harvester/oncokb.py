@@ -162,8 +162,9 @@ def convert(gene_data):
         association = {}
         association['description'] = variant['consequence']['description']
         association['environmentalContexts'] = []
+
         association['phenotype'] = {
-            'description': biological['oncogenic']
+            'description': 'Cancer'
         }
         association['evidence'] = [{
             "evidenceType": {
@@ -179,6 +180,7 @@ def convert(gene_data):
             }
         }]
         # add summary fields for Display
+        association['oncogenic'] = biological['oncogenic']
         association['evidence_label'] = None
         association = ed.evidence_direction(biological['level_label'],
                                             association, na=True)
