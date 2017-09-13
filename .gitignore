@@ -1,5 +1,6 @@
 .env
 *.pyc
+*.swp
 esdata
 *.DS_Store
 __pycache__/
@@ -24,5 +25,4 @@ harvester/oncokb_all_actionable_variants*.*
 # requests-cache(s)
 harvester/*.sqlite
 harvester/*log
-
-*.swp
+harvester/.zotero
