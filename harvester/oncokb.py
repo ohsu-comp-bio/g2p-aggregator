@@ -109,6 +109,7 @@ def convert(gene_data):
             }
         }]
         # add summary fields for Display
+        association['oncogenic'] = ''
         association = el.evidence_label(clinical['level'],
                                         association, na=True)
         association = ed.evidence_direction(clinical['level_label'],
@@ -164,7 +165,7 @@ def convert(gene_data):
         association['environmentalContexts'] = []
 
         association['phenotype'] = {
-            'description': 'Cancer'
+            'description': 'cancer'
         }
         association['evidence'] = [{
             "evidenceType": {

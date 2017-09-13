@@ -209,6 +209,7 @@ def convert(evidence):
     drug_label = '+'.join(drug_names)
 
     association = {}
+    association['oncogenic'] = ''
     association['description'] = narrative
     association['environmentalContexts'] = []
     association['environmentalContexts'].append({
