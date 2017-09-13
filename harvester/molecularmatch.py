@@ -90,7 +90,7 @@ def convert(evidence):
     for tag in tags:
         if tag['facet'] == 'GENE' and tag['priority'] == 1:
             gene = tag['term']
-        if tag['facet'] == 'CONDITION':
+        if tag['facet'] == 'CONDITION' and tag['priority'] == 1:
             condition = tag['term']
         if tag['facet'] == 'MUTATION' and tag['priority'] == 1:
             mutation = tag['term']
