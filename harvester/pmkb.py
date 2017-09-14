@@ -73,6 +73,7 @@ def convert(interpretation):
                 association = {}
 
                 # association['evidence_label'] = interpretation['tier']
+                association['oncogenic'] = ''
                 association = el.evidence_label(str(interpretation['tier']),
                                                 association, na=True)
                 association = ed.evidence_direction(
