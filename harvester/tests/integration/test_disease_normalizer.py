@@ -73,9 +73,9 @@ def test_BRCA_BOCA():
 
 def test_Advanced_Solid_Tumor():
     diseases = normalize("Advanced Solid Tumor")
-    print 'diseases', diseases
+    assert diseases[0]['ontology_term'] == 'DOID:162'
 
 
 def test_Astrocytoma_Anaplastic():
     diseases = normalize("Astrocytoma, Anaplastic")
-    print 'diseases', diseases
+    assert diseases[0]['ontology_term'] == 'DOID:3069'
