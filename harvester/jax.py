@@ -159,7 +159,6 @@ def convert(jax_evidence):
             }
         }]
         # add summary fields for Display
-        association['oncogenic'] = ''
         association = el.evidence_label(evidence['approval_status'],
                                         association)
         association = ed.evidence_direction(evidence['response_type'],

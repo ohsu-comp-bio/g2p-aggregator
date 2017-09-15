@@ -19,7 +19,6 @@ import pmkb
 import drug_normalizer
 import disease_normalizer
 import sage
-import zotero
 
 from elastic_silo import ElasticSilo
 import elastic_silo
@@ -37,7 +36,7 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('--harvesters',  nargs='+',
                        help='''harvest from these sources. default:
                                [cgi_biomarkers,jax,civic,oncokb,
-                               pmkb,zotero]''',
+                               pmkb]''',
                        default=['cgi_biomarkers', 'jax', 'civic',
                                 'oncokb', 'pmkb'])
 
