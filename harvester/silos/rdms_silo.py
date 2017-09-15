@@ -112,6 +112,21 @@ class Drug(Base):
     def __repr__(self):
         return "<Drug(name='%s')>" % (self.name)
 
+class Article(Base):
+    '''
+    PubMed Articles
+    '''
+    __tablename__ = 'Article'
+
+    id = Column(Integer, primary_key=True)
+    pubmed_id = Column(Integer)
+    link = Column(String)
+
+    source_variant_evidence_items = relationship('SourceVariantEvidenceItem', back_populates='article')
+
+    def __rep__(self):
+        return "<PubMed(name='%s')>" % (self.pubmed_id)
+
 class Disease(Base):
     '''
     A disease.
@@ -156,11 +171,35 @@ class VariantEvidenceItemAssociation(Base):
 
     variant_id = Column(Integer, ForeignKey('Variant.id'), primary_key=True)
     evidence_item_id = Column(Integer, ForeignKey('EvidenceItem.id'), primary_key=True)
-    source_id = Column(Integer, ForeignKey('Source.id'))
 
     evidence_item = relationship('EvidenceItem')
     variant = relationship('Variant')
+
+class SourceVariantEvidenceItem(Base):
+    '''
+    Association between variants, evidence items, and sources of evidence
+    '''
+    __tablename__ = 'SourceVariantEvidenceItem'
+
+    source_id = Column(Integer, ForeignKey('Source.id'))
+    variant_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.variant_id'))
+    evidence_item_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.evidence_item_id'))
+
     source = relationship('Source')
+    evidence_associations = relationship('VariantEvidenceItemAssociation')
+
+class ArticleVariantEvidenceItem(Base):
+    '''
+    Association between Articles and Variant-EvidenceItem Associations
+    '''
+    __tablename__ = 'ArticleVariantEvidenceItem'
+
+    article_id = Column(Integer, ForeignKey('Article.id'))
+    variant_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.variant_id'))
+    evidence_item_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.evidence_item_id'))
+
+    article = relationship('Article')
+    evidence_associations = relationship('VariantEvidenceItemAssociation')
 
 class RDMSSilo(object):
     """ A silo is where we store stuff that has been harvested.
@@ -229,6 +268,13 @@ class RDMSSilo(object):
                                 name=phenotype.get('description', ''),
                                 family=phenotype.get('family', ''))
 
+        # Add articles.
+        article = association['evidence']['info']['publications']
+        articles = [get_or_create(session, Article, 
+                                  link=article_link, 
+                                  pubmed_id=article_link.lstrip('http://www.ncbi.nlm.nih.gov/pubmed/')) \
+                    for article_link in article]
+
         # Add evidence items and associations b/t variants and evidence items.
         for drug in drugs:
             evidence = association['evidence']
@@ -242,5 +288,7 @@ class RDMSSilo(object):
             for variant in variants:
                 get_or_create(session, VariantEvidenceItemAssociation,
                               variant_id=variant.id,
-                              evidence_item_id=evidence.id,
-                              source_id=source.id)
+                              evidence_item_id=evidence.id)
+
+        # Add source_variant_evidence_item associations
+        # Add article_variant_eviden_item associations
