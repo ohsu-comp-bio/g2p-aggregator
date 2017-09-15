@@ -131,14 +131,6 @@ def normalize_feature_association(feature_association):
 # mesothelioma - malignant mesothelioma
 def project_lookup(name):
     disease_alias = {}
-    disease_alias['Neoplasm of breast'] = 'Breast Cancer'
-    disease_alias['MM - Malignant melanoma of skin'] = 'skin melanoma'
-    disease_alias['Carcinoma of ovary'] = 'ovarian cancer'
-    disease_alias['PTC - Papillary thyroid carcinoma'] = 'papillary thyroid carcinoma'
-    disease_alias['CA - Carcinoma of breast'] = 'Breast Cancer'
-    disease_alias['CML - Chronic myeloid leukaemia'] = 'chronic myeloid leukemia'
-    disease_alias['Malignant tumor of breast'] = 'Breast Cancer'
-
     disease_alias['Malignant peripheral nerve sheat tumor'] = 'malignant peripheral nerve sheath tumor'
     disease_alias['Lung squamous cell'] = 'lung squamous cell carcinoma'
 

@@ -75,8 +75,8 @@ def parse_hgvc_c(hgvs_c):
     return {
         "pos": pos,
         "type": ctype,
-        "ref": ref or '',
-        "alt": alt or ''
+        "ref": ref,
+        "alt": alt
     }
 
 
@@ -98,11 +98,6 @@ def print_lookup_table(input_stream):
     Create and print COSMIC lookup table by reading from input_stream and
     outputing corresponding line for the lookup table.
     """
-    def reverse_complement(seq):
-        complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
-        bases = reversed([complement.get(base, base) for base in seq])
-        return ''.join(bases)
-
     print "\t".join(["gene", "hgvs_c", "hgvs_p", "build", "chrom", "start", "end", "ref", "alt", "strand"])  # NOQA
     for line in input_stream:
         fields = line.split("\t")
@@ -111,17 +106,10 @@ def print_lookup_table(input_stream):
         build, genome_pos, strand = fields[22:25]
 
         parse_results = parse_hgvc_c(hgvs_c)
-        ref = parse_results.get('ref', '')
-        alt = parse_results.get('alt', '')
-
-        # Reverse complement ref, alt if on reverse strand.
-        if strand == '-':
-            ref = reverse_complement(ref)
-            alt = reverse_complement(alt)
 
         chrom, start, end = parse_genome_pos(genome_pos)
         if bool(parse_results) and parse_results["ref"] and chrom:
-            print "\t".join([gene, hgvs_c, hgvs_p, build, chrom, start, end, ref, alt, strand])  # NOQA
+            print "\t".join([gene, hgvs_c, hgvs_p, build, chrom, start, end, parse_results["ref"], parse_results["alt"], strand])  # NOQA
         else:
             # TODO: Debugging.
             # print >> sys.stderr, "LINE IGNORED", hgvs_c

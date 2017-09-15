@@ -103,7 +103,6 @@ def normalize_biothings(name):
                 # The higher the _score, the more relevant the document.
                 if hit['_score'] < 8.8:
                     continue
-
                 chembl = hit['chembl']
                 synonym_fda = synonym_usan = synonym_inn = None
                 if 'molecule_synonyms' in chembl:
@@ -139,11 +138,11 @@ def normalize_biothings(name):
                 products = pydash.get(hit, 'drugbank.products', [])
                 if type(products) is list:
                     for product in products:
-                        if product['approved']:
+                        if product['approved'] == 'true':
                             approved_countries.append(product['country'])
                 else:
                     product = products
-                    if product['approved']:
+                    if product['approved'] == 'true':
                         approved_countries.append(product['country'])
 
                 approved_countries = list(set(approved_countries))
