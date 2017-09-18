@@ -48,7 +48,7 @@ class Source(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
-    evidence_associations = relationship('VariantEvidenceItemAssociation')
+    source_evidence_associations = relationship('SourceVariantEvidenceItem')
 
 class Gene(Base):
     '''
@@ -122,7 +122,7 @@ class Article(Base):
     pubmed_id = Column(Integer)
     link = Column(String)
 
-    source_variant_evidence_items = relationship('SourceVariantEvidenceItem', back_populates='article')
+    article_variant_evidence_items = relationship('ArticleVariantEvidenceItem', back_populates='article')
 
     def __rep__(self):
         return "<PubMed(name='%s')>" % (self.pubmed_id)
@@ -169,8 +169,9 @@ class VariantEvidenceItemAssociation(Base):
     '''
     __tablename__ = 'VariantEvidenceItemAssociation'
 
-    variant_id = Column(Integer, ForeignKey('Variant.id'), primary_key=True)
-    evidence_item_id = Column(Integer, ForeignKey('EvidenceItem.id'), primary_key=True)
+    id = Column(Integer, primary_key=True)
+    variant_id = Column(Integer, ForeignKey('Variant.id'))
+    evidence_item_id = Column(Integer, ForeignKey('EvidenceItem.id'))
 
     evidence_item = relationship('EvidenceItem')
     variant = relationship('Variant')
@@ -181,9 +182,8 @@ class SourceVariantEvidenceItem(Base):
     '''
     __tablename__ = 'SourceVariantEvidenceItem'
 
-    source_id = Column(Integer, ForeignKey('Source.id'))
-    variant_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.variant_id'))
-    evidence_item_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.evidence_item_id'))
+    source_id = Column(Integer, ForeignKey('Source.id'), primary_key=True)
+    variant_ei_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.id'), primary_key=True)
 
     source = relationship('Source')
     evidence_associations = relationship('VariantEvidenceItemAssociation')
@@ -194,9 +194,8 @@ class ArticleVariantEvidenceItem(Base):
     '''
     __tablename__ = 'ArticleVariantEvidenceItem'
 
-    article_id = Column(Integer, ForeignKey('Article.id'))
-    variant_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.variant_id'))
-    evidence_item_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.evidence_item_id'))
+    article_id = Column(Integer, ForeignKey('Article.id'), primary_key=True)
+    variant_ei_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.id'), primary_key=True)
 
     article = relationship('Article')
     evidence_associations = relationship('VariantEvidenceItemAssociation')
@@ -269,7 +268,9 @@ class RDMSSilo(object):
                                 family=phenotype.get('family', ''))
 
         # Add articles.
-        article = association['evidence']['info']['publications']
+        if len(association['evidence']) > 1:
+            print 'ERROR: more than one "evidence"'
+        article = association['evidence'][0]['info']['publications']
         articles = [get_or_create(session, Article, 
                                   link=article_link, 
                                   pubmed_id=article_link.lstrip('http://www.ncbi.nlm.nih.gov/pubmed/')) \
