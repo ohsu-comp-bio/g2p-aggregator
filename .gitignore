@@ -26,4 +26,3 @@ harvester/*.sqlite
 harvester/*log
 
 *.swp
-harvester/.zotero

@@ -39,7 +39,7 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('--harvesters',  nargs='+',
                        help='''harvest from these sources. default:
                                [cgi_biomarkers,jax,civic,oncokb,
-                               pmkb,zotero]''',
+                               pmkb]''',
                        default=['cgi_biomarkers', 'jax', 'civic',
                                 'oncokb', 'pmkb'])
 
