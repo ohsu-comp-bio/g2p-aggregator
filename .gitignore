@@ -25,4 +25,3 @@ harvester/oncokb_all_actionable_variants*.*
 # requests-cache(s)
 harvester/*.sqlite
 harvester/*log
-harvester/.zotero
