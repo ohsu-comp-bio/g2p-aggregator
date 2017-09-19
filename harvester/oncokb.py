@@ -13,7 +13,6 @@ import mutation_type as mut
 LOOKUP_TABLE = None
 
 
-
 def harvest(genes):
     r = requests.get('http://oncokb.org/api/v1/levels')
     levels = r.json()
@@ -109,7 +108,6 @@ def convert(gene_data):
             }
         }]
         # add summary fields for Display
-        association['oncogenic'] = ''
         association = el.evidence_label(clinical['level'],
                                         association, na=True)
         association = ed.evidence_direction(clinical['level_label'],
