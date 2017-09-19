@@ -246,6 +246,11 @@ def normalize_feature_association(feature_association):
     association = feature_association['association']
     if 'environmentalContexts' not in association:
         return
+    if association['environmentalContexts'] == []:
+        # skip if they have no drugs
+        logging.warning('normalize_drugs NODRUGS {}'
+                        .format(feature_association['source']))
+        return
     compounds = []
     for ctx in association['environmentalContexts']:
         ctx_drugs = normalize(ctx['description'])
