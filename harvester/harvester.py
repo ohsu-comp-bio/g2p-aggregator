@@ -19,7 +19,6 @@ import pmkb
 import drug_normalizer
 import disease_normalizer
 import sage
-import zotero
 
 from elastic_silo import ElasticSilo
 import elastic_silo
