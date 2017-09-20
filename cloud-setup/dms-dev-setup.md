@@ -66,5 +66,5 @@ c5b1b3d702fc        g2paggregator_kibana         "/bin/sh -c /usr/loca"   43 min
   * The ES instance running in docker, has a `backups` snapshot repo set for the file system at util/elastic/backups (this is _not_ checked into git). See [ES Documentation for more](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-snapshots.html). There are sample commands checked into git at `util/elastic/*.sh`
   * Alternatively, run harvesters to recollect data. (And restore kibana visualizations/dashboards)
 
-## functionality in Internet Explorer
-  * In order for Internet Explorer to run g2p according to this set-up, after initialization, go to `dms-dev.compbio.ohsu.edu/kibana` and click on 'management/avanced settings`. The option `state:InSessionStorage` must be set to true and saved. 
+## Functionality in Internet Explorer
+  * In order for Internet Explorer to run g2p according to this set-up, after initialization, go to `dms-dev.compbio.ohsu.edu/kibana` and click on 'management/advanced settings'. The option `state:InSessionStorage` must be set to true and saved. 
