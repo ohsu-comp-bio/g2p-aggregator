@@ -95,6 +95,7 @@ def convert(gene_data):
                 association = ed.evidence_direction(
                     evidence_item['clinical_significance'], association
                 )
+
                 association['publication_url'] = evidence_item['source']['source_url'],   # NOQA
                 if len(evidence_item['drugs']) > 0:
                     association['drug_labels'] = ','.join([drug['name'] for drug in evidence_item['drugs']])   # NOQA
