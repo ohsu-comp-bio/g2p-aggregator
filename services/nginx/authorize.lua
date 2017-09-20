@@ -110,7 +110,10 @@ local restrictions = {
     ["/plugins.*"]                      = { "GET" },
     ["/es_admin.*"]                     = { "GET", "POST" },
 
-    ["/static.*"]                       = { "GET" }
+    ["/static.*"]                       = { "GET" },
+
+    ["/kibana"]                       = { "GET", "POST" },
+    ["/elastic"]                      = { "GET", "POST" }
   }
 
 }
