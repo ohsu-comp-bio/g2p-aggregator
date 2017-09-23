@@ -50,6 +50,9 @@ class Source(Base):
 
     source_evidence_associations = relationship('SourceVariantEvidenceItem')
 
+    def __repr__(self):
+        return "<Source(name='%i')>" % (self.name)
+
 class Gene(Base):
     '''
     A gene found in the genome.
@@ -271,8 +274,8 @@ class RDMSSilo(object):
         if len(association['evidence']) > 1:
             print 'ERROR: more than one "evidence"'
         article = association['evidence'][0]['info']['publications']
-        articles = [get_or_create(session, Article, 
-                                  link=article_link, 
+        articles = [get_or_create(session, Article,
+                                  link=article_link,
                                   pubmed_id=article_link.lstrip('http://www.ncbi.nlm.nih.gov/pubmed/')) \
                     for article_link in article]
 
@@ -287,9 +290,13 @@ class RDMSSilo(object):
 
             # Create associations between variants and evidence items.
             for variant in variants:
-                get_or_create(session, VariantEvidenceItemAssociation,
-                              variant_id=variant.id,
-                              evidence_item_id=evidence.id)
+                veia = get_or_create(session, VariantEvidenceItemAssociation,
+                                     variant_id=variant.id,
+                                     evidence_item_id=evidence.id)
 
-        # Add source_variant_evidence_item associations
-        # Add article_variant_eviden_item associations
+                # Add source_variant_evidence_item associations
+                get_or_create(session, SourceVariantEvidenceItem,
+                              source_id=source.id,
+                              variant_ei_id=veia.id)
+
+                # Add article_variant_eviden_item associations
