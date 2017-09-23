@@ -51,7 +51,7 @@ class Source(Base):
     source_evidence_associations = relationship('SourceVariantEvidenceItem')
 
     def __repr__(self):
-        return "<Source(name='%i')>" % (self.name)
+        return "<Source(name='%s')>" % (self.name)
 
 class Gene(Base):
     '''
