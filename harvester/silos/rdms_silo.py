@@ -299,4 +299,8 @@ class RDMSSilo(object):
                               source_id=source.id,
                               variant_ei_id=veia.id)
 
-                # Add article_variant_eviden_item associations
+                # Add article_variant_evidence_item associations
+                for article in articles:
+                    get_or_create(session, ArticleVariantEvidenceItem,
+                                  article_id=article.id,
+                                  variant_ei_id=veia.id)
