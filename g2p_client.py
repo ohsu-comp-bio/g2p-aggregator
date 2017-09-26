@@ -85,9 +85,11 @@ class G2PDatabase(object):
                 'genes': ':'.join(hit['genes']),
                 'drug': hit['association'].to_dict().get('drug_labels', ''),
                 'description': hit['association']['description'],
-                'evidence_label': hit['association']['evidence_label'],
-                'evidence_url': hit['association']['publication_url'],
+                'evidence_label': hit['association']['evidence_label']
             }
+
+            if 'publication_url' in hit['association']:
+                hit_dict['evidence_url'] = hit['association']['publication_url']
 
             # FIXME: this yields only the last feature of association, not all features.
             for i, feature in enumerate(hit['features']):
