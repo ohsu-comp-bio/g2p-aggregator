@@ -95,7 +95,7 @@ class Variant(Base):
     gene_id = Column(Integer, ForeignKey('Gene.id'))
 
     gene = relationship('Gene', back_populates='variants')
-    evidence_associations = relationship('VariantEvidenceItemAssociation')
+    evidence_associations = relationship('VariantEvidenceItem')
 
     def __repr__(self):
         return "<Variant(chromosome='%s', start='%s', ref='%s', alt='%s', gene='%s')>" % (
@@ -166,11 +166,11 @@ class EvidenceItem(Base):
         return "<EvidenceItem(evidence_level='%i', evidence_direction='%i', drug='%s', disease='%s')>" % (
             self.evidence_level, self.evidence_direction, self.drug, self.disease)
 
-class VariantEvidenceItemAssociation(Base):
+class VariantEvidenceItem(Base):
     '''
     Association between variants and evidence items.
     '''
-    __tablename__ = 'VariantEvidenceItemAssociation'
+    __tablename__ = 'VariantEvidenceItem'
 
     id = Column(Integer, primary_key=True)
     variant_id = Column(Integer, ForeignKey('Variant.id'))
@@ -186,10 +186,10 @@ class SourceVariantEvidenceItem(Base):
     __tablename__ = 'SourceVariantEvidenceItem'
 
     source_id = Column(Integer, ForeignKey('Source.id'), primary_key=True)
-    variant_ei_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.id'), primary_key=True)
+    variant_ei_id = Column(Integer, ForeignKey('VariantEvidenceItem.id'), primary_key=True)
 
     source = relationship('Source')
-    evidence_associations = relationship('VariantEvidenceItemAssociation')
+    evidence_associations = relationship('VariantEvidenceItem')
 
 class ArticleVariantEvidenceItem(Base):
     '''
@@ -198,10 +198,10 @@ class ArticleVariantEvidenceItem(Base):
     __tablename__ = 'ArticleVariantEvidenceItem'
 
     article_id = Column(Integer, ForeignKey('Article.id'), primary_key=True)
-    variant_ei_id = Column(Integer, ForeignKey('VariantEvidenceItemAssociation.id'), primary_key=True)
+    variant_ei_id = Column(Integer, ForeignKey('VariantEvidenceItem.id'), primary_key=True)
 
     article = relationship('Article')
-    evidence_associations = relationship('VariantEvidenceItemAssociation')
+    evidence_associations = relationship('VariantEvidenceItem')
 
 class RDMSSilo(object):
     """ A silo is where we store stuff that has been harvested.
@@ -290,7 +290,7 @@ class RDMSSilo(object):
 
             # Create associations between variants and evidence items.
             for variant in variants:
-                veia = get_or_create(session, VariantEvidenceItemAssociation,
+                veia = get_or_create(session, VariantEvidenceItem,
                                      variant_id=variant.id,
                                      evidence_item_id=evidence.id)
 
