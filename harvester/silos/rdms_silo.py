@@ -250,8 +250,8 @@ class RDMSSilo(object):
                     get_or_create(session, Variant,
                                   chromosome=feature.get('chromosome', ''),
                                   start=feature.get('start', -1),
-                                  ref=feature.get('ref', ''),
-                                  alt=feature.get('alt', ''),
+                                  ref=(feature.get('ref', '') or '-'),
+                                  alt=(feature.get('alt', '') or '-'),
                                   gene_id=gene.id) \
                     for feature in feature_association['features']
                    ]
