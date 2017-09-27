@@ -19,6 +19,8 @@ import pmkb
 import drug_normalizer
 import disease_normalizer
 import sage
+import brca
+import jax_trials
 
 from elastic_silo import ElasticSilo
 import elastic_silo
@@ -38,7 +40,7 @@ argparser.add_argument('--harvesters',  nargs='+',
                                [cgi_biomarkers,jax,civic,oncokb,
                                pmkb]''',
                        default=['cgi_biomarkers', 'jax', 'civic',
-                                'oncokb', 'pmkb'])
+                                'oncokb', 'pmkb', 'brca', 'jax_trials'])
 
 
 argparser.add_argument('--silos',  nargs='+',
