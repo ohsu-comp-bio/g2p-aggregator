@@ -47,6 +47,8 @@ def convert(gene_data):
         feature['ref'] = brca['Ref']
         feature['alt'] = brca['Alt']
         feature['name'] = brca['Protein_Change']
+        if len(feature['name']) == 0:
+            feature['name'] = brca['HGVS_cDNA']
         # feature['biomarker_type'] = ?
         association = {}
         association['description'] = brca['Pathogenicity_expert']
@@ -55,17 +57,20 @@ def convert(gene_data):
             'description': brca['Condition_ID_value_ENIGMA'],
             # 'id': ?
         }
+
+        citations = brca['Clinical_significance_citations_ENIGMA']
+        info = None
+        if not citations == '-':
+            pubmed = "http://www.ncbi.nlm.nih.gov/pubmed/{}".format(citations.split(':')[1])
+            info = {'publications': [pubmed]}
+
         association['evidence'] = [{
             "evidenceType": {
                 "sourceName": "brca",
                 "id": '{}'.format(brca['id'])
             },
             'description': brca['Clinical_Significance_ClinVar'],
-            'info': {
-                'publications': [
-                    brca['Clinical_significance_citations_ENIGMA']
-                ]
-            }
+            'info': info
         }]
         # add summary fields for Display
         association['oncogenic'] = brca['Clinical_Significance_ClinVar']
