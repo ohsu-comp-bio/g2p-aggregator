@@ -26,6 +26,8 @@ from elastic_silo import ElasticSilo
 import elastic_silo
 from kafka_silo import KafkaSilo
 import kafka_silo
+from file_silo import FileSilo
+import file_silo
 
 import requests
 import requests_cache
@@ -45,7 +47,8 @@ argparser.add_argument('--harvesters',  nargs='+',
 
 argparser.add_argument('--silos',  nargs='+',
                        help='''save to these silos. default:[elastic]''',
-                       default=['elastic'], choices=['elastic', 'kafka'])
+                       default=['elastic'],
+                       choices=['elastic', 'kafka', 'file'])
 
 
 argparser.add_argument('--delete_index', '-d',
@@ -63,6 +66,8 @@ argparser.add_argument('--genes',   nargs='+',
 
 elastic_silo.populate_args(argparser)
 kafka_silo.populate_args(argparser)
+file_silo.populate_args(argparser)
+
 
 args = argparser.parse_args()
 for h in args.harvesters:
@@ -79,6 +84,8 @@ logging.info("silos: %r" % args.silos)
 logging.info("elastic_search: %r" % args.elastic_search)
 logging.info("elastic_index: %r" % args.elastic_index)
 logging.info("delete_index: %r" % args.delete_index)
+logging.info("file_output_dir: %r" % args.file_output_dir)
+
 if not args.genes:
     logging.info("genes: all")
 else:
@@ -93,6 +100,8 @@ def _make_silos(args):
             silos.append(ElasticSilo(args))
         if s == 'kafka':
             silos.append(KafkaSilo(args))
+        if s == 'file':
+            silos.append(FileSilo(args))
     return silos
 
 
