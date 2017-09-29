@@ -24,6 +24,7 @@ def _get_cancer_collections(item_coll):
 def harvest(genes):
     """ given an array of gene symbols, harvest them from civic """
     # harvest all genes
+    global LOOKUP_TABLE
     if not genes:
         if not LOOKUP_TABLE:
             LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
