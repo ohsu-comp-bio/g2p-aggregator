@@ -43,7 +43,11 @@ class FileSilo:
         """ write dict to file """
         source = feature_association['source']
         path = os.path.join(self._file_output_dir, '{}.json'.format(source))
-        with open(path, 'a') as the_file:
+        if os.path.exists(path):
+            append_write = 'a'  # append if already exists
+        else:
+            append_write = 'w'  # make a new file if not
+        with open(path, append_write) as the_file:
             the_file.write(
                 json.dumps(feature_association, separators=(',', ':')))
             the_file.write('\n')
