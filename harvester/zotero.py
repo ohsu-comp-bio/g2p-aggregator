@@ -35,7 +35,7 @@ def harvest(genes):
     articles = z.items()
     for gene in genes:
         for art in articles:
-            if gene in art['data']['extra']:
+            if 'extra' in art['data'] and gene in art['data']['extra']:
                 gene_data = {'gene': gene, 'zotero': art}
                 yield gene_data
 
