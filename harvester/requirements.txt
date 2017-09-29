@@ -6,3 +6,4 @@ kafka-python==1.3.3
 requests-cache==0.4.13
 pydash==4.1.0
 synapseclient==1.7.2
+PyYAML==3.12
