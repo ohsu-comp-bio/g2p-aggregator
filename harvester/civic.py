@@ -53,6 +53,8 @@ def convert(gene_data):
             feature['end'] = variant['coordinates']['stop']
             feature['referenceName'] = str(variant['coordinates']['reference_build'])  # NOQA
             feature['chromosome'] = str(variant['coordinates']['chromosome'])
+            feature['ref'] = str(variant['coordinates']['reference_bases'])
+            feature['alt'] = str(variant['coordinates']['variant_bases'])
             feature['name'] = variant['name']
             if (
                 'variant_types' in variant and
@@ -93,6 +95,7 @@ def convert(gene_data):
                 association = ed.evidence_direction(
                     evidence_item['clinical_significance'], association
                 )
+
                 association['publication_url'] = evidence_item['source']['source_url'],   # NOQA
                 if len(evidence_item['drugs']) > 0:
                     association['drug_labels'] = ','.join([drug['name'] for drug in evidence_item['drugs']])   # NOQA
