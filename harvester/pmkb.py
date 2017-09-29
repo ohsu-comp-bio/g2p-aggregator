@@ -73,11 +73,10 @@ def convert(interpretation):
                 association = {}
 
                 # association['evidence_label'] = interpretation['tier']
-                association = el.evidence_label(str(interpretation['tier']),
-                                                association, na=True)
-                association = ed.evidence_direction(
-                                str(interpretation['tier']),
-                                association, na=True)
+                association = el.evidence_label(association, str(interpretation['tier']),
+                                                na=True)
+                association = ed.evidence_direction(association,
+                                str(interpretation['tier']), na=True)
 
                 association['description'] = interpretation['interpretation']
                 # TODO pmkb does not break out drug !?!?

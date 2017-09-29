@@ -6,7 +6,7 @@
 # see https://docs.google.com/spreadsheets/d/1j9AKdv1k87iO8qH-ujnW3x4VusbGoXDjdb5apUqJsSI/edit#gid=1415903760
 
 
-def evidence_label(evidence, association, na=False):
+def evidence_label(association, evidence=None, na=False):
     # CGI
     # Drug status?? VICC group??
     # cgi_a = ['clinical practice']

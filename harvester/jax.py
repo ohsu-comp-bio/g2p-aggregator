@@ -159,10 +159,8 @@ def convert(jax_evidence):
             }
         }]
         # add summary fields for Display
-        association = el.evidence_label(evidence['approval_status'],
-                                        association)
-        association = ed.evidence_direction(evidence['response_type'],
-                                            association)
+        association = el.evidence_label(association, evidence['approval_status'])
+        association = ed.evidence_direction(association, evidence['response_type'])
 
         if len(evidence['references']) > 0:
             association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(evidence['references'][0])  # NOQA

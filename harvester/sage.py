@@ -75,10 +75,10 @@ def convert(gene_data):
                 'description': evidence_item['drug_labels'],
             }]
 
-            association = el.evidence_label(evidence_item['evidence_label'],
-                                            association, na=True)
-            association = ed.evidence_direction(evidence_item['response_type'],
-                                                association)
+            association = el.evidence_label(association, evidence_item['evidence_label'],
+                                            na=True)
+            association = ed.evidence_direction(association, 
+                                                evidence_item['response_type'])
 
             feature_association = {'genes': [gene],
                                    'features': [feature],

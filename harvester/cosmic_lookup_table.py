@@ -20,6 +20,13 @@ class CosmicLookup(object):
         self.lookup_table = pandas.read_csv(lookup_table_file, sep="\t")
         self.gene_df_cache = {}
 
+    def get_genes(self):
+        """
+        Returns a list of all genes represented in the cosmic table
+        """
+        gene_df = self.lookup_table[['gene']].drop_duplicates(keep='first')
+        return list(gene_df.values.flatten())
+
     def get_entries(self, gene, hgvs_p):
         """
         Returns a dataframe of results from filtering on gene and hgvs_p

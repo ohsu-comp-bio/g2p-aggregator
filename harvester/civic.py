@@ -90,10 +90,10 @@ def convert(gene_data):
                 }]
                 # add summary fields for Display
                 association = el.evidence_label(
-                    evidence_item['evidence_level'], association, na=True
+                    association, evidence_item['evidence_level'], na=True
                 )
                 association = ed.evidence_direction(
-                    evidence_item['clinical_significance'], association
+                    association, evidence_item['clinical_significance']
                 )
 
                 association['publication_url'] = evidence_item['source']['source_url'],   # NOQA
