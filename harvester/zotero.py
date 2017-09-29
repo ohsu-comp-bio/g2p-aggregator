@@ -1,13 +1,22 @@
-from pyzotero.zotero import Zotero
 import os
 import sys
 import json
+
+from pyzotero.zotero import Zotero
+
 import cosmic_lookup_table
+
+import evidence_label as el
+import evidence_direction as ed
 
 LOOKUP_TABLE = None
 
+test_library = 4331130
 smmart_library = 1405957
 api_key = os.environ.get("ZOTERO_API_KEY")
+
+#z = Zotero(smmart_library, 'group', api_key)
+z = Zotero(test_library, 'user', api_key)
 
 def _get_cancer_collections(item_coll):
     return_coll = []
@@ -30,7 +39,6 @@ def harvest(genes):
                 "./cosmic_lookup_table.tsv")
             genes = LOOKUP_TABLE.get_genes()
 
-    z = Zotero(smmart_library, 'group', api_key)
     articles = z.items()
     for gene in genes:
         for art in articles:
@@ -53,8 +61,8 @@ def convert(gene_data):
     association['environmentalContexts'] = []
     association['drug_labels'] = []
     association['drug_labels'] = ','.join([tag['tag'] for tag in zotero['data']['tags']])
-    for drug in association['drug_labels']:
-        association['environmentalContexts'].append({'description': drug})
+    for drug in zotero['data']['tags']:
+        association['environmentalContexts'].append({'description': drug['tag']})
     association['phenotype'] = {
         'description' : _get_cancer_collections(zotero['data']['collections'])
     }
@@ -65,12 +73,12 @@ def convert(gene_data):
         },
         'description': '',
         'info': {
-            'publications': zotero['data']['url']['link']
+            'publications': zotero['data']['url']
         }
     }]
     association = el.evidence_label(association, na=True)
     association = ed.evidence_direction(association, na=True)
-    association['publication_url'] = zotero['data']['url']['link']
+    association['publication_url'] = zotero['data']['url']
     feature_names = feature["geneSymbol"] + ' ' + feature["name"]
     feature_association = {'genes': [gene],
                            'features': [feature],
