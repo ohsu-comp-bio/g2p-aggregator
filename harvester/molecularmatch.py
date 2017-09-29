@@ -233,8 +233,8 @@ def convert(evidence):
     # add summary fields for Display
 
     # association['evidence_label'] = direction
-    association = el.evidence_label(tier, association, na=False)
-    association = ed.evidence_direction(tier, association, na=False)
+    association = el.evidence_label(association, tier, na=False)
+    association = ed.evidence_direction(association, tier, na=False)
 
     if len(pubs) > 0:
         association['publication_url'] = pubs[0]

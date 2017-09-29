@@ -3,7 +3,7 @@
 # 'resistant', 'sensitive', or 'no benefit'
 
 
-def evidence_direction(evidence=None, association, na=False):
+def evidence_direction(association, evidence=None, na=False):
     resistant = ['resistant', 'resistance', 'poor outcome',
                  'decreased response']
     sensitive = ['sensitive', 'predictive of response']
