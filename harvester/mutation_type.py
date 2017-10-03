@@ -10,26 +10,27 @@ def norm_biomarker(evidence, cgi_biomarker=None):
     # Note that 'CNA' is currently left out as it is relevant only in the case
     # of CGI and directed in for loop below. 
     mut_types = {
-        'fusion' : ['fusion', 'fus'],
-        'snp' : ['snp', 'mut', 'mutant', 'missense', 'protein altering', 'coding sequence', 'nonsense'],
         'biallelic inactivation' : ['bia'],
-        'overexpression' : ['expr', 'over exp'],
         'decreased expression' : ['dec exp'],
-        'unspecified' : ['na', 'n/a', 'gene variant', 'wild type', 'any'], # civic
-        'exon' : ['exon'], # civic
-        'transcript': ['transcript'], # civic
-        'loss of function' : ['loss of function'], # civic
-        'gain of function' : ['gain of function'], # civic
-        'frameshift' : ['frameshift'],
-        'loss of heterozygosity' : ['loss of heterozygosity'], # civic
         'deletion' : ['deletion'],
+        'exon' : ['exon'], # civic
+        'frameshift' : ['frameshift'],
+        'fusion' : ['fusion', 'fus'],
+        'gain of function' : ['gain of function'], # civic
+        'indel' : ['indel'],
         'insertion' : ['insertion'],
-        '3 Prime UTR' : ['3 prime utr'],
-        'stopgain' : ['stop gained'],
-        'startloss' : ['start lost'],
-        'silent' : ['silent mutation', 'synonymous', 'inact mut'],
         'intron' : ['intron variant'],
-        'indel' : ['indel']
+        'loss of function' : ['loss of function'], # civic
+        'loss of heterozygosity' : ['loss of heterozygosity'], # civic
+        'overexpression' : ['expr', 'over exp'],
+        'silent' : ['silent mutation', 'synonymous', 'inact mut'],
+        'snp' : ['snp', 'mut', 'mutant', 'missense', 'protein altering', 'coding sequence', 'nonsense'],
+        'startloss' : ['start lost'],
+	'stopgain' : ['stop gained'],
+        'transcript': ['transcript'], # civic
+        'unspecified' : ['na', 'n/a', 'gene variant', 'any'], # civic
+        'wild-type' : ['wild-type', 'wild type']
+        '3 Prime UTR' : ['3 prime utr'],
     }
 
     for mut in mut_types:

@@ -21,6 +21,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # see https://ckb.jax.org/about/curationMethodology
 
+
 def _parse_profile(profile):
     parts = profile.split()
     global LOOKUP_TABLE
@@ -49,42 +50,59 @@ def _parse_profile(profile):
         'wild-type'
     ]
     gene_list = LOOKUP_TABLE.get_genes()
-    mut_list = LOOKUP_TABLE.get_p_variants()
     genes = []
     muts = []
     biomarkers = []
-    biomarker_type = None
-    # Complex loop: Run through the split profile.
-    # For each part of the profile...
+    biomarker_types = None
+    fusions = []
+    # Complex loop: Run through the split profile, creating four arrays,
+    # one of the indices of genes in `parts`, one of the indices of mutations
+    # in `parts` (if present, `None` if not), one of biomarker strings, 
+    # (if present, `None` if not), and a fusions array. Gene, mutation, and
+    # biomarker arrays should always have same length. 
     for i in range(len(parts)):
+        # check for fusions
+        if '-' in parts[i] and parts[i] not in jax_biomarker_types:
+            fusion = parts[i].split('-')
+            if fusion[0] in gene_list and fusion[1] in gene_list:
+                fusions.append(parts[i].split('-'))
+                # if you're dealing with a fusion with no other gene listed, 
+                # use the fusion as the gene
+                if len(parts) > 1 and parts[i+1] not in gene_list:
+                    genes.append(parts[i])
+                    biomarker_types = []
+                continue 
+       # check to see if you're on a gene
         if parts[i] in gene_list:
-            genes.append(i)
-            # each time we come across a gene index in the profile,
-            # reset the biomarker_type array
-            biomarker_type = []
+            genes.append(parts[i])
+            # reset the biomarker_type array on every new gene
+            biomarker_types = []
             continue
-        if parts[i] in mut_list:
-            muts.append(i)
+        # check to see if part matches a mutation variant format, e.g. `V600E`
+        if re.match("[A-Z][0-9]+[fs]?[*]?[0-9]?[A-Z]?", parts[i]):
+            muts.append(parts[i])
             if i+1 == len(parts) or parts[i+1] in gene_list:
-                biomarkers.append([None])
+                biomarkers.append([''])
             continue
         # Should only hit this if there's no mutation listed for the present gene, 
         # so denote that and catch the biomarker.
         elif len(genes) != len(muts):
-            muts.append(None)
+            muts.append('')
         if parts[i] in jax_biomarker_types:
-            biomarker_type.append(parts[i])
+            biomarker_types.append(parts[i])
             if i+1 == len(parts) or parts[i+1] in gene_list:
-                biomarkers.append(biomarker_type)
-        else:
-            biomarkers.append([None])
-    biomarker_strings = []
+                biomarkers.append(biomarker_types)
+        elif len(genes) != len(biomarkers):
+            biomarkers.append([''])
+    # change the internal biomarker_type arrays into strings
+    biomarker_types = []
     for biomarker in biomarkers:
         if biomarker[0]:
-            biomarker_strings.append(' '.join(biomarker))
+            biomarker_types.append(' '.join(biomarker))
         else:
-            biomarker_strings.append(None)
-    return genes, muts, biomarker_strings
+            biomarker_types.append('')
+    return genes, muts, biomarker_types, fusions
+
 
 def harvest(genes):
     """ get data from jax """
@@ -155,6 +173,7 @@ def get_evidence(gene_ids):
 
 
 def convert(jax_evidence):
+    global LOOKUP_TABLE
     gene = jax_evidence['gene']
     jax = jax_evidence['jax_id']
     evidence_array = jax_evidence['evidence']
@@ -163,60 +182,47 @@ def convert(jax_evidence):
         # actually combinations and should be treated accordingly.
 
         # Parse molecular profile and use for variant-level information.
+        profile = evidence['molecular_profile'].replace('Tp53', 'TP53').replace(' - ', '-')
+        gene_index, mut_index, biomarkers, fusions  = _parse_profile(profile)
 
-        print json.dumps({"molecular_profile": evidence['molecular_profile']}, indent=4, sort_keys=True)
-#        genes_from_profile, tuples = _parse(evidence['molecular_profile'])
-        gene_index, mut_index, biomarker_index = _parse_profile(evidence['molecular_profile'])
-        print "GENE", gene_index
-        print "MUT", mut_index
-        print "BIOMARKER", biomarker_index
-#        sys.exit()
-        continue
+        if not (len(gene_index) == len(mut_index) == len(biomarkers)):
+            print  "ERROR: This molecular profile has been parsed incorrectly!"
+            print json.dumps({"molecular_profile": evidence['molecular_profile']}, indent=4, sort_keys=True)
 
         features = []
-        for tuple in tuples:
+        parts = profile.split()
+        for i in range(len(gene_index)):
             feature = {}
-            feature['geneSymbol'] = tuple[0]
-            feature['name'] = tuple[0]
-            # feature['name'] = ' '.join(tuple[1:])
-            # print tuple
-            # print tuple[1:]
-            feature['biomarker_type'] = mut.norm_biomarker(' '.join(tuple[1:]))
-            # print feature['biomarker_type']
-#            break
-#            break
-            # feature['biomarker_type'] = mut.norm_biomarker(None)
+            feature['geneSymbol'] = gene_index[i]
+            feature['name'] = ' '.join([gene_index[i], mut_index[i], biomarkers[i]])
+            if biomarkers[i]:
+                feature['biomarker_type'] = mut.norm_biomarker(biomarkers[i])
+            else:
+                feature['biomarker_type'] = mut.norm_biomarker('na')
 
-            try:
-                """
-                 filter out
-                 "FLT3 D835X FLT3 exon 14 ins"
-                """
-                exceptions = set(["exon", "ins", "amp", "del", "exp", "dec"])
-                profile = set(tuple)
-                if len(exceptions.intersection(profile)) > 0:
-                    print 'skipping ', evidence['molecular_profile']
-                    matches = []
-                else:
-                    # Look up variant and add position information.
-                    if not LOOKUP_TABLE:
-                        LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
-                                        "./cosmic_lookup_table.tsv")
-                    matches = LOOKUP_TABLE.get_entries(tuple[0],
-                                                       ' '.join(tuple[1:]))
-                if len(matches) > 0:
-                    # FIXME: just using the first match for now;
-                    # it's not clear what to do if there are multiple matches.
-                    match = matches[0]
-                    feature['chromosome'] = str(match['chrom'])
-                    feature['start'] = match['start']
-                    feature['end'] = match['end']
-                    feature['ref'] = match['ref']
-                    feature['alt'] = match['alt']
-                    feature['referenceName'] = str(match['build'])
-            except:
-                pass
+            # Look up variant and add position information.
+            if not LOOKUP_TABLE:
+                LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
+                               "./cosmic_lookup_table.tsv")
+            matches = LOOKUP_TABLE.get_entries(gene_index[i], mut_index[i])
+            if len(matches) > 0:
+                # FIXME: just using the first match for now;
+                # it's not clear what to do if there are multiple matches.
+                match = matches[0]
+                feature['chromosome'] = str(match['chrom'])
+                feature['start'] = match['start']
+                feature['end'] = match['end']
+                feature['ref'] = match['ref']
+                feature['alt'] = match['alt']
+                feature['referenceName'] = str(match['build'])
             features.append(feature)
+        for fusion in fusions:
+            for gene in fusion:
+                feature = {}
+                feature['geneSymbol'] = gene
+                feature['name'] = '-'.join(fusion)
+                feature['biomarker_type'] = mut.norm_biomarker("fusion")
+                features.append(feature)
 
         association = {}
         association['description'] = evidence['efficacy_evidence']
@@ -245,13 +251,12 @@ def convert(jax_evidence):
         if len(evidence['references']) > 0:
             association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(evidence['references'][0])  # NOQA
         association['drug_labels'] = evidence['therapy_name']
-        feature_association = {'genes': genes_from_profile,
+        feature_association = {'genes': ','.join(set(gene_index)),
                                'feature_names': evidence['molecular_profile'],
                                'features': features,
                                'association': association,
                                'source': 'jax',
                                'jax': evidence}
-        break
         yield feature_association
 
 
@@ -262,95 +267,6 @@ def harvest_and_convert(genes):
         for feature_association in convert(jax_evidence):
             # print "jax convert_yield {}".format(feature_association.keys())
             yield feature_association
-
-
-def _parse(mol_profile):
-    """ returns gene, tuples[] """
-    molecular_profile = mol_profile.replace(' - ', '-')
-    if mol_profile != molecular_profile:
-        print "\n\n\n\nLOOK NOT EQUAL!!!!\n\n\n\n"
-        print mol_profile
-        print molecular_profile
-    parts = molecular_profile.split()
-    gene = None
-    # gene_complete = True
-
-    tuples = []
-    tuple = None
-    fusion_modifier = ''
-    for idx, part in enumerate(parts):
-        if not gene:
-            # grabs the first 'part' of the molecular profile as the gene'
-            gene = part
-        # # deal with 'GENE - GENE '
-        # if part == '-':
-        #     gene += part
-        #     gene_complete = False
-        #     continue
-        # elif not gene_complete:
-        #     gene += part
-        #     gene_complete = True
-        #     continue
-
-        if not tuple:
-            tuple = []
-        # build first tuple
-        if len(tuples) == 0:
-            if len(tuple) == 0 and '-' not in gene:
-                tuple.append(gene)
-        if idx == 0:
-            continue
-
-        # ignore standalone plus
-        if not part == '+':
-            tuple.append(part)
-
-        # we know there is at least one more to fetch before terminating tuple
-        if len(tuple) == 1 and idx < len(parts)-1:
-            continue
-
-        # is the current tuple complete?
-        if (
-                (len(tuple) > 1 and part.isupper()) or
-                idx == len(parts)-1 or
-                parts[idx+1].isupper()
-           ):
-                if len(tuple) == 1 and tuple[0].islower():
-                    print "\n\n\n\nWHERE DOES FUSION MODIFIER HAPPEN??\n\n\n\n"
-                    fusion_modifier = ' {}'.format(tuple[0])
-                else:
-                    tuples.append(tuple)
-                tuple = None
-
-    # if gene is a fusion, render genes separately
-    if ('-' in gene):
-        fusion = gene
-        first_gene, second_gene = gene.split('-')
-        tuples.append([first_gene, fusion + fusion_modifier])
-        tuples.append([second_gene, fusion + fusion_modifier])
-        gene = first_gene
-
-    # if gene in tuples is fusion re-render
-    def is_fusion(tuple):
-        return '-' in tuple[0]
-
-    non_fusion_tuples = [x for x in tuples if not is_fusion(x)]
-    fusion_tuples = [x for x in tuples if is_fusion(x)]
-    for tuple in fusion_tuples:
-        fusion = tuple[0]
-        first_gene, second_gene = fusion.split('-')
-        non_fusion_tuples.append([first_gene, fusion])
-        non_fusion_tuples.append([second_gene, fusion])
-    tuples = non_fusion_tuples
-
-    # get set of all genes
-    genes = set([])
-    for tuple in tuples:
-        genes.add(tuple[0])
-
-    print "GENES", genes
-    print "TUPLES", tuples
-    return sorted(list(genes)), tuples
 
 
 def _test():
