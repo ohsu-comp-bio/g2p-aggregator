@@ -6,6 +6,8 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from inflection import parameterize, underscore
 import json
+import re
+
 import logging
 import evidence_label as el
 import evidence_direction as ed
@@ -19,6 +21,70 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # see https://ckb.jax.org/about/curationMethodology
 
+def _parse_profile(profile):
+    parts = profile.split()
+    global LOOKUP_TABLE
+    if not LOOKUP_TABLE:
+        LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
+                "./cosmic_lookup_table.tsv")
+    parts = profile.split()
+    # this list taken from https://ckb.jax.org/about/glossaryOfTerms
+    # "Non specific variants" list, separated by space, where applicable
+    jax_biomarker_types = [
+        'act',
+        'amp',
+        'dec',
+        'del',
+        'exp',
+        'fusion',
+        'inact',
+        'loss',
+        'mut',
+        'mutant',
+        'negative',
+        'over',
+        'pos',
+        'positive',
+        'rearrange',
+        'wild-type'
+    ]
+    gene_list = LOOKUP_TABLE.get_genes()
+    mut_list = LOOKUP_TABLE.get_p_variants()
+    genes = []
+    muts = []
+    biomarkers = []
+    biomarker_type = None
+    # Complex loop: Run through the split profile.
+    # For each part of the profile...
+    for i in range(len(parts)):
+        if parts[i] in gene_list:
+            genes.append(i)
+            # each time we come across a gene index in the profile,
+            # reset the biomarker_type array
+            biomarker_type = []
+            continue
+        if parts[i] in mut_list:
+            muts.append(i)
+            if i+1 == len(parts) or parts[i+1] in gene_list:
+                biomarkers.append([None])
+            continue
+        # Should only hit this if there's no mutation listed for the present gene, 
+        # so denote that and catch the biomarker.
+        elif len(genes) != len(muts):
+            muts.append(None)
+        if parts[i] in jax_biomarker_types:
+            biomarker_type.append(parts[i])
+            if i+1 == len(parts) or parts[i+1] in gene_list:
+                biomarkers.append(biomarker_type)
+        else:
+            biomarkers.append([None])
+    biomarker_strings = []
+    for biomarker in biomarkers:
+        if biomarker[0]:
+            biomarker_strings.append(' '.join(biomarker))
+        else:
+            biomarker_strings.append(None)
+    return genes, muts, biomarker_strings
 
 def harvest(genes):
     """ get data from jax """
@@ -97,7 +163,15 @@ def convert(jax_evidence):
         # actually combinations and should be treated accordingly.
 
         # Parse molecular profile and use for variant-level information.
-        genes_from_profile, tuples = _parse(evidence['molecular_profile'])
+
+        print json.dumps({"molecular_profile": evidence['molecular_profile']}, indent=4, sort_keys=True)
+#        genes_from_profile, tuples = _parse(evidence['molecular_profile'])
+        gene_index, mut_index, biomarker_index = _parse_profile(evidence['molecular_profile'])
+        print "GENE", gene_index
+        print "MUT", mut_index
+        print "BIOMARKER", biomarker_index
+#        sys.exit()
+        continue
 
         features = []
         for tuple in tuples:
@@ -105,8 +179,12 @@ def convert(jax_evidence):
             feature['geneSymbol'] = tuple[0]
             feature['name'] = tuple[0]
             # feature['name'] = ' '.join(tuple[1:])
+            # print tuple
+            # print tuple[1:]
             feature['biomarker_type'] = mut.norm_biomarker(' '.join(tuple[1:]))
-            print feature['biomarker_type']
+            # print feature['biomarker_type']
+#            break
+#            break
             # feature['biomarker_type'] = mut.norm_biomarker(None)
 
             try:
@@ -173,6 +251,7 @@ def convert(jax_evidence):
                                'association': association,
                                'source': 'jax',
                                'jax': evidence}
+        break
         yield feature_association
 
 
@@ -185,9 +264,13 @@ def harvest_and_convert(genes):
             yield feature_association
 
 
-def _parse(molecular_profile):
+def _parse(mol_profile):
     """ returns gene, tuples[] """
-    molecular_profile = molecular_profile.replace(' - ', '-')
+    molecular_profile = mol_profile.replace(' - ', '-')
+    if mol_profile != molecular_profile:
+        print "\n\n\n\nLOOK NOT EQUAL!!!!\n\n\n\n"
+        print mol_profile
+        print molecular_profile
     parts = molecular_profile.split()
     gene = None
     # gene_complete = True
@@ -197,6 +280,7 @@ def _parse(molecular_profile):
     fusion_modifier = ''
     for idx, part in enumerate(parts):
         if not gene:
+            # grabs the first 'part' of the molecular profile as the gene'
             gene = part
         # # deal with 'GENE - GENE '
         # if part == '-':
@@ -214,7 +298,6 @@ def _parse(molecular_profile):
         if len(tuples) == 0:
             if len(tuple) == 0 and '-' not in gene:
                 tuple.append(gene)
-
         if idx == 0:
             continue
 
@@ -233,6 +316,7 @@ def _parse(molecular_profile):
                 parts[idx+1].isupper()
            ):
                 if len(tuple) == 1 and tuple[0].islower():
+                    print "\n\n\n\nWHERE DOES FUSION MODIFIER HAPPEN??\n\n\n\n"
                     fusion_modifier = ' {}'.format(tuple[0])
                 else:
                     tuples.append(tuple)
@@ -264,6 +348,8 @@ def _parse(molecular_profile):
     for tuple in tuples:
         genes.add(tuple[0])
 
+    print "GENES", genes
+    print "TUPLES", tuples
     return sorted(list(genes)), tuples
 
 
