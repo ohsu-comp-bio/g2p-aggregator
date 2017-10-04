@@ -16,6 +16,7 @@ import mutation_type as mut
 import cosmic_lookup_table
 
 LOOKUP_TABLE = None
+gene_list = None
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -25,6 +26,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 def _parse_profile(profile):
     parts = profile.split()
     global LOOKUP_TABLE
+    global gene_list
     if not LOOKUP_TABLE:
         LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
                 "./cosmic_lookup_table.tsv")
@@ -49,7 +51,8 @@ def _parse_profile(profile):
         'rearrange',
         'wild-type'
     ]
-    gene_list = LOOKUP_TABLE.get_genes()
+    if not gene_list:
+        gene_list = LOOKUP_TABLE.get_genes()
     genes = []
     muts = []
     biomarkers = []
@@ -68,7 +71,9 @@ def _parse_profile(profile):
                 fusions.append(parts[i].split('-'))
                 # if you're dealing with a fusion with no other gene listed, 
                 # use the fusion as the gene
-                if len(parts) > 1 and parts[i+1] not in gene_list:
+                if i+1 == len(parts):
+                    pass
+                elif len(parts) > 1 and parts[i+1] not in gene_list:
                     genes.append(parts[i])
                     biomarker_types = []
                 continue 
@@ -81,7 +86,7 @@ def _parse_profile(profile):
         # check to see if part matches a mutation variant format, e.g. `V600E`
         if re.match("[A-Z][0-9]+[fs]?[*]?[0-9]?[A-Z]?", parts[i]):
             muts.append(parts[i])
-            if i+1 == len(parts) or parts[i+1] in gene_list:
+            if i+1 == len(parts) or parts[i+1].split('-')[0] in gene_list:
                 biomarkers.append([''])
             continue
         # Should only hit this if there's no mutation listed for the present gene, 
@@ -90,7 +95,7 @@ def _parse_profile(profile):
             muts.append('')
         if parts[i] in jax_biomarker_types:
             biomarker_types.append(parts[i])
-            if i+1 == len(parts) or parts[i+1] in gene_list:
+            if i+1 == len(parts) or parts[i+1].split('-')[0] in gene_list:
                 biomarkers.append(biomarker_types)
         elif len(genes) != len(biomarkers):
             biomarkers.append([''])
