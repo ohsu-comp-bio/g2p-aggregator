@@ -27,14 +27,6 @@ class CosmicLookup(object):
         gene_df = self.lookup_table[['gene']].drop_duplicates(keep='first')
         return list(gene_df.values.flatten())
 
-    def get_p_variants(self):
-        """
-        Returns a list of all genes represented in the cosmic table
-        """
-        v_df = self.lookup_table[['hgvs_p']].drop_duplicates(keep='first')
-        v_df = v_df['hgvs_p'].str.replace(pat='p.', repl='')
-        return list(v_df.values.flatten())
-
     def get_entries(self, gene, hgvs_p):
         """
         Returns a dataframe of results from filtering on gene and hgvs_p
