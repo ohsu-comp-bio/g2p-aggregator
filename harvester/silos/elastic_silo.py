@@ -64,7 +64,7 @@ class ElasticSilo:
         maintain it as a string.
         """
         sources = ['cgi', 'jax', 'civic', 'oncokb',
-                   'molecularmatch', 'pmkb', 'sage']
+                   'molecularmatch', 'pmkb', 'sage', 'brca', 'jax_trials']
         for source in sources:
             if source in feature_association:
                 if not isinstance(feature_association[source], basestring):
