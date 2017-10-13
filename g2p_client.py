@@ -74,14 +74,18 @@ class G2PDatabase(object):
 
         data = []
         for _, hit in enumerate(s.scan()):
+            association_dict = hit['association'].to_dict()
+            genes = hit['genes']
+            if isinstance(genes, basestring):
+                genes = [genes]
             hit_dict = {
                 'source': hit['source'],
-                'genes': ':'.join(hit['genes']),
-                'drug': hit['association'].to_dict().get('drug_labels', ''),
+                'genes': ':'.join(genes),
+                'drug': association_dict.get('drug_labels', ''),
                 'description': hit['association']['description'],
-                'evidence_label': hit['association']['evidence_label'],
-                'evidence_direction': hit['association']['response_type'],
-                'evidence_url': hit['association'].to_dict().get('publication_url', '')
+                'evidence_label': association_dict.get('evidence_label', ''),
+                'evidence_direction': association_dict.get('response_type', ''),
+                'evidence_url': association_dict.get('publication_url', '')
             }
 
             # FIXME: this yields only the last feature of association, not all features.
