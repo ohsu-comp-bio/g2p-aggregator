@@ -68,6 +68,16 @@ def convert(interpretation):
                         attributes[key] = {'string_value': variant[key]}
                 feature['attributes'] = attributes
 
+                # TODO - replace w/ biocommons/hgvs ?
+                if 'dna_change' in variant:
+                    dna_change = variant['dna_change']
+                    if dna_change and '>' in dna_change:
+                        prefix, alt = dna_change.split('>')
+                        ref = prefix[-len(alt):]
+                        if len(ref) > 0 and len(alt) > 0:
+                            feature['ref'] = ref
+                            feature['alt'] = alt
+
                 gene = variant['gene']['name']
 
                 association = {}
