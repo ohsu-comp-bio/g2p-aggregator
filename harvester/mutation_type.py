@@ -10,26 +10,32 @@ def norm_biomarker(evidence, cgi_biomarker=None):
     # Note that 'CNA' is currently left out as it is relevant only in the case
     # of CGI and directed in for loop below. 
     mut_types = {
-        'fusion' : ['fusion', 'fus'],
-        'snp' : ['snp', 'mut', 'mutant', 'missense', 'protein altering', 'coding sequence', 'nonsense'],
+        'amplification' : ['amp'], # gene is amplified
         'biallelic inactivation' : ['bia'],
-        'overexpression' : ['expr', 'over exp'],
-        'decreased expression' : ['dec exp'],
-        'unspecified' : ['na', 'n/a', 'gene variant', 'wild type', 'any'], # civic
+        'decreased expression' : ['dec exp'], # gene or protein has decreased expression
+        'deletion' : ['deletion', 'del'], # gene  is deleted
         'exon' : ['exon'], # civic
-        'transcript': ['transcript'], # civic
-        'loss of function' : ['loss of function'], # civic
-        'gain of function' : ['gain of function'], # civic
         'frameshift' : ['frameshift'],
-        'loss of heterozygosity' : ['loss of heterozygosity'], # civic
-        'deletion' : ['deletion'],
+        'fusion' : ['fusion', 'fus'], # gene fusion
+        'gain of function' : ['gain of function', 'act mut'], # gain of protein function
+        'indel' : ['indel'],
         'insertion' : ['insertion'],
-        '3 Prime UTR' : ['3 prime utr'],
-        'stopgain' : ['stop gained'],
-        'startloss' : ['start lost'],
-        'silent' : ['silent mutation', 'synonymous', 'inact mut'],
         'intron' : ['intron variant'],
-        'indel' : ['indel']
+        'loss' : ['loss'], # gene or protein is lost
+        'loss of function' : ['loss of function', 'inact mut'], # loss of protein function
+        'loss of heterozygosity' : ['loss of heterozygosity'], # civic
+        'mutant': ['mutant', 'mut', 'na', 'n/a', 'gene variant', 'any'], # unspecified mutation
+        'negative': ['negative', 'neg'], # lack of gene or protein
+        'over expression' : ['expr', 'over exp'], # gene or protein has increased expression
+        'positive': ['positive', 'pos'], # gene or protein is present
+        'rearrangement': ['rearrange'], # unspecified gene rearrangement
+        'silent' : ['silent mutation', 'synonymous'],
+        'snp' : ['snp', 'missense', 'protein altering', 'coding sequence', 'nonsense'],
+        'startloss' : ['start lost'],
+	'stopgain' : ['stop gained'],
+        'transcript': ['transcript'], # civic
+        'wild-type' : ['wild-type', 'wild type'], # no mutation detected in gene
+        '3 Prime UTR' : ['3 prime utr']
     }
 
     for mut in mut_types:
