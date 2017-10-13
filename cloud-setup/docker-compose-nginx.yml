@@ -15,10 +15,12 @@ services:
       - "./services/nginx/.htpasswd:/usr/local/openresty/nginx/conf/.htpasswd"
       - "./certs:/certs"
       - "./services/nginx/g2p.html:/var/www/static-html/g2p.html"
-
     ports:
       - "443:443"
       - "80:80"
+    environment:
+      - SERVER_NAME=${SERVER_NAME}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
     links:
       - elastic
       - kibana
