@@ -1,6 +1,7 @@
 .env
 *.pyc
 *.swp
+*.ipynb_checkpoints
 esdata
 *.DS_Store
 __pycache__/
@@ -25,5 +26,7 @@ harvester/oncokb_all_actionable_variants*.*
 
 # requests-cache(s)
 harvester/*.sqlite
+harvester/*.sqlite3
 harvester/*log
 harvester/.zotero
+harvester/zotero_help.py
