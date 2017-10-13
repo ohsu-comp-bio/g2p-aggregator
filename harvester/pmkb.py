@@ -54,8 +54,8 @@ def convert(interpretation):
                 a = coordinate.split(':')
                 chromosome = a[0]
                 start, stop = a[1].split('-')
-                feature['start'] = start
-                feature['end'] = stop
+                feature['start'] = int(start)
+                feature['end'] = int(stop)
                 feature['chromosome'] = str(chromosome)
                 feature['referenceName'] = 'GRCh37/hg19'
                 feature['biomarker_type'] = mut.norm_biomarker(
