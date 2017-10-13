@@ -1,0 +1,3 @@
+elasticsearch_dsl
+holoviews
+pyupset
