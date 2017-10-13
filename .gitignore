@@ -11,6 +11,7 @@ attic
 .plotly
 .htpasswd
 util/elastic/backups
+data
 harvester/cosmic_lookup_table.tsv
 harvester/CosmicMutantExport.tsv.gz
 harvester/benchmark_results.txt
