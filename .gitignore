@@ -1,5 +1,7 @@
 .env
 *.pyc
+*.swp
+*.ipynb_checkpoints
 esdata
 *.DS_Store
 __pycache__/
@@ -11,6 +13,7 @@ attic
 .plotly
 .htpasswd
 util/elastic/backups
+data
 harvester/cosmic_lookup_table.tsv
 harvester/CosmicMutantExport.tsv.gz
 harvester/benchmark_results.txt
@@ -23,6 +26,7 @@ harvester/oncokb_all_actionable_variants*.*
 
 # requests-cache(s)
 harvester/*.sqlite
+harvester/*.sqlite3
 harvester/*log
-
-*.swp
+harvester/.zotero
+harvester/zotero_help.py
