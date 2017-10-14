@@ -1,5 +1,6 @@
 
 import sys
+import re
 from lxml import html
 from lxml import etree
 import requests
@@ -14,10 +15,96 @@ import mutation_type as mut
 import cosmic_lookup_table
 
 LOOKUP_TABLE = None
+gene_list = None
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # see https://ckb.jax.org/about/curationMethodology
+
+def _parse_profile(profile):
+    parts = profile.split()
+    global LOOKUP_TABLE
+    global gene_list
+    if not LOOKUP_TABLE:
+        LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
+                "./cosmic_lookup_table.tsv")
+    parts = profile.split()
+    # this list taken from https://ckb.jax.org/about/glossaryOfTerms
+    # "Non specific variants" list, separated by space, where applicable
+    jax_biomarker_types = [
+        'act',
+        'amp',
+        'dec',
+        'del',
+        'exp',
+        'fusion',
+        'inact',
+        'loss',
+        'mut',
+        'mutant',
+        'negative',
+        'over',
+        'pos',
+        'positive',
+        'rearrange',
+        'wild-type'
+    ]
+    if not gene_list:
+        gene_list = LOOKUP_TABLE.get_genes()
+    genes = []
+    muts = []
+    biomarkers = []
+    biomarker_types = None
+    fusions = []
+    # Complex loop: Run through the split profile, creating four arrays,
+    # one of the indices of genes in `parts`, one of the indices of mutations
+    # in `parts` (if present, `None` if not), one of biomarker strings,
+    # (if present, `None` if not), and a fusions array. Gene, mutation, and
+    # biomarker arrays should always have same length.
+    for i in range(len(parts)):
+        # check for fusions
+        if '-' in parts[i] and parts[i] not in jax_biomarker_types:
+            fusion = parts[i].split('-')
+            if fusion[0] in gene_list and fusion[1] in gene_list:
+                fusions.append(parts[i].split('-'))
+                # if you're dealing with a fusion with no other gene listed,
+                # use the fusion as the gene
+                if i+1 == len(parts):
+                    pass
+                elif len(parts) > 1 and parts[i+1] not in gene_list:
+                    genes.append(parts[i])
+                    biomarker_types = []
+                continue
+       # check to see if you're on a gene
+        if parts[i] in gene_list:
+            genes.append(parts[i])
+            # reset the biomarker_type array on every new gene
+            biomarker_types = []
+            continue
+        # check to see if part matches a mutation variant format, e.g. `V600E`
+        if re.match("[A-Z][0-9]+[fs]?[*]?[0-9]?[A-Z]?", parts[i]):
+            muts.append(parts[i])
+            if i+1 == len(parts) or parts[i+1].split('-')[0] in gene_list:
+                biomarkers.append([''])
+            continue
+        # Should only hit this if there's no mutation listed for the present gene,
+        # so denote that and catch the biomarker.
+        elif len(genes) != len(muts):
+            muts.append('')
+        if parts[i] in jax_biomarker_types:
+            biomarker_types.append(parts[i])
+            if i+1 == len(parts) or parts[i+1].split('-')[0] in gene_list:
+                biomarkers.append(biomarker_types)
+        elif len(genes) != len(biomarkers):
+            biomarkers.append([''])
+    # change the internal biomarker_type arrays into strings
+    biomarker_types = []
+    for biomarker in biomarkers:
+        if biomarker[0]:
+            biomarker_types.append(' '.join(biomarker))
+        else:
+            biomarker_types.append('')
+    return genes, muts, biomarker_types, fusions
 
 
 def harvest(genes):
@@ -56,6 +143,7 @@ def get_evidence(trial_infos):
 
 
 def convert(jax_evidence):
+    global LOOKUP_TABLE
     jax = jax_evidence['jax_id']
     evidence = jax_evidence['evidence']
     genes = set([])
@@ -69,30 +157,30 @@ def convert(jax_evidence):
     features = []
     for profile in profiles:
         # Parse molecular profile and use for variant-level information.
-        genes_from_profile, tuples = _parse(profile)
-        for tuple in tuples:
-            feature = {}
-            feature['geneSymbol'] = tuple[0]
-            feature['name'] = tuple[0]
-            # feature['name'] = ' '.join(tuple[1:])
-            feature['biomarker_type'] = mut.norm_biomarker(' '.join(tuple[1:]))
-            try:
-                """
-                 filter out
-                 "FLT3 D835X FLT3 exon 14 ins"
-                """
-                exceptions = set(["exon", "ins", "amp", "del", "exp", "dec"])
-                profile = set(tuple)
-                if len(exceptions.intersection(profile)) > 0:
-                    print 'skipping ', evidence['molecular_profile']
-                    matches = []
+
+        # Parse molecular profile and use for variant-level information.
+        profile = profile.replace('Tp53', 'TP53').replace(' - ', '-')
+        gene_index, mut_index, biomarkers, fusions  = _parse_profile(profile)
+        if not (len(gene_index) == len(mut_index) == len(biomarkers)):
+            print  "ERROR: This molecular profile has been parsed incorrectly!"
+            print json.dumps({"molecular_profile": profile}, indent=4, sort_keys=True)
+
+        else:
+            parts = profile.split()
+            for i in range(len(gene_index)):
+                feature = {}
+                feature['geneSymbol'] = gene_index[i]
+                feature['name'] = ' '.join([gene_index[i], mut_index[i], biomarkers[i]])
+                if biomarkers[i]:
+                    feature['biomarker_type'] = mut.norm_biomarker(biomarkers[i])
                 else:
-                    # Look up variant and add position information.
-                    if not LOOKUP_TABLE:
-                        LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
-                                        "./cosmic_lookup_table.tsv")
-                    matches = LOOKUP_TABLE.get_entries(tuple[0],
-                                                       ' '.join(tuple[1:]))
+                    feature['biomarker_type'] = mut.norm_biomarker('na')
+
+                # Look up variant and add position information.
+                if not LOOKUP_TABLE:
+                    LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
+                                   "./cosmic_lookup_table.tsv")
+                matches = LOOKUP_TABLE.get_entries(gene_index[i], mut_index[i])
                 if len(matches) > 0:
                     # FIXME: just using the first match for now;
                     # it's not clear what to do if there are multiple matches.
@@ -103,9 +191,14 @@ def convert(jax_evidence):
                     feature['ref'] = match['ref']
                     feature['alt'] = match['alt']
                     feature['referenceName'] = str(match['build'])
-            except:
-                pass
-            features.append(feature)
+                features.append(feature)
+            for fusion in fusions:
+                for gene in fusion:
+                    feature = {}
+                    feature['geneSymbol'] = gene
+                    feature['name'] = '-'.join(fusion)
+                    feature['biomarker_type'] = mut.norm_biomarker("fusion")
+                    features.append(feature)
 
     association = {}
     association['description'] = evidence['title']
