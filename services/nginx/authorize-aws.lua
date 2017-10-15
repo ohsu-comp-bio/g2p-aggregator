@@ -91,8 +91,7 @@ local restrictions = {
     ["/plugins.*"]                      = { "GET" },
     ["/es_admin.*"]                     = { "GET", "POST" },
 
-    ["/static.*"]                       = { "GET" },
-    ["/admin.*"]                        = { "GET" }
+    ["/static.*"]                       = { "GET" }
 
   },
 
@@ -105,21 +104,20 @@ local restrictions = {
     ["/_aliases"]                       = { "GET" },
     ["/_cluster.*"]                     = { "GET" },
 
-    ["/app.*"]                          = { "GET" },
-    ["/ui.*"]                           = { "GET" },
-    ["/bundles.*"]                      = { "GET" },
-    ["/api.*"]                          = { "GET", "POST" },
-    ["/plugins.*"]                      = { "GET" },
+    ["/_plugin/app.*"]                          = { "GET" },
+    ["/_plugin/ui.*"]                           = { "GET" },
+    ["/_plugin/bundles.*"]                      = { "GET" },
+    ["/_plugin/api.*"]                          = { "GET", "POST" },
+    ["/_plugin/plugins.*"]                      = { "GET" },
 
-    ["/es_admin.*"]                     = { "GET" },
-    ["/es_admin.*/_search"]             = { "GET", "POST" },
-    ["/es_admin.*/_msearch"]            = { "GET", "POST" },
-    ["/es_admin.*/_mget"]               = { "GET", "POST" },
+    ["/_plugin/.*/es_admin.*"]                     = { "GET" },
+    ["/*/_search"]                              = { "GET", "POST" },
+    ["/.*/_msearch"]                            = { "GET", "POST" },
+    ["/*/_mget"]                                = { "GET", "POST" },
 
-    ["/static.*"]                       = { "GET" },
+    ["/_plugin/static.*"]                       = { "GET" },
+    ["/_plugin/.*"]                             = { "GET" },
 
-    ["/kibana"]                       = { "GET", "POST" },
-    ["/elastic"]                      = { "GET", "POST" }
   }
 
 }
