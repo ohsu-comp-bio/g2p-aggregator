@@ -81,6 +81,12 @@ optional arguments:
                         harvest from these sources. default: ['cgi_biomarkers', 'jax', 'civic', 'oncokb', 'g2p']
 ```
 
+EXAMPLE:
+
+```
+python harvester.py --elastic_index g2p --delete_index --harvesters molecularmatch cgi_biomarkers jax civic oncokb pmkb > harvest.log
+```
+
 ## How do I write a new harvester?
 A `harvester` is a python module that implements this [duck typing](https://en.wikipedia.org/wiki/Duck_typing) interface.
 
@@ -155,6 +161,11 @@ Launch it by:
 ELASTIC_PORT=9200 KIBANA_PORT=5601 docker-compose up -d
 ```
 This will automatically download elastic search etc. and will expose the standard elastic search and kibana ports (9200 and 5601)
+
+If you only want to use elastic search (e.g. interfacing through a different client), you may spin up ES only.
+```
+ELASTIC_PORT=9200 docker-compose -f docker-compose-es.yml up -d
+```
 
 If you would like to host an instance, launch docker-compose with an additional nginx file.
 ```
