@@ -33,7 +33,7 @@ cosmic_lookup_table.tsv:
 
 ## Create cgi_mut_benchmarking.tsv file.
 cgi_mut_benchmarking.tsv:
-	grep MUT cgi_biomarkers_20170208.tsv | \
+	grep MUT cgi_biomarkers_$(CGI_VERSION)/cgi_biomarkers.tsv | \
 	egrep -v "oncogenic mutation|insertion|deletion|wildtype|promoters|_variant" | \
 	cut -f4 | sed 's/\:/	/g' > cgi_mut_benchmarking.tsv
 
