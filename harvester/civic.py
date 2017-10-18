@@ -63,6 +63,11 @@ def convert(gene_data):
                 feature['biomarker_type'] = mut.norm_biomarker(variant['variant_types'][0]['display_name'])  # NOQA
             for evidence_item in variant['evidence_items']:
                 association = {}
+                for part in variant['name'].split():
+                    if not '-' in part and not part == variant['entrez_name']:
+                        association['variant_name'] = part
+                    else:
+                        association['variant_name'] = None
                 association['description'] = evidence_item['description']
                 association['environmentalContexts'] = []
                 environmentalContexts = association['environmentalContexts']
