@@ -210,6 +210,11 @@ def convert(evidence):
 
     association = {}
     association['description'] = narrative
+    association['variant_name'] = []
+    for v in evidence['variantInfo']:
+        for l in v['locations']:
+            if 'amino_acid_change' in l:
+                association['variant_name'].append(l['amino_acid_change'])
     association['environmentalContexts'] = []
     association['environmentalContexts'].append({
         'description': drug_label})

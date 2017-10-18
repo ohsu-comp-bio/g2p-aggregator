@@ -230,6 +230,7 @@ def convert(jax_evidence):
                 features.append(feature)
 
         association = {}
+        association['variant_name'] = mut_index
         association['description'] = evidence['efficacy_evidence']
         association['environmentalContexts'] = []
         association['environmentalContexts'].append({
