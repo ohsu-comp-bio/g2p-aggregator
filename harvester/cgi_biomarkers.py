@@ -82,6 +82,7 @@ def convert(evidence):
         features.append(feature)
 
     association = {}
+    association['variant_name'] = evidence['individual_mutation'].split(':')[1]
     association['description'] = '{} {} {}'.format(gene,
                                                    evidence['Drug full name'],
                                                    evidence['Association'])
