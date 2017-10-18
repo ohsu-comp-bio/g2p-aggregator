@@ -66,8 +66,6 @@ def convert(gene_data):
                 for part in variant['name'].split():
                     if not '-' in part and not part == variant['entrez_name']:
                         association['variant_name'] = part
-                    else:
-                        association['variant_name'] = None
                 association['description'] = evidence_item['description']
                 association['environmentalContexts'] = []
                 environmentalContexts = association['environmentalContexts']
