@@ -87,6 +87,7 @@ def convert(gene_data):
 
         association = {}
         association['description'] = clinical['level_label']
+        association['variant_name'] = variant['name']
         association['environmentalContexts'] = []
         for drug in clinical['drug']:
             association['environmentalContexts'].append({'description': drug})
@@ -159,6 +160,7 @@ def convert(gene_data):
             feature['referenceName'] = str(match['build'])
 
         association = {}
+        association['variant_name'] = variant['name']
         association['description'] = variant['consequence']['description']
         association['environmentalContexts'] = []
 

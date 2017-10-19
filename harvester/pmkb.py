@@ -72,6 +72,9 @@ def convert(interpretation):
 
                 association = {}
 
+                if attributes['amino_acid_change']['string_value']:
+                    association['variant_name'] = attributes['amino_acid_change']['string_value']
+
                 # association['evidence_label'] = interpretation['tier']
                 association = el.evidence_label(str(interpretation['tier']),
                                                 association, na=True)
