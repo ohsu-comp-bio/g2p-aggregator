@@ -186,12 +186,16 @@ def responses():
 @app.route('/chromosomes')
 def chromosomes():
     client = Elasticsearch()
-    s = Search(using=client)
-    a = A('terms', field='features.chromosome.keyword')
-    rsp = s.aggs.bucket('category_terms', a)
-    print rsp
-    return (jsonify(rsp))
-
+    s = Search(using=client, index="associations")
+    s.aggs.bucket('chromosome', 'terms', field='features.chromosome.keyword')
+    aggregation = s.execute()
+    # print aggregation.aggregations.chromosome # .doc_count
+    # print aggregation.hits.total
+    # print aggregation.aggregations.chromosome.buckets
+    responses = []
+    for bucket in aggregation.aggregations.chromosome.buckets:
+        responses.append(bucket.to_dict())
+    return (jsonify(responses))
 
 #  MAIN -----------------
 if __name__ == '__main__':  # pragma: no cover

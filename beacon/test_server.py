@@ -22,5 +22,5 @@ def test_beacon_vicc(client):
 def test_chromosomes(client):
     """ a populated server should return evidence for this variant """
     rsp = client.get('/chromosomes')
-    print rsp.data
+    assert len(rsp.json) > 0
     #  assert rsp.json['organization'] == 'VICC, OHSU'
