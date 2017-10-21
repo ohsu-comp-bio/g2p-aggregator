@@ -1,4 +1,5 @@
 .env
+.cache
 *.pyc
 *.swp
 *.ipynb_checkpoints

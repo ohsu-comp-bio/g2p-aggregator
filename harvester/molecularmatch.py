@@ -161,7 +161,7 @@ def convert(evidence):
             feature['chromosome'] = str(grch37_mutation['chr'])
             feature['start'] = grch37_mutation['start']
             feature['alt'] = grch37_mutation['alt']
-            #  TODO: add build/reference information
+            feature['referenceName'] = 'GRCh37'
         except:
             try:
                 grch37_mutation = mutation_evidence['GRCh37_location'][1]
@@ -169,6 +169,7 @@ def convert(evidence):
                 feature['start'] = grch37_mutation['start']
                 feature['ref'] = grch37_mutation['ref']
                 feature['alt'] = grch37_mutation['alt']
+                feature['referenceName'] = 'GRCh37'
             except:
                 pass
 

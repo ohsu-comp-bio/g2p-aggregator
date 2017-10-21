@@ -35,7 +35,7 @@ def convert(gene_data):
         feature = {}
         feature['geneSymbol'] = brca['Gene_Symbol']
         # feature['entrez_id'] = ?
-        builds = ['Hg38', 'Hg37', 'Hg36']
+        builds = ['Hg37', 'Hg38',  'Hg36']
         for build in builds:
             if '{}_Start'.format(build) in brca:
                 feature['start'] = brca['{}_Start'.format(build)]

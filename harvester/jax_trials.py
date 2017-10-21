@@ -227,7 +227,7 @@ def convert(jax_evidence):
                            'features': features,
                            'association': association,
                            'source': 'jax_trials',
-                           'jax_trial': evidence}
+                           'jax_trials': evidence}
     yield feature_association
 
 

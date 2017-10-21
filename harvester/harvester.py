@@ -16,11 +16,13 @@ import oncokb
 import cgi_biomarkers
 import molecularmatch
 import pmkb
-import drug_normalizer
-import disease_normalizer
 import sage
 import brca
 import jax_trials
+
+import drug_normalizer
+import disease_normalizer
+import reference_genome_normalizer
 
 from elastic_silo import ElasticSilo
 import elastic_silo
@@ -134,6 +136,7 @@ def normalize(feature_association):
     """ standard representation of drugs,disease etc. """
     drug_normalizer.normalize_feature_association(feature_association)
     disease_normalizer.normalize_feature_association(feature_association)
+    reference_genome_normalizer.normalize_feature_association(feature_association)
 
 
 def main():
