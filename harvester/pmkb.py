@@ -76,6 +76,7 @@ def convert(interpretation):
                     association['variant_name'] = attributes['amino_acid_change']['string_value']
 
                 # association['evidence_label'] = interpretation['tier']
+                association['source_link'] = 'https://pmkb.weill.cornell.edu/variants/{}'.format(variant['id'])
                 association = el.evidence_label(str(interpretation['tier']),
                                                 association, na=True)
                 association = ed.evidence_direction(

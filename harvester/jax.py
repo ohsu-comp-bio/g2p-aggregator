@@ -231,6 +231,7 @@ def convert(jax_evidence):
 
         association = {}
         association['variant_name'] = mut_index
+        association['source_link'] = 'https://ckb.jax.org{}'.format(evidence['molecular_profile_href'])
         association['description'] = evidence['efficacy_evidence']
         association['environmentalContexts'] = []
         association['environmentalContexts'].append({

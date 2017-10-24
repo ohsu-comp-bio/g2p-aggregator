@@ -99,6 +99,7 @@ def convert(gene_data):
                     evidence_item['clinical_significance'], association
                 )
 
+                association['source_link'] = 'https://civic.genome.wustl.edu/events/genes/{}/summary/variants/{}/summary'.format(variant['gene_id'], variant['id']) # NOQA
                 association['publication_url'] = evidence_item['source']['source_url'],   # NOQA
                 if len(evidence_item['drugs']) > 0:
                     association['drug_labels'] = ','.join([drug['name'] for drug in evidence_item['drugs']])   # NOQA

@@ -2,9 +2,9 @@
 
 import requests
 import json
+from urllib import urlencode
 
 import cosmic_lookup_table
-
 
 import evidence_label as el
 import evidence_direction as ed
@@ -109,6 +109,8 @@ def convert(gene_data):
             }
         }]
         # add summary fields for Display
+        association['source_link'] = 'http://oncokb.org/#/gene/{}/variant/{}'.format(gene, 
+                                     urlencode(variant['name']))
         association = el.evidence_label(clinical['level'],
                                         association, na=True)
         association = ed.evidence_direction(clinical['level_label'],
@@ -181,6 +183,8 @@ def convert(gene_data):
             }
         }]
         # add summary fields for Display
+        association['source_link'] = 'http://oncokb.org/#/gene/{}/variant/{}'.format(gene, 
+                                      urlencode(variant['name']))
         association['oncogenic'] = biological['oncogenic']
         association['evidence_label'] = None
         association = ed.evidence_direction(biological['level_label'],
