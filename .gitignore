@@ -1,4 +1,5 @@
 .env
+**/venv
 *.pyc
 *.swp
 *.ipynb_checkpoints
