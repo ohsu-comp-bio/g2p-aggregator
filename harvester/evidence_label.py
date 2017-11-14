@@ -50,10 +50,10 @@ def evidence_label(evidence, association, na=False):
     oncokb_d = ['4']
 
     # molecularmatch
-    molecularmatch_a = ['1', '1a', '1b']
-    molecularmatch_b = ['2', '2c', '2d']
-    molecularmatch_c = ['3']
-    molecularmatch_d = ['4', '5']
+    molecularmatch_a = ['1', '1a']
+    molecularmatch_b = ['1b']
+    molecularmatch_c = ['2', '2c']
+    molecularmatch_d = ['2d', '3', '4', '5']
 
     ev_lab = {
         'A': cgi_a + jax_a + pmkb_a + civic_a + oncokb_a + molecularmatch_a,
