@@ -15,6 +15,7 @@ import civic
 import oncokb
 import cgi_biomarkers
 import molecularmatch
+import molecularmatch_trials
 import pmkb
 import sage
 import brca
@@ -44,7 +45,8 @@ argparser.add_argument('--harvesters',  nargs='+',
                                [cgi_biomarkers,jax,civic,oncokb,
                                pmkb]''',
                        default=['cgi_biomarkers', 'jax', 'civic',
-                                'oncokb', 'pmkb', 'brca', 'jax_trials'])
+                                'oncokb', 'pmkb', 'brca', 'jax_trials',
+                                'molecularmatch_trials'])
 
 
 argparser.add_argument('--silos',  nargs='+',
