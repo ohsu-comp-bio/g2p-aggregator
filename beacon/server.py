@@ -33,16 +33,19 @@ VICC_BEACON = {
     "name": "VICC - G2P",
     "url": None,
     "organization": "VICC, OHSU",
-    "description": None,
-    "homePage": None,
+    "description": """
+    The Variant Interpretation for Cancer Consortium (VICC)
+The VICC is a Driver Project of the Global Alliance for Genomics Health (GA4GH).
+
+The field of precision medicine aspires to a future in which a cancer patient’s molecular information can be used to inform diagnosis, prognosis and treatment options most likely to benefit that individual patient. Many groups have created knowledgebases to annotate cancer genomic mutations associated with evidence of pathogenicity or relevant treatment options. However, clinicians and researchers are unable to fully utilize the accumulated knowledge derived from such efforts. Integration of the available knowledge is currently infeasible because each group (often redundantly) curates their own knowledgebase without adherence to any interoperability standards. Therefore, there is a clear need to standardize and coordinate clinical-genomics curation efforts, and create a public community resource able to query the aggregated information. To this end we have formed the Variant Interpretation for Cancer Consortium (VICC) to bring together the leading institutions that are independently developing comprehensive cancer variant interpretation databases.
+""",
+    "homePage": "http://cancervariants.org/",
     "email": None,
     "aggregator": True,
     "visible": True,
     "enabled": True,
     "supportedReferences": [
-      "HG38",
-      "HG18",
-      "HG19"
+      "GRCH37"
     ]
 }
 
@@ -68,7 +71,7 @@ def beacons():
 @app.route('/beacons/<id>')
 def beacon(id):
     """
-    List beacons. Takes no parameters
+    return our beacon
     ---
     parameters:
       - name: id
