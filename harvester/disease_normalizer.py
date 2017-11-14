@@ -143,7 +143,7 @@ def normalize_feature_association(feature_association):
 def project_lookup(name):
     disease = disease_alias.get(name)
     if not disease == name and disease:
-        logging.warning('renamed {} to {}'.format(name, disease))
+        logging.debug('renamed {} to {}'.format(name, disease))
     if not disease:
         disease = name
     return disease
