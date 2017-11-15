@@ -51,7 +51,6 @@ def get_evidence(gene_ids):
                 logging.info('%s %s', url, json.dumps(payload))
                 r = requests.post(url, data=payload)
                 assertions = r.json()
-                logging.debug(assertions)
                 if assertions['total'] == 0:
                     start = -1
                     continue
