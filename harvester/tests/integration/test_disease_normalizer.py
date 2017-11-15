@@ -79,3 +79,8 @@ def test_Advanced_Solid_Tumor():
 def test_Astrocytoma_Anaplastic():
     diseases = normalize("Astrocytoma, Anaplastic")
     assert diseases[0]['ontology_term'] == 'DOID:3069'
+
+
+def test_ovary_adenocarcinoma():
+    diseases = normalize('ovary adenocarcinoma')
+    assert diseases[0]['ontology_term'] == 'DOID:3713'
