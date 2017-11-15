@@ -20,10 +20,7 @@ def evidence_label(evidence, association, na=False):
     cgi_b = ['late trials', 'late trials,pre-clinical']
     cgi_c = ['early trials', 'case report', 'clinical trial',
              'early trials,case report']
-    cgi_d = ['pre-clinical']
-
-
-
+    cgi_d = ['pre-clinical', 'clinical trials']
 
     # JAX
     jax_a = ['guideline', 'fda approved']
@@ -50,23 +47,26 @@ def evidence_label(evidence, association, na=False):
     oncokb_d = ['4']
 
     # molecularmatch
-    molecularmatch_a = ['1', '1a', '1b']
-    molecularmatch_b = ['2', '2c', '2d']
-    molecularmatch_c = ['3']
-    molecularmatch_d = ['4', '5']
+    molecularmatch_a = ['1', '1a']
+    molecularmatch_b = ['1b']
+    molecularmatch_c = ['2', '2c']
+    molecularmatch_d = ['2d', '3', '4', '5']
+
+    # sage
+    sage_c = ['early clinical', 'case reports']
 
     ev_lab = {
         'A': cgi_a + jax_a + pmkb_a + civic_a + oncokb_a + molecularmatch_a,
         'B': cgi_b + jax_b + pmkb_b + civic_b + oncokb_b + molecularmatch_b,
-        'C': cgi_c + jax_c + pmkb_c + civic_c + oncokb_c + molecularmatch_c,
+        'C': cgi_c + jax_c + pmkb_c + civic_c + oncokb_c + molecularmatch_c + sage_c,  # NOQA
         'D': cgi_d + jax_d + pmkb_d + civic_d + oncokb_d + molecularmatch_d
     }
 
     ev_lev = {
-        'A' : 1,
-        'B' : 2,
-        'C' : 3,
-        'D' : 4
+        'A': 1,
+        'B': 2,
+        'C': 3,
+        'D': 4
     }
 
     for item in ev_lab:
@@ -76,7 +76,7 @@ def evidence_label(evidence, association, na=False):
                 association['evidence_level'] = ev_lev[item]
     if 'evidence_label' not in association:
         if na:
-            association['evidence_label'] = 'NA'
+            association['evidence_label'] = 'D'
             # association['evidence_level'] = 'NA'
         else:
             association['evidence_label'] = evidence
