@@ -15,6 +15,7 @@ salivary duct carcinoma	salivary gland carcinoma
 UVM	Uveal Melanoma
 Billiary tract	biliary tract neoplasm
 L	Lung Cancer
+lung	Lung Cancer
 T Lymphoblastic Leukemia/Lymphoma	acute T cell leukemia
 BTCA	Biliary Tract Cancer
 Solid tumor	Cancer
@@ -33,7 +34,9 @@ Non-small cell lung	non-small cell lung carcinoma
 Neoplasm of colon	Neoplasm of the colon
 WT	Wilms Tumor
 AML	Acute Myeloid Leukemia
-MALY	Malignant Lymphoma
+Acute myeloid leukaemia, disease	Acute Myeloid Leukemia
+MALY	Lymphoma
+Malignant Lymphoma	Lymphoma
 Gastrointestinal stromal	Gastrointestinal stromal tumor
 CER	cervical cancer
 SKCM	Skin Cutaneous Melanoma
@@ -41,7 +44,9 @@ GACA	Gastric Cancer
 SKCA	Skin Adenocarcinoma
 Neoplasm of colorectum	rectal neoplasm
 PRAD	Prostate Cancer
+Tumour of prostate	Prostate Cancer
 CLLE	Chronic Lymphocytic Leukemia
+Chronic lymphoid leukaemia, disease	Chronic Lymphocytic Leukemia
 Ovary	ovarian cancer
 UCS	Uterine Carcinosarcoma
 ESCA	Esophageal Cancer
@@ -70,6 +75,7 @@ LICA	Liver Cancer
 urothelial carcinoma	bladder urachal urothelial carcinoma
 MM - Malignant melanoma of skin	skin melanoma
 ALL	Acute Lymphoblastic Leukemia
+ALL - Acute lymphoblastic leukaemia	Acute Lymphoblastic Leukemia
 Any cancer type	Cancer
 LMS	Soft tissue cancer
 Solid tumors	Cancer
@@ -112,3 +118,8 @@ BREAST-OVARIAN CANCER, FAMILIAL, SUSCEPTIBILITY TO, 1; BROVCA1 (604370	Breast Ca
 BREAST-OVARIAN CANCER, FAMILIAL, SUSCEPTIBILITY TO, 1; BROVCA1 (604370)	Breast Cancer
 BREAST-OVARIAN CANCER, FAMILIAL, SUSCEPTIBILITY TO, 2; BROVCA2 (612555)	Breast Cancer
 BREAST-OVARIAN CANCER, FAMILIAL, SUSCEPTIBILITY TO, 2; BROVCA2 (612555	Breast Cancer
+Leukaemia	leukemia
+HIV - Human immunodeficiency virus infection	human immunodeficiency virus infectious disease
+HF - Heart failure	Heart failure
+Plasmacytic myeloma	multiple myeloma
+Ovarian Ca	Ovarian Cancer
