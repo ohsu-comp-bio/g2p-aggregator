@@ -79,6 +79,7 @@ def convert(evidence):
         feature['geneSymbol'] = gene
         feature['name'] = evidence['individual_mutation']
         feature['description'] = evidence['Alteration']
+        feature['referenceName'] = 'GRCh37'
         features.append(feature)
 
     association = {}

@@ -1,0 +1,4 @@
+elasticsearch_dsl
+holoviews
+pyupset
+bokeh==0.12.5

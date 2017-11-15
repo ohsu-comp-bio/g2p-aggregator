@@ -22,12 +22,6 @@ class G2PDatabase(object):
         self.client = Elasticsearch(host=es_host)
         self.index = index
 
-        # Get a list of sources in the database.
-        # TODO: there has to be a more efficient way to do this which
-        # doesn't require loading all results (faceted search? return only some
-        # fields? )
-        self.sources = list(set([h.source for h in self.query_all().scan()]))
-
     def query_all(self):
         '''
         Returns all documents in the database.
@@ -64,7 +58,7 @@ class G2PDatabase(object):
 
     def hits_to_dataframe(self, s):
         start_columns = ['source', 'genes', 'drug']
-        end_columns = ['description', 'evidence_label', 'evidence_url']
+        end_columns = ['description', 'evidence_label', 'evidence_direction', 'evidence_url']
         feature_cols = ['feature_geneSymbol', 'feature_name', 'feature_entrez_id',
                         'feature_chromosome', 'feature_start', 'feature_end',
                         'feature_ref', 'feature_alt', 'feature_referenceName',
@@ -80,13 +74,18 @@ class G2PDatabase(object):
 
         data = []
         for _, hit in enumerate(s.scan()):
+            association_dict = hit['association'].to_dict()
+            genes = hit['genes']
+            if isinstance(genes, basestring):
+                genes = [genes]
             hit_dict = {
                 'source': hit['source'],
-                'genes': ':'.join(hit['genes']),
-                'drug': hit['association'].to_dict().get('drug_labels', ''),
+                'genes': ':'.join(genes),
+                'drug': association_dict.get('drug_labels', ''),
                 'description': hit['association']['description'],
-                'evidence_label': hit['association']['evidence_label'],
-                'evidence_url': hit['association']['publication_url'],
+                'evidence_label': association_dict.get('evidence_label', ''),
+                'evidence_direction': association_dict.get('response_type', ''),
+                'evidence_url': association_dict.get('publication_url', '')
             }
 
             # FIXME: this yields only the last feature of association, not all features.
@@ -129,10 +128,14 @@ class G2PDatabase(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--host", help="ES host")
+    parser.add_argument('-s', '--host', help='ES host')
+    parser.add_argument('-g', '--gene', help="Gene to query for")
     args = parser.parse_args()
 
-
     database = G2PDatabase(args.host)
-    s = database.query_all()
+    if args.gene:
+        s = database.query_by_gene(args.gene)
+    else:
+        s = database.query_all()
+
     print database.hits_to_dataframe(s).to_csv(sep='\t', index=False, encoding='utf-8')
