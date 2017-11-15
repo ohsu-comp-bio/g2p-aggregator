@@ -84,3 +84,51 @@ def test_Astrocytoma_Anaplastic():
 def test_ovary_adenocarcinoma():
     diseases = normalize('ovary adenocarcinoma')
     assert diseases[0]['ontology_term'] == 'DOID:3713'
+
+
+def test_Malignant_Lymphoma():
+    diseases = normalize('Malignant Lymphoma')
+    assert diseases[0]['ontology_term'] == 'DOID:0060058'
+    print diseases
+
+
+def test_Glioma():
+    diseases = normalize('Glioma')
+    assert diseases[0]['ontology_term'] == 'HP:0009733'
+    assert diseases[0]['family'] == 'Neuroepithelial neoplasm'
+
+
+def test_Heart_failure():
+    diseases = normalize('Heart failure')
+    assert diseases[0]['ontology_term'] == 'SYMP:0000292'
+    assert diseases[0]['family'] == 'cardiovascular system symptom'
+
+
+def test_HF():
+    diseases = normalize('HF - Heart failure')
+    assert diseases[0]['ontology_term'] == 'SYMP:0000292'
+    assert diseases[0]['family'] == 'cardiovascular system symptom'
+
+
+def test_Lung():
+    diseases = normalize('Lung')
+    assert diseases[0]['ontology_term'] == 'DOID:1324'
+    assert diseases[0]['family'] == 'respiratory system cancer'
+
+
+def test_HIV():
+    diseases = normalize('HIV - Human immunodeficiency virus infection')
+    assert diseases[0]['ontology_term'] == 'DOID:526'
+    assert diseases[0]['family'] == 'human immunodeficiency virus infectious disease'
+
+
+def test_Plasmacytic_myeloma():
+    diseases = normalize('Plasmacytic myeloma')
+    print diseases
+    assert diseases[0]['ontology_term'] == 'DOID:9538'
+    assert diseases[0]['family'] == 'hematologic cancer'
+#
+#
+# multiple myeloma
+#
+# multiple myeloma

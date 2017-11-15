@@ -7,7 +7,7 @@ import evidence_direction as ed
 import logging
 import mutation_type as mut
 from warnings import warn
-
+import sys
 
 DEFAULT_GENES = ['*']
 TRIAL_IDS = []
@@ -24,7 +24,8 @@ def get_evidence(gene_ids):
 
     for gene in gene_ids:
         count = 0
-        start = 0
+        start = int(os.getenv('MM_TRIALS_START', 0))
+        end = int(os.getenv('MM_TRIALS_END', sys.maxint))
         limit = 50
         filters = [{'facet': 'MUTATION', 'term': '{}'.format(gene)}]
         resourceURLs = {
@@ -46,11 +47,6 @@ def get_evidence(gene_ids):
                 r = requests.post(url, data=payload)
                 assertions = r.json()
                 logging.debug(assertions)
-                if assertions['total'] == 0:
-                    start = -1
-                    continue
-                else:
-                    start = start + limit
                 logging.info(
                     "page {} of {}. total {} count {}".format(
                         assertions['page'],
@@ -62,6 +58,14 @@ def get_evidence(gene_ids):
                 # filter those drugs, only those with diseases
                 for hit in assertions['rows']:
                     yield hit
+                if assertions['total'] == 0:
+                    start = -1
+                    continue
+                else:
+                    start = start + limit
+                if start > end:
+                    logging.info("reached end {}".format(end))
+                    start = -1
 
             except Exception as e:
                 logging.error(
