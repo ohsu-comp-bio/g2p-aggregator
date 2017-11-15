@@ -2,6 +2,14 @@ import requests
 import urllib
 import logging
 import re
+import os
+
+
+NOFINDS = []
+
+API_KEY = os.environ.get('BIOONTOLOGY_API_KEY')
+if not API_KEY:
+    raise ValueError('Please set BIOONTOLOGY_API_KEY in environment')
 
 
 disease_alias = {}
@@ -10,11 +18,14 @@ with open('disease_alias.tsv', "r") as f:
         if line.startswith("#"):
             continue
         inline_list = line.rstrip().split('\t')
-        disease_alias[inline_list[0]] = inline_list[1]
+        disease_alias[inline_list[0].lower()] = inline_list[1]
 
 
 def normalize_ebi(name):
     """ call ebi & retrieve """
+    if name in NOFINDS:
+        logging.info('{} in disease_normalizer.NOFINDS'.format(name))
+        return []
     name = urllib.quote_plus(project_lookup(name))
     url = 'https://www.ebi.ac.uk/ols/api/search?q={}&groupField=iri&exact=on&start=0&ontology=doid'.format(name)  # NOQA
     # .response
@@ -45,10 +56,12 @@ def normalize_ebi(name):
     r = requests.get(url, timeout=20)
     rsp = r.json()
     if 'response' not in rsp:
+        NOFINDS.append(name)
         return []
     response = rsp['response']
     numFound = response['numFound']
     if numFound == 0:
+        NOFINDS.append(name)
         return []
     doc = response['docs'][0]
     term = {'ontology_term': doc['obo_id'].encode('utf8'),
@@ -61,15 +74,22 @@ def normalize_ebi(name):
     return [term]
 
 
-def get_family(doid):
+def get_family(ontology_id):
     # get the hierarchy
+    url = r = None
     try:
-        url = 'http://disease-ontology.org/query_tree?search=True&node={}'.format(doid)  # NOQA
+        if ontology_id.startswith('DOID'):
+            url = 'http://disease-ontology.org/query_tree?search=True&node={}'.format(ontology_id)  # NOQA
+            r = requests.get(url, timeout=20)
+            rsp = r.json()
+            return get_hierarchy_family(get_hierarchy(rsp[0], []))['text']
+        (ontology, k) = ontology_id.split(':')
+        url = 'http://data.bioontology.org/ontologies/{}/classes/{}/ancestors?apikey={}'.format(ontology, ontology_id, API_KEY)  # NOQA
         r = requests.get(url, timeout=20)
-        rsp = r.json()
-        return get_hierarchy_family(get_hierarchy(rsp[0], []))['text']
+        return r.json()[0]['prefLabel']
     except Exception as e:
-        logging.error('{} {} {}'.format(url, r, e))
+        logging.exception(e)
+        logging.error('get_family {} {} {}'.format(url, r, e))
         return None
 
 
@@ -128,6 +148,7 @@ def normalize_feature_association(feature_association):
     diseases = normalize(association['phenotype']['description'])
     if len(diseases) == 0:
         feature_association['dev_tags'].append('no-doid')
+        association['phenotype']['family'] = 'Uncategorized-PHN'
         return
     # TODO we are only looking for exact match of one disease right now
     association['phenotype']['type'] = {
@@ -136,12 +157,13 @@ def normalize_feature_association(feature_association):
     }
     if 'family' in diseases[0]:
         association['phenotype']['family'] = diseases[0]['family']
-
+    else:
+        association['phenotype']['family'] = 'Uncategorized-PHN'
     association['phenotype']['description'] = diseases[0]['label']
 
 
 def project_lookup(name):
-    disease = disease_alias.get(name)
+    disease = disease_alias.get(name.lower())
     if not disease == name and disease:
         logging.debug('renamed {} to {}'.format(name, disease))
     if not disease:
