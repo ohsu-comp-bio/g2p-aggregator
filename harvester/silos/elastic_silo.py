@@ -52,18 +52,25 @@ class ElasticSilo:
                 }
               }
             }
-            self._es.delete_by_query(index=self._index, body=query)
+            self._es.delete_by_query(index=self._index,
+                                     # doc_type='association',
+                                     body=query)
+            logging.info("deleted associations for {}.{}"
+                         .format(self._index, source))
+        except exceptions.NotFoundError as nf:
+            logging.info("index not found associations for {}.{}"
+                         .format(self._index, source))
         except Exception as e:
-            logging.exception
             logging.error(query)
-            pass
+            logging.exception(e)
+            raise e
 
     def _stringify_sources(self, feature_association):
         """ Maintaining the original document causes a 'field explosion'
         thousands on fields in a document. So, for now at least,
         maintain it as a string.
         """
-        sources = ['cgi', 'jax', 'civic', 'oncokb',
+        sources = ['cgi', 'jax', 'civic', 'oncokb', 'molecularmatch_trials',
                    'molecularmatch', 'pmkb', 'sage', 'brca', 'jax_trials']
         for source in sources:
             if source in feature_association:
