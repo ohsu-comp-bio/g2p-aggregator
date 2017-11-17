@@ -54,7 +54,9 @@ class ElasticSilo:
             }
             self._es.delete_by_query(index=self._index,
                                      # doc_type='association',
-                                     body=query)
+                                     body=query,
+                                     timeout='2m',
+                                     request_timeout=120)
             logging.info("deleted associations for {}.{}"
                          .format(self._index, source))
         except exceptions.NotFoundError as nf:
