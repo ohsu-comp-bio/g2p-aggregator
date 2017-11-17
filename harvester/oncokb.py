@@ -2,13 +2,14 @@
 
 import requests
 import json
-from urllib import urlencode
+from urllib import urlencode, quote_plus
 
 import cosmic_lookup_table
 
 import evidence_label as el
 import evidence_direction as ed
 import mutation_type as mut
+from feature_enricher import enrich
 
 LOOKUP_TABLE = None
 
@@ -65,6 +66,7 @@ def convert(gene_data):
         feature = {}
         feature['geneSymbol'] = gene
         feature['name'] = variant['name']
+        feature['description'] = variant['name']
         feature['entrez_id'] = gene_data['entrezGeneId']
         feature['biomarker_type'] = mut.norm_biomarker(
             variant['consequence']['term'])
@@ -84,6 +86,8 @@ def convert(gene_data):
             feature['ref'] = match['ref']
             feature['alt'] = match['alt']
             feature['referenceName'] = str(match['build'])
+        else:
+            feature = enrich(feature)
 
         association = {}
         association['description'] = clinical['level_label']
@@ -109,8 +113,8 @@ def convert(gene_data):
             }
         }]
         # add summary fields for Display
-        association['source_link'] = 'http://oncokb.org/#/gene/{}/variant/{}'.format(gene, 
-                                     urlencode(variant['name']))
+        association['source_link'] = 'http://oncokb.org/#/gene/{}/variant/{}'.format(gene,
+                                     quote_plus(variant['name']))
         association = el.evidence_label(clinical['level'],
                                         association, na=True)
         association = ed.evidence_direction(clinical['level_label'],
@@ -183,8 +187,15 @@ def convert(gene_data):
             }
         }]
         # add summary fields for Display
-        association['source_link'] = 'http://oncokb.org/#/gene/{}/variant/{}'.format(gene, 
-                                      urlencode(variant['name']))
+        # print variant['name']
+        # print variant['name'].__class__
+        # print gene
+        # print gene.__class__
+        #
+        # association['source_link'] = \
+        #     'http://oncokb.org/#/gene/{}/variant/{}' \
+        #     .format(gene, urlencode(str(variant['name'])))
+
         association['oncogenic'] = biological['oncogenic']
         association['evidence_label'] = None
         association = ed.evidence_direction(biological['level_label'],
