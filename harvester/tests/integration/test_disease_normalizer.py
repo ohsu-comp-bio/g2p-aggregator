@@ -1,6 +1,8 @@
 import sys
 sys.path.append('.')  # NOQA
-
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logging.debug("HI")
 from disease_normalizer import normalize
 import requests
 import requests_cache
@@ -119,16 +121,28 @@ def test_Lung():
 def test_HIV():
     diseases = normalize('HIV - Human immunodeficiency virus infection')
     assert diseases[0]['ontology_term'] == 'DOID:526'
-    assert diseases[0]['family'] == 'human immunodeficiency virus infectious disease'
+    assert diseases[0]['family'] == 'human immunodeficiency virus infectious disease'  # NOQA
 
 
 def test_Plasmacytic_myeloma():
     diseases = normalize('Plasmacytic myeloma')
-    print diseases
     assert diseases[0]['ontology_term'] == 'DOID:9538'
     assert diseases[0]['family'] == 'hematologic cancer'
-#
-#
-# multiple myeloma
-#
-# multiple myeloma
+
+
+def test_Myeloproliferative_disorder():
+    diseases = normalize('Myeloproliferative disorder')
+    assert diseases[0]['ontology_term'] == 'DOID:2226'
+    assert diseases[0]['family'] == 'hematologic cancer'
+
+
+def test_Diffuse_malignant_lymphoma_histiocytic():
+    diseases = normalize('Diffuse malignant lymphoma - histiocytic')
+    assert diseases[0]['ontology_term'] == 'DOID:8675'
+    assert diseases[0]['family'] == 'immune system cancer'
+
+
+def test_Follicular_non_Hodgkin_lymphoma():
+    diseases = normalize('Follicular non-Hodgkin lymphoma')
+    assert diseases[0]['ontology_term'] == 'DOID:0060060'
+    assert diseases[0]['family'] == 'hematologic cancer'
