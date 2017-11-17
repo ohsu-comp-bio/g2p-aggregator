@@ -8,34 +8,66 @@ def norm_biomarker(evidence, cgi_biomarker=None):
         return 'NA'
 
     # Note that 'CNA' is currently left out as it is relevant only in the case
-    # of CGI and directed in for loop below. 
+    # of CGI and directed in for loop below.
+
+    #  BRCA Exchange
+    # F(Frameshift),
+    # 3'UTR(3'UTR 3-prime Untranslated Region),
+    # 5'UTR(5'UTR 5-prime Untranslated Region),
+    # IFI(In Frame Insertion),
+    # IFD(In Frame Deletion),
+    # IVS(Intervening Sequence),
+    # M(Missense),
+    # N(Nonsense),
+    # P(Polymorphism),
+    # S(Splice),
+    # Syn(Synonymous),
+    # UV(Unclassified Variant)
+
     mut_types = {
-        'amplification' : ['amp'], # gene is amplified
-        'biallelic inactivation' : ['bia'],
-        'decreased expression' : ['dec exp'], # gene or protein has decreased expression
-        'deletion' : ['deletion', 'del'], # gene  is deleted
-        'exon' : ['exon'], # civic
-        'frameshift' : ['frameshift'],
-        'fusion' : ['fusion', 'fus'], # gene fusion
-        'gain of function' : ['gain of function', 'act mut'], # gain of protein function
-        'indel' : ['indel'],
-        'insertion' : ['insertion'],
-        'intron' : ['intron variant'],
-        'loss' : ['loss'], # gene or protein is lost
-        'loss of function' : ['loss of function', 'inact mut'], # loss of protein function
-        'loss of heterozygosity' : ['loss of heterozygosity'], # civic
-        'mutant': ['mutant', 'mut', 'na', 'n/a', 'gene variant', 'any'], # unspecified mutation
-        'negative': ['negative', 'neg'], # lack of gene or protein
-        'over expression' : ['expr', 'over exp'], # gene or protein has increased expression
-        'positive': ['positive', 'pos'], # gene or protein is present
-        'rearrangement': ['rearrange'], # unspecified gene rearrangement
-        'silent' : ['silent mutation', 'synonymous'],
-        'snp' : ['snp', 'missense', 'protein altering', 'coding sequence', 'nonsense'],
-        'startloss' : ['start lost'],
-	'stopgain' : ['stop gained'],
-        'transcript': ['transcript'], # civic
-        'wild-type' : ['wild-type', 'wild type'], # no mutation detected in gene
-        '3 Prime UTR' : ['3 prime utr']
+        "3'UTR": ["3'utr"],  # 3-prime Untranslated Region
+        "5'UTR": ["5'utr"],  # 5-prime Untranslated Region
+        'amplification': ['amp'],  # gene is amplified
+        'biallelic inactivation': ['bia'],
+        # gene or protein has decreased expression
+        'decreased expression': ['dec exp'],
+        'deletion': ['deletion', 'del', 'ifd'],  # gene  is deleted
+        'exon': ['exon'],  # civic
+        'frameshift': ['frameshift', 'f'],
+        'fusion': ['fusion', 'fus'],  # gene fusion
+        # gain of protein function
+        'gain of function': ['gain of function', 'act mut'],
+        'indel': ['indel'],
+        'intervening sequence': ['ivs'],  # IVS(Intervening Sequence),
+        'insertion': ['insertion', 'ifi'],
+        'intron': ['intron variant'],
+        'loss': ['loss'],  # gene or protein is lost
+        # loss of protein function
+        'loss of function': ['loss of function', 'inact mut'],
+        'loss of heterozygosity': ['loss of heterozygosity'],  # civic
+        'missense': ['m'],
+        # unspecified mutation
+        'mutant': ['mutant', 'mut', 'na', 'n/a', 'gene variant', 'any',
+                   '-', 'uv'],
+        'negative': ['negative', 'neg'],  # lack of gene or protein
+        'nonsense': ['n'],
+        # gene or protein has increased expression
+        'over expression': ['expr', 'over exp'],
+        'positive': ['positive', 'pos'],  # gene or protein is present
+        'polymorphism': ['p'],
+
+        'rearrangement': ['rearrange'],  # unspecified gene rearrangement
+        'silent': ['silent mutation', 'synonymous'],
+        'snp': ['snp', 'missense', 'protein altering', 'coding sequence',
+                'nonsense'],
+        'splice': ['s'],
+        'synonymous': ['syn'],
+        'startloss': ['start lost'],
+        'stopgain': ['stop gained'],
+        'transcript': ['transcript'],  # civic
+        'wild-type': ['wild-type', 'wild type'],  # no mut. detected in gene
+        '3 Prime UTR': ['3 prime utr'],
+        'copy number variant': ['copy number variant']
     }
 
     for mut in mut_types:
@@ -44,7 +76,7 @@ def norm_biomarker(evidence, cgi_biomarker=None):
                 return mut
             elif ev == "cna":
                 # Copy number alteration, either amplification or deletion.
-                # This is only relevant in the case of CGI 
+                # This is only relevant in the case of CGI
                 if "amplification" in cgi_biomarker:
                     return "amplification"
                 elif "deletion" in cgi_biomarker:
