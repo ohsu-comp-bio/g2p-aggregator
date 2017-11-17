@@ -47,9 +47,11 @@ def convert(gene_data):
         feature['ref'] = brca['Ref']
         feature['alt'] = brca['Alt']
         feature['name'] = brca['Protein_Change']
+        feature['biomarker_type'] = mut.norm_biomarker(
+                                    brca['Mutation_type_BIC'])
         if len(feature['name']) == 0:
             feature['name'] = brca['HGVS_cDNA']
-        # feature['biomarker_type'] = ?
+
         association = {}
         association['description'] = brca['Pathogenicity_expert']
         association['environmentalContexts'] = []
