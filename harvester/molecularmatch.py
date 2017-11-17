@@ -159,23 +159,19 @@ def convert(evidence):
 
         # Add variant-level information.
         # TODO: only looks at first location, not all locations.
-        try:
+        if ('GRCh37_location' in mutation_evidence and
+                len(mutation_evidence['GRCh37_location']) > 0):
             grch37_mutation = mutation_evidence['GRCh37_location'][0]
-            feature['ref'] = grch37_mutation['ref']
-            feature['chromosome'] = str(grch37_mutation['chr'])
-            feature['start'] = grch37_mutation['start']
-            feature['alt'] = grch37_mutation['alt']
-            feature['referenceName'] = 'GRCh37'
-        except:
-            try:
-                grch37_mutation = mutation_evidence['GRCh37_location'][1]
-                feature['chromosome'] = str(grch37_mutation['chr'])
-                feature['start'] = grch37_mutation['start']
+            if 'ref' in grch37_mutation:
                 feature['ref'] = grch37_mutation['ref']
+            if 'alt' in grch37_mutation:
                 feature['alt'] = grch37_mutation['alt']
-                feature['referenceName'] = 'GRCh37'
-            except:
-                pass
+            if 'chr' in grch37_mutation:
+                feature['chromosome'] = str(grch37_mutation['chr'])
+            if 'start' in grch37_mutation:
+                feature['start'] = grch37_mutation['start']
+            if 'stop' in grch37_mutation:
+                feature['end'] = grch37_mutation['stop']
 
         biomarker_types = []
         if 'mutation_type' in mutation_evidence:
