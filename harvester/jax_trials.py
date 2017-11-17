@@ -21,6 +21,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # see https://ckb.jax.org/about/curationMethodology
 
+
 def _parse_profile(profile):
     parts = profile.split()
     global LOOKUP_TABLE
@@ -75,7 +76,7 @@ def _parse_profile(profile):
                     genes.append(parts[i])
                     biomarker_types = []
                 continue
-       # check to see if you're on a gene
+        # check to see if you're on a gene
         if parts[i] in gene_list:
             genes.append(parts[i])
             # reset the biomarker_type array on every new gene
@@ -87,7 +88,8 @@ def _parse_profile(profile):
             if i+1 == len(parts) or parts[i+1].split('-')[0] in gene_list:
                 biomarkers.append([''])
             continue
-        # Should only hit this if there's no mutation listed for the present gene,
+        # Should only hit this if there's no mutation listed for
+        # the present gene,
         # so denote that and catch the biomarker.
         elif len(genes) != len(muts):
             muts.append('')
@@ -118,7 +120,7 @@ def _get_trials_ids():
     """gets json for list of all trials yield"""
     offset = 0
     while True:
-        url = 'https://ckb.jax.org/ckb-api/api/v1/clinicalTrials?offset={}&max=100'.format(offset)
+        url = 'https://ckb.jax.org/ckb-api/api/v1/clinicalTrials?offset={}&max=100'.format(offset)  # NOQA
         page = requests.get(url, verify=False)
         trials_ids = []
         trials_infos = page.json()['clinicalTrials']
@@ -133,10 +135,10 @@ def get_evidence(trial_infos):
     """ scrape webpage """
     gene_evidence = []
     for trial_info in trial_infos:
-        url = 'https://ckb.jax.org/ckb-api/api/v1/clinicalTrials/{}'.format(trial_info['id'])
+        url = 'https://ckb.jax.org/ckb-api/api/v1/clinicalTrials/{}'.format(trial_info['id'])  # NOQA
         page = requests.get(url, verify=False)
         clinicalTrial = page.json()
-        if clinicalTrial['variantRequirements'] == 'no' or len(clinicalTrial['variantRequirementDetails']) == 0:
+        if clinicalTrial['variantRequirements'] == 'no' or len(clinicalTrial['variantRequirementDetails']) == 0:  # NOQA
             logging.info('no variants, skipping {}'.format(trial_info['id']))
             break
         yield {'jax_id': trial_info['id'], 'evidence': clinicalTrial}  # NOQA
@@ -160,19 +162,21 @@ def convert(jax_evidence):
 
         # Parse molecular profile and use for variant-level information.
         profile = profile.replace('Tp53', 'TP53').replace(' - ', '-')
-        gene_index, mut_index, biomarkers, fusions  = _parse_profile(profile)
+        gene_index, mut_index, biomarkers, fusions = _parse_profile(profile)
         if not (len(gene_index) == len(mut_index) == len(biomarkers)):
-            print  "ERROR: This molecular profile has been parsed incorrectly!"
-            print json.dumps({"molecular_profile": profile}, indent=4, sort_keys=True)
+            print "ERROR: This molecular profile has been parsed incorrectly!"
+            print json.dumps({"molecular_profile": profile}, indent=4, sort_keys=True)  # NOQA
 
         else:
             parts = profile.split()
             for i in range(len(gene_index)):
                 feature = {}
                 feature['geneSymbol'] = gene_index[i]
-                feature['name'] = ' '.join([gene_index[i], mut_index[i], biomarkers[i]])
+                feature['name'] = ' '.join([gene_index[i], mut_index[i],
+                                            biomarkers[i]])
                 if biomarkers[i]:
-                    feature['biomarker_type'] = mut.norm_biomarker(biomarkers[i])
+                    feature['biomarker_type'] = mut.norm_biomarker(
+                        biomarkers[i])
                 else:
                     feature['biomarker_type'] = mut.norm_biomarker('na')
 
