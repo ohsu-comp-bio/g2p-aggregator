@@ -56,11 +56,13 @@ def normalize_ebi(name):
     r = requests.get(url, timeout=20)
     rsp = r.json()
     if 'response' not in rsp:
+        logging.info('{} in disease_normalizer.NOFINDS'.format(name))
         NOFINDS.append(name)
         return []
     response = rsp['response']
     numFound = response['numFound']
     if numFound == 0:
+        logging.info('{} in disease_normalizer.NOFINDS'.format(name))
         NOFINDS.append(name)
         return []
     doc = response['docs'][0]
