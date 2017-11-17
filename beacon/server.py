@@ -1,10 +1,12 @@
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+# coding=utf8
 from flask import Flask, jsonify
 from flasgger import Swagger
 from flask import request
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, A
-
 
 app = Flask(__name__)
 swagger = Swagger(app)
@@ -28,19 +30,21 @@ swagger = Swagger(app)
 # /alleles	Lists supported alleles.	Go to example
 # /references	Lists supported reference genomes.	Go to example
 
+DESCRIPTION = """
+The Variant Interpretation for Cancer Consortium (VICC)
+The VICC is a Driver Project of the Global Alliance for Genomics Health (GA4GH).
+The field of precision medicine aspires to a future in which a cancer patient’s molecular information can be used to inform diagnosis, prognosis and treatment options most likely to benefit that individual patient. Many groups have created knowledgebases to annotate cancer genomic mutations associated with evidence of pathogenicity or relevant treatment options. However, clinicians and researchers are unable to fully utilize the accumulated knowledge derived from such efforts. Integration of the available knowledge is currently infeasible because each group (often redundantly) curates their own knowledgebase without adherence to any interoperability standards. Therefore, there is a clear need to standardize and coordinate clinical-genomics curation efforts, and create a public community resource able to query the aggregated information. To this end we have formed the Variant Interpretation for Cancer Consortium (VICC) to bring together the leading institutions that are independently developing comprehensive cancer variant interpretation databases.
+"""  # NOQA
+
+
 VICC_BEACON = {
     "id": "vicc",
-    "name": "VICC - G2P",
+    "name": "VICC",
     "url": None,
-    "organization": "VICC, OHSU",
-    "description": """
-    The Variant Interpretation for Cancer Consortium (VICC)
-The VICC is a Driver Project of the Global Alliance for Genomics Health (GA4GH).
-
-The field of precision medicine aspires to a future in which a cancer patient’s molecular information can be used to inform diagnosis, prognosis and treatment options most likely to benefit that individual patient. Many groups have created knowledgebases to annotate cancer genomic mutations associated with evidence of pathogenicity or relevant treatment options. However, clinicians and researchers are unable to fully utilize the accumulated knowledge derived from such efforts. Integration of the available knowledge is currently infeasible because each group (often redundantly) curates their own knowledgebase without adherence to any interoperability standards. Therefore, there is a clear need to standardize and coordinate clinical-genomics curation efforts, and create a public community resource able to query the aggregated information. To this end we have formed the Variant Interpretation for Cancer Consortium (VICC) to bring together the leading institutions that are independently developing comprehensive cancer variant interpretation databases.
-""",
+    "organization": "VICC",
+    "description": DESCRIPTION,
     "homePage": "http://cancervariants.org/",
-    "email": None,
+    "email": "vicc_paper@genomicsandhealth.org",
     "aggregator": True,
     "visible": True,
     "enabled": True,
@@ -51,7 +55,11 @@ The field of precision medicine aspires to a future in which a cancer patient’
 
 VICC_ORG = {
     "id": "vicc",
-    "name": "VICC - G2P"
+    "name": "VICC",
+    "description": DESCRIPTION,
+    "url": "http://cancervariants.org/",
+    "address": None,
+    "logo": "http://cancervariants.org/images//VICC_color_combo_v2.png"
 }
 
 
@@ -90,7 +98,7 @@ def beacon(id):
     abort(404)
 
 
-@app.route('/organizations/')
+@app.route('/organizations')
 def organizations():
     """
     List organizations. Takes no parameters
@@ -158,9 +166,9 @@ def responses():
     """
     client = Elasticsearch()
     s = Search(using=client)
-    args = ['chrom', 'pos', 'allele', 'ref', 'beacon']
+    args = ['chrom', 'pos', 'allele', 'ref']  # , 'beacon'
     alias = ['features.chromosome', 'features.start', 'features.alt',
-             'features.referenceName', 'source']
+             'features.referenceName']  # , 'source'
 
     q = s
     queryEcho = {}
@@ -172,7 +180,6 @@ def responses():
             queryEcho[arg] = value
             kwargs[alias[idx]] = value
             q = q.query("match", **kwargs)
-
     responses = []
     for hit in q:
         response = {
@@ -197,9 +204,45 @@ def chromosomes():
     # print aggregation.aggregations.chromosome.buckets
     responses = []
     for bucket in aggregation.aggregations.chromosome.buckets:
-        responses.append(bucket.to_dict())
+        responses.append(bucket.key)
+    return (jsonify(responses))
+
+
+@app.route('/references')
+def references():
+    client = Elasticsearch()
+    s = Search(using=client, index="associations")
+    s.aggs.bucket('referenceName', 'terms',
+                  field='features.referenceName.keyword')
+    aggregation = s.execute()
+    # print aggregation.hits.total
+    # print aggregation.aggregations.referenceName.doc_count
+
+    # print aggregation.aggregations.chromosome.buckets
+    responses = []
+    for bucket in aggregation.aggregations.referenceName.buckets:
+        if not bucket.key == 'None':
+            responses.append(bucket.key)
+    return (jsonify(responses))
+
+
+@app.route('/alleles')
+def alleles():
+    client = Elasticsearch()
+    s = Search(using=client, index="associations")
+    s.aggs.bucket('alleles', 'terms',
+                  field='features.ref.keyword')
+    aggregation = s.execute()
+    # print aggregation.hits.total
+    # print aggregation.aggregations.referenceName.doc_count
+
+    # print aggregation.aggregations.chromosome.buckets
+    responses = []
+    for bucket in aggregation.aggregations.alleles.buckets:
+        if not bucket.key == 'None':
+            responses.append(bucket.key)
     return (jsonify(responses))
 
 #  MAIN -----------------
 if __name__ == '__main__':  # pragma: no cover
-    app.run(debug=True)
+    app.run(debug=False)
