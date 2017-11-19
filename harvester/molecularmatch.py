@@ -162,6 +162,7 @@ def convert(evidence):
         if ('GRCh37_location' in mutation_evidence and
                 len(mutation_evidence['GRCh37_location']) > 0):
             grch37_mutation = mutation_evidence['GRCh37_location'][0]
+            feature['referenceName'] = 'GRCh37'
             if 'ref' in grch37_mutation:
                 feature['ref'] = grch37_mutation['ref']
             if 'alt' in grch37_mutation:
