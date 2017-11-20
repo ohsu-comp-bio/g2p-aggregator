@@ -152,9 +152,9 @@ def convert(evidence):
                 },
                 'description': evidence['title'],
                 'info': {
-                    'publications':
+                    'publications': [
                         'https://clinicaltrials.gov/ct2/show/{}'
-                        .format(evidence['id'])
+                        .format(evidence['id'])]
                 }
             }]
             # add summary fields for Display

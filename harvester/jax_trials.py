@@ -220,8 +220,8 @@ def convert(jax_evidence):
         },
         'description': evidence['title'],
         'info': {
-            'publications':
-                'https://clinicaltrials.gov/ct2/show/{}'.format(jax)
+            'publications': [
+                'https://clinicaltrials.gov/ct2/show/{}'.format(jax)]
         }
     }]
     # add summary fields for Display
