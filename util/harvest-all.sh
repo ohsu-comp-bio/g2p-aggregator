@@ -1,6 +1,7 @@
 cd ~/g2p-aggregator/harvester;
 echo 'Launching harvesters'
-harvesters=( cgi_biomarkers jax civic oncokb pmkb molecularmatch sage jax_trials brca )
+# harvesters=( cgi_biomarkers jax civic oncokb pmkb molecularmatch sage jax_trials brca )
+harvesters=( jax_trials )
 for h in "${harvesters[@]}"
 do
 	python harvester.py --harvesters $h --delete_source >$h.log  &
