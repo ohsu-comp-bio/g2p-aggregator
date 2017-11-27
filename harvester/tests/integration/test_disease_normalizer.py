@@ -146,3 +146,32 @@ def test_Follicular_non_Hodgkin_lymphoma():
     diseases = normalize('Follicular non-Hodgkin lymphoma')
     assert diseases[0]['ontology_term'] == 'DOID:0060060'
     assert diseases[0]['family'] == 'hematologic cancer'
+
+
+def test_Merkel_cell_carcinoma():
+    diseases = normalize('Merkel cell carcinoma')
+    assert diseases[0]['ontology_term'] == 'DOID:3965'
+    assert diseases[0]['family'] == 'skin cancer'
+
+
+def test_Cancer_of_intraabdominal_organ():
+    diseases = normalize('Cancer of intraabdominal organ')
+    assert diseases[0]['ontology_term'] == 'SNOMEDCT:448882009'
+    assert diseases[0]['family'] == 'Malignant neoplasm of abdomen'
+
+
+def test_Primary_malignant_neoplasm_of_retroperitoneum():
+    diseases = normalize('Primary malignant neoplasm of retroperitoneum')
+    assert diseases[0]['ontology_term'] == 'SNOMEDCT:94092006'
+    assert diseases[0]['family'] == 'Primary malignant neoplasm of trunk'
+
+
+def test_Malignant_tumour_of_urinary_tract_proper():
+    diseases = normalize('Malignant tumour of urinary tract proper')
+    assert diseases[0]['ontology_term'] == 'RCD:X78it'
+    assert diseases[0]['family'] == 'Malignant tumour'
+
+
+def test_Cancer_of_digestive_system():
+    diseases = normalize('Cancer of digestive system')
+    assert diseases[0]['ontology_term'] == 'DOID:8377'
