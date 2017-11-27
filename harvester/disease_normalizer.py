@@ -6,6 +6,7 @@ import os
 
 
 NOFINDS = []
+BIOONTOLOGY_NOFINDS = []
 
 API_KEY = os.environ.get('BIOONTOLOGY_API_KEY')
 if not API_KEY:
@@ -19,6 +20,35 @@ with open('disease_alias.tsv', "r") as f:
             continue
         inline_list = line.rstrip().split('\t')
         disease_alias[inline_list[0].lower()] = inline_list[1]
+
+
+def normalize_bioontology(name):
+    """ call bioontology & retrieve """
+    if name in BIOONTOLOGY_NOFINDS:
+        logging.info('{} in disease_normalizer.BIOONTOLOGY_NOFINDS'
+                     .format(name))
+        return []
+    quoted_name = urllib.quote_plus(name)
+    url = 'http://data.bioontology.org/search?q={}&apikey={}'.format(quoted_name, API_KEY)  # NOQA
+    r = requests.get(url, timeout=20)
+    response = r.json()
+    terms = []
+    if 'collection' in response and len(response['collection']) > 0:
+        collection = response['collection'][0]
+        parts = collection['@id'].split('/')
+        ontology = parts[-2]
+        id = parts[-1]
+        if ontology == 'obo':
+            (ontology, id) = id.split('_')
+        term = {'ontology_term': '{}:{}'.format(ontology, id),
+                'label': name}
+        terms.append(term)
+        family = get_family(term['ontology_term'])
+        if family:
+            term['family'] = family
+    else:
+        BIOONTOLOGY_NOFINDS.append(name)
+    return terms
 
 
 def normalize_ebi(name):
@@ -68,7 +98,6 @@ def normalize_ebi(name):
     doc = response['docs'][0]
     term = {'ontology_term': doc['obo_id'].encode('utf8'),
             'label': doc['label'].encode('utf8')}
-
     family = get_family(doc['obo_id'])
     if family:
         term['family'] = family
@@ -83,12 +112,22 @@ def get_family(ontology_id):
         if ontology_id.startswith('DOID'):
             url = 'http://disease-ontology.org/query_tree?search=True&node={}'.format(ontology_id)  # NOQA
             r = requests.get(url, timeout=20)
-            rsp = r.json()
-            return get_hierarchy_family(get_hierarchy(rsp[0], []))['text']
+            if not r.status_code == 500:
+                rsp = r.json()
+                return get_hierarchy_family(get_hierarchy(rsp[0], []))['text']
         (ontology, k) = ontology_id.split(':')
-        url = 'http://data.bioontology.org/ontologies/{}/classes/{}/ancestors?apikey={}'.format(ontology, ontology_id, API_KEY)  # NOQA
+        if not (ontology == 'SNOMEDCT' or
+                ontology == 'DOID' or
+                ontology == 'RCD' or
+                ontology == 'OMIM'):
+            k = ontology_id
+        url = 'http://data.bioontology.org/ontologies/{}/classes/{}/ancestors?apikey={}'.format(ontology, k, API_KEY)  # NOQA
         r = requests.get(url, timeout=20)
-        return r.json()[0]['prefLabel']
+        if r.status_code == 200:
+            classes = r.json()
+            if len(classes) > 0:
+                return r.json()[0]['prefLabel']
+        return None
     except Exception as e:
         logging.exception(e)
         logging.error('get_family {} {} {}'.format(url, r, e))
@@ -125,6 +164,7 @@ def normalize(name):
     try:
         diseases = []
         if name:
+            # find in ebi
             normalized_diseases = normalize_ebi(name)
             if len(normalized_diseases) > 0:
                 diseases = diseases + normalized_diseases
@@ -133,6 +173,9 @@ def normalize(name):
                 for name_part in names:
                     normalized_diseases = normalize_ebi(name_part)
                     diseases = diseases + normalized_diseases
+            if len(diseases) == 0:
+                diseases = normalize_bioontology(name)
+
         return diseases
     except Exception as e:
         logging.warning("Could not normalize {}".format(name))
