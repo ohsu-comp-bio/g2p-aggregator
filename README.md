@@ -3,8 +3,8 @@
 A prototype of the Genotype to phenotype user interface exists [here](https://g2p-ohsu.ddns.net/g2p).   
 
 
-![image](https://cloud.githubusercontent.com/assets/47808/26114835/35b36864-3a13-11e7-9297-7aa996bd965e.png) 
-![image](https://cloud.githubusercontent.com/assets/47808/26114916/6d4ff44a-3a13-11e7-8c5f-09eda59955ac.png) 
+![image](https://cloud.githubusercontent.com/assets/47808/26114835/35b36864-3a13-11e7-9297-7aa996bd965e.png)
+![image](https://cloud.githubusercontent.com/assets/47808/26114916/6d4ff44a-3a13-11e7-8c5f-09eda59955ac.png)
 
 
 ## What is it?  Why use it?
@@ -161,6 +161,12 @@ If you would like to host an instance, launch docker-compose with an additional 
 docker-compose -f docker-compose.yml -f cloud-setup/docker-compose-nginx.yml up -d
 ```
 This will do the same setup, but will also include an nginx proxy to map http and https ports.  
+
+As a convenience, there is a juypter image for notebook analysis:
+```
+docker-compose -f docker-compose.yml -f docker-compose-jupyter.yml up -d
+```
+
 
 
 ## What else do I need to know?
