@@ -26,7 +26,9 @@ class ElasticSilo:
 
     def __init__(self, args):
         """ initialize, set endpoint & index name """
-        self._es = Elasticsearch([args.elastic_search], serializer=JSONSerializerPython2())  # NOQA
+        self._es = Elasticsearch([args.elastic_search],
+                                 serializer=JSONSerializerPython2(),
+                                 request_timeout=120)
         self._index = args.elastic_index
 
     def __str__(self):
@@ -62,6 +64,9 @@ class ElasticSilo:
         except exceptions.NotFoundError as nf:
             logging.info("index not found associations for {}.{}"
                          .format(self._index, source))
+        except exceptions.ConflictError as ce:
+            logging.info("duplicate associations for {}.{}"
+                         .format(self._index, source))
         except Exception as e:
             logging.error(query)
             logging.exception(e)
@@ -85,11 +90,17 @@ class ElasticSilo:
         # prevent field explosion
         feature_association = self._stringify_sources(feature_association)
 
+        # if 'molecularmatch_trials' in feature_association:
+        #     del feature_association['molecularmatch_trials']
+
         # try:
         result = self._es.index(index=self._index,
                                 body=feature_association,
                                 doc_type='association',
-                                op_type='index')
+                                timeout='120s',
+                                request_timeout=120,
+                                op_type='index'
+                                )
 
         if result['_shards']['failed'] > 0:
             logging.error('failure updating association {}'
