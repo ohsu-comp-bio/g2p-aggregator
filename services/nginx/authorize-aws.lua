@@ -91,33 +91,36 @@ local restrictions = {
     ["/plugins.*"]                      = { "GET" },
     ["/es_admin.*"]                     = { "GET", "POST" },
 
-    ["/static.*"]                       = { "GET" }
+    ["/static.*"]                       = { "GET" },
+    ["/admin.*"]                        = { "GET" }
 
   },
 
   g2p = {
 
     ["^/$"]                             = { "GET" },
+    ["^/.*$"]                           = { "GET" },
     ["^/?[^/]*/?[^/]*/_search"]         = { "GET", "POST" },
     ["^/?[^/]*/?[^/]*/_msearch"]        = { "GET", "POST" },
     ["^/?[^/]*/?[^/]*/_validate/query"] = { "GET", "POST" },
     ["/_aliases"]                       = { "GET" },
     ["/_cluster.*"]                     = { "GET" },
 
-    ["/_plugin/app.*"]                          = { "GET" },
-    ["/_plugin/ui.*"]                           = { "GET" },
-    ["/_plugin/bundles.*"]                      = { "GET" },
-    ["/_plugin/api.*"]                          = { "GET", "POST" },
-    ["/_plugin/plugins.*"]                      = { "GET" },
+    ["/app.*"]                          = { "GET" },
+    ["/ui.*"]                           = { "GET" },
+    ["/bundles.*"]                      = { "GET" },
+    ["/api.*"]                          = { "GET", "POST" },
+    ["/plugins.*"]                      = { "GET" },
 
-    ["/_plugin/.*/es_admin.*"]                     = { "GET" },
-    ["/*/_search"]                              = { "GET", "POST" },
-    ["/.*/_msearch"]                            = { "GET", "POST" },
-    ["/*/_mget"]                                = { "GET", "POST" },
+    ["^/?[^/]*/?[^/]*/es_admin.*"]                     = { "GET" },
+    ["^/?[^/]*/?[^/]*/es_admin.*/_search"]             = { "GET", "POST" },
+    ["^/?[^/]*/?[^/]*/es_admin.*/_msearch"]            = { "GET", "POST" },
+    ["^/?[^/]*/?[^/]*/es_admin.*/_mget"]               = { "GET", "POST" },
 
-    ["/_plugin/static.*"]                       = { "GET" },
-    ["/_plugin/.*"]                             = { "GET" },
+    ["/static.*"]                       = { "GET" },
 
+    -- ["/kibana"]                       = { "GET", "POST" },
+    ["/elastic"]                      = { "GET", "POST" }
   }
 
 }
@@ -164,13 +167,13 @@ for path, methods in pairs(restrictions[role]) do
     break
   end
 
-  -- ngx.log(ngx.WARN, method.." "..uri.." NO matched: m:"..tostring(m).." path:"..tostring(path).." for "..role)
+  ngx.log(ngx.WARN, method.." "..uri.." NO matched: m:"..tostring(m).." path:"..tostring(path).." for "..role)
 end
 
 if not allowed then
   ngx.header.content_type = 'text/plain'
   ngx.log(ngx.WARN, "Role ["..role.."] not allowed to access the resource ["..method.." "..uri.."]")
   ngx.status = 403
-  ngx.say("403 Forbidden: You don\'t have access to this resource.")
+  ngx.say("403 Role ["..role.."] not allowed to access the resource ["..method.." "..uri.."]")
   return ngx.exit(403)
 end

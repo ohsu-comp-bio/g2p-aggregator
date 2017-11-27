@@ -1,0 +1,3 @@
+################
+version: '2.1'
+# empty for now, we are just running nginx
