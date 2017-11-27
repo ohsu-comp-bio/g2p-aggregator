@@ -46,7 +46,7 @@ def get_evidence(gene_ids):
             }
             try:
                 logging.info('%s %s', url, json.dumps(payload))
-                r = requests.post(url, data=payload)
+                r = requests.post(url, data=payload, timeout=120)
                 assertions = r.json()
                 logging.debug(assertions)
                 logging.info(
@@ -68,7 +68,11 @@ def get_evidence(gene_ids):
                 if start > end:
                     logging.info("reached end {}".format(end))
                     start = -1
-
+            except requests.exceptions.ConnectionError as ce:
+                logging.error(
+                    "molecularmatch ConnectionError, retrying. fetching {}"
+                    .format(gene),
+                )
             except Exception as e:
                 logging.error(
                     "molecularmatch error fetching {}".format(gene),
@@ -87,13 +91,9 @@ def convert(evidence):
                      {'facet': 'PHASE', 'term': evidence['phase']},
                      {'facet': 'TITLE', 'term': evidence['title']}]
     for t in evidence['tags']:
-        if t.get("filterType", None) == "include" and t.get("priority", 0) > 0:
-            # print '      ', t['facet'],  t['term']
-            # if t['facet'] == 'CONDITION':
-            #     print '        ', t
+        if t.get("filterType", None) == "include" and \
+           t.get("suppress", True) is False:
             evidence_tags.append(t)
-    #     # else:
-    #     #     print '?     ', t['facet'],  t['term']
 
     has_drug = False
     has_condition = False
@@ -158,7 +158,8 @@ def convert(evidence):
                 }
             }]
             # add summary fields for Display
-            association['evidence_label'] = 'D'
+            association = el.evidence_label(evidence['phase'],
+                                            association, na=False)
             feature_association = {
                                    'genes': genes,
                                    'feature_names': features,
