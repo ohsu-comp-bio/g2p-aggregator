@@ -76,7 +76,7 @@ def convert(gene_data):
         }]
         # add summary fields for Display
         association['oncogenic'] = brca['Clinical_Significance_ClinVar'].split(',')[0]
-        association['evidence_label'] = None
+        association['evidence_label'] = 'D'
         feature_association = {'genes': [brca['Gene_Symbol']],
                                'features': [feature],
                                'feature_names': [feature['name']],
