@@ -55,11 +55,26 @@ def evidence_label(evidence, association, na=False):
     # sage
     sage_c = ['early clinical', 'case reports']
 
+    # molecularmatch_trials
+    #    >>> phases
+    # set([u'Phase 1/Phase 2', u'Early Phase 1', u'Phase 2a',
+    #      u'N/A', u'Phase 2b', u'Phase 2', u'Phase 3', u'Phase 0', u'Phase 1',
+    #      u'Phase 4', u'Unknown', u'Not Applicable', u'Phase 2/Phase 3'])
+    molecularmatch_t_a = []
+    molecularmatch_t_b = ['phase 1/phase 3', 'phase 3', 'phase 4',
+                          'phase 2/phase 3', 'phase 3/phase 4']
+    molecularmatch_t_c = ['early phase 1', 'phase 1', 'phase 2a', 'phase 2b',
+                          'phase 1/phase 2', 'phase 2', 'phase 1 / phase 2']
+    molecularmatch_t_d = ['phase 0', 'n/a', 'unknown', 'not applicable']
+
     ev_lab = {
         'A': cgi_a + jax_a + pmkb_a + civic_a + oncokb_a + molecularmatch_a,
-        'B': cgi_b + jax_b + pmkb_b + civic_b + oncokb_b + molecularmatch_b,
-        'C': cgi_c + jax_c + pmkb_c + civic_c + oncokb_c + molecularmatch_c + sage_c,  # NOQA
-        'D': cgi_d + jax_d + pmkb_d + civic_d + oncokb_d + molecularmatch_d
+        'B': cgi_b + jax_b + pmkb_b + civic_b + oncokb_b + molecularmatch_b +
+             molecularmatch_t_b,
+        'C': cgi_c + jax_c + pmkb_c + civic_c + oncokb_c + molecularmatch_c +
+             sage_c + molecularmatch_t_c,  # NOQA
+        'D': cgi_d + jax_d + pmkb_d + civic_d + oncokb_d + molecularmatch_d +
+             molecularmatch_t_d
     }
 
     ev_lev = {
@@ -71,9 +86,11 @@ def evidence_label(evidence, association, na=False):
 
     for item in ev_lab:
         for opt in ev_lab[item]:
-            if evidence and opt == evidence.lower():
+            if opt == evidence.lower():
                 association['evidence_label'] = item
                 association['evidence_level'] = ev_lev[item]
+                break
+
     if 'evidence_label' not in association:
         if na:
             association['evidence_label'] = 'D'
