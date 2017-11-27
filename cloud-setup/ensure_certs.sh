@@ -42,7 +42,7 @@ if [ $? -eq 0 ]
     exit 1
   fi
   mkdir -p certs
-  sudo cp -r letsencrypt_certs/live/$SERVER_NAME   certs
+  sudo cp  -r letsencrypt_certs/live/$SERVER_NAME   certs
   sudo cat  letsencrypt_certs/live/$SERVER_NAME/fullchain.pem >  certs/fullchain.pem
   sudo cat  letsencrypt_certs/live/$SERVER_NAME/privkey.pem >  certs/privkey.pem
 fi
