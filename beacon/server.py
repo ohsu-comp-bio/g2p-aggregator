@@ -8,6 +8,10 @@ from flask import request
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, A
 
+import os
+# use certifi for CA certificates
+import certifi
+
 app = Flask(__name__)
 swagger = Swagger(app)
 
@@ -29,6 +33,13 @@ swagger = Swagger(app)
 # /chromosomes	Lists supported chromosome.	Go to example
 # /alleles	Lists supported alleles.	Go to example
 # /references	Lists supported reference genomes.	Go to example
+
+
+def _es():
+    es_host = os.getenv('ES', 'http://localhost')
+    return Elasticsearch(['{}'.format(es_host)])
+
+
 
 DESCRIPTION = """
 The Variant Interpretation for Cancer Consortium (VICC)
@@ -164,7 +175,7 @@ def responses():
       200:
         description: An array of hits
     """
-    client = Elasticsearch()
+    client = _es()
     s = Search(using=client)
     args = ['chrom', 'pos', 'allele', 'ref']  # , 'beacon'
     alias = ['features.chromosome', 'features.start', 'features.alt',
@@ -195,7 +206,7 @@ def responses():
 
 @app.route('/chromosomes')
 def chromosomes():
-    client = Elasticsearch()
+    client = _es()
     s = Search(using=client, index="associations")
     s.aggs.bucket('chromosome', 'terms', field='features.chromosome.keyword')
     aggregation = s.execute()
@@ -210,7 +221,7 @@ def chromosomes():
 
 @app.route('/references')
 def references():
-    client = Elasticsearch()
+    client = _es()
     s = Search(using=client, index="associations")
     s.aggs.bucket('referenceName', 'terms',
                   field='features.referenceName.keyword')
@@ -228,7 +239,7 @@ def references():
 
 @app.route('/alleles')
 def alleles():
-    client = Elasticsearch()
+    client = _es()
     s = Search(using=client, index="associations")
     s.aggs.bucket('alleles', 'terms',
                   field='features.ref.keyword')
@@ -245,4 +256,4 @@ def alleles():
 
 #  MAIN -----------------
 if __name__ == '__main__':  # pragma: no cover
-    app.run(debug=False)
+    app.run(debug=False, host="0.0.0.0")
