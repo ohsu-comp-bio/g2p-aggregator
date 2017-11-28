@@ -1,3 +1,14 @@
 ################
 version: '2.1'
-# empty for now, we are just running nginx
+
+services:
+  beacon:
+    container_name: beacon_g2p
+    build:
+      context: ./beacon/
+    volumes:
+      - "./util:/util/"
+    ports:
+      - "${BEACON_PORT}:${BEACON_PORT}"
+    environment:
+      - ES=${ES}
