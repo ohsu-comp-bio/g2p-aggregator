@@ -17,6 +17,8 @@ services:
     environment:
       - SERVER_NAME=${SERVER_NAME}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
+    links:
+      - beacon
     # extra_hosts:   
     #   - "elastic:$ES_IP"
     #   - "kibana:$ES_IP"
