@@ -123,7 +123,10 @@ def _get_trials_ids():
         url = 'https://ckb.jax.org/ckb-api/api/v1/clinicalTrials?offset={}&max=100'.format(offset)  # NOQA
         page = requests.get(url, verify=False)
         trials_ids = []
-        trials_infos = page.json()['clinicalTrials']
+        payload = page.json()
+        logging.info('totalCount:{} offset:{}'.format(
+            payload['totalCount'], offset))
+        trials_infos = payload['clinicalTrials']
         if len(trials_infos) == 0:
             break
         offset = offset + 100
@@ -132,7 +135,7 @@ def _get_trials_ids():
 
 
 def get_evidence(trial_infos):
-    """ scrape webpage """
+    """ scrape api """
     gene_evidence = []
     for trial_info in trial_infos:
         url = 'https://ckb.jax.org/ckb-api/api/v1/clinicalTrials/{}'.format(trial_info['id'])  # NOQA
