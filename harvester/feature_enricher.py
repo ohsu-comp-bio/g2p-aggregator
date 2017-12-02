@@ -17,7 +17,6 @@ def enrich(feature):
     payload = {'name': feature['description']}
     r = requests.get(url, params=payload, headers=headers)
     mutation = r.json()
-
     if 'name' in mutation:
         feature['name'] = mutation['name']
     else:
@@ -37,12 +36,22 @@ def enrich(feature):
             feature['end'] = grch37_mutation['stop']
 
         feature['referenceName'] = 'GRCh37'
+        links = feature.get('links', [])
+        links.append(r.url)
+        feature['links'] = links
 
     if 'biomarker_type' not in feature:
         if ('mutation_type' in mutation and
                 len(mutation['mutation_type']) > 0):
                 feature['biomarker_type'] = mut.norm_biomarker(
                                 mutation['mutation_type'][0])
+
+    # there is a lot of info in mutation, just get synonyms and links
+    if ('wgsaMap' in mutation and 'Synonyms' in mutation['wgsaMap'][0]):
+        synonyms = feature.get('synonyms', [])
+        synonyms = synonyms + mutation['wgsaMap'][0]['Synonyms']
+        synonyms = list(set(synonyms))
+        feature['synonyms'] = synonyms
 
     # if 'geneSymbol' in mutation and mutation['geneSymbol']:
     #     feature['geneSymbol'] = mutation['geneSymbol']

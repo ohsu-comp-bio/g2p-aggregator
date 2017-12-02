@@ -17,6 +17,23 @@ NOFINDS_PUBCHEM = []
 NOFINDS_BIOTHINGS = []
 
 
+def _chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
+
+
+def _decompose(name):
+    """given a name, split into an array of searchable terms"""
+    name_parts = re.split('\W+', name)
+    no_punct = ' '.join(name_parts).strip()
+    name_parts = no_punct.split()
+    pairs = [' '.join(c) for c in _chunks(name_parts, 2)]
+    if [no_punct] == pairs:
+        return pairs + name_parts
+    return [no_punct] + pairs + name_parts
+
+
 def normalize_pubchem_substance(name):
     """ call pubchem and retrieve compound_id and most common synonym
         see https://pubchem.ncbi.nlm.nih.gov/rdf/#_Toc421254632
@@ -24,16 +41,16 @@ def normalize_pubchem_substance(name):
     if name in NOFINDS_PUBCHEM_SUBSTANCE:
         logging.info("NOFINDS_PUBCHEM_SUBSTANCE {}".format(name))
         return []
-    name_parts = name.split()  # split on whitespace
+    name_parts = _decompose(name)
     compounds = []
     try:
         for name_part in name_parts:
-            if len(name_part) < 2:
+            if len(name_part) < 3:
                 continue
             if name_part in NOFINDS_PUBCHEM_SUBSTANCE:
                 continue
             url = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/substance/name/{}/synonyms/JSON'.format(name_part)  # NOQA
-            r = requests.get(url)
+            r = requests.get(url, timeout=60)
             rsp = r.json()
             if 'InformationList' in rsp:
                 informationList = r.json()['InformationList']
@@ -59,13 +76,13 @@ def normalize_pubchem(name):
     if name in NOFINDS_PUBCHEM:
         logging.info("NOFINDS_PUBCHEM {}".format(name))
         return []
-    name_parts = name.split()  # split on whitespace
+    name_parts = _decompose(name)
     compounds = []
     for name_part in name_parts:
-        if len(name_part) < 2:
+        if len(name_part) < 3:
             continue
         url = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{}/synonyms/JSON'.format(name_part)  # NOQA
-        r = requests.get(url)
+        r = requests.get(url, timeout=60)
         rsp = r.json()
         if 'InformationList' in rsp:
             informationList = r.json()['InformationList']
@@ -86,11 +103,10 @@ def normalize_biothings(name):
         if name in NOFINDS_BIOTHINGS:
             logging.info("NOFINDS_BIOTHINGS {}".format(name))
             return []
-        # name_parts = name.split()  # split on whitespace
-        name_parts = re.split('\W+', name)
+        name_parts = _decompose(name)
         compounds = []
         for name_part in name_parts:
-            if len(name_part) < 2:
+            if len(name_part) < 3:
                 continue
             fields = 'fields=pubchem.cid,chebi.chebi_id'\
                 ',chembl.molecule_chembl_id'\
@@ -102,19 +118,20 @@ def normalize_biothings(name):
                 'chembl.usan_stem_definition'
             url = 'http://c.biothings.io/v1/query?q=chembl.pref_name:{}&{}'.format(name_part, fields)  # NOQA
             logging.debug(url)
-            r = requests.get(url)
+            r = requests.get(url, timeout=60)
             rsp = r.json()
-            logging.debug(rsp)
             hits = rsp['hits']
+            logging.debug('len(hits) {}'.format(len(hits)))
             if len(hits) == 0:
                 url = 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:{}&{}'.format(name_part, fields)  # NOQA
                 logging.debug(url)
-                r = requests.get(url)
+                r = requests.get(url, timeout=60)
                 rsp = r.json()
                 logging.debug(rsp)
 
             if 'hits' in rsp:
                 hits = rsp['hits']
+                logging.debug('len(hits) {}'.format(len(hits)))
                 if len(hits) == 0:
                     continue
                 # sort to get best hit
@@ -126,6 +143,9 @@ def normalize_biothings(name):
                     continue
                 # The higher the _score, the more relevant the document.
                 if hit['_score'] < 8.8:
+                    logging.debug(
+                        'discarded, score too low {}'.format(hit['_score'])
+                        )
                     continue
 
                 chembl = hit['chembl']
@@ -203,20 +223,23 @@ def normalize_biothings(name):
 
 def normalize_chembl(name):
     """ chembl """
-    name_parts = name.split()  # split on whitespace
+    name_parts = _decompose(name)
     compounds = []
     for name_part in name_parts:
-        if len(name_part) < 2:
+        if len(name_part) < 3:
             continue
-        url = 'https://www.ebi.ac.uk/chembl/api/data/chembl_id_lookup/search?q={}'.format(name_part)  # NOQA
-        r = requests.get(url, headers={'Accept': 'application/json'})
         try:
+            url = 'https://www.ebi.ac.uk/chembl/api/data/chembl_id_lookup/search?q={}'.format(name_part)  # NOQA
+            r = requests.get(url,
+                             headers={'Accept': 'application/json'},
+                             timeout=60)
             rsp = r.json()
             if 'chembl_id_lookups' in rsp and len(rsp['chembl_id_lookups']) > 0:
                 lookup = rsp['chembl_id_lookups'][0]
                 url = 'https://www.ebi.ac.uk{}'.format(lookup['resource_url'])
                 data = requests.get(url,
-                                    headers={'Accept': 'application/json'}).json()
+                                    headers={'Accept': 'application/json'},
+                                    timeout=60).json()
                 if 'molecule_synonyms' not in data:
                     continue
                 molecule_synonyms = data['molecule_synonyms']
@@ -251,7 +274,7 @@ def normalize(name):
         name = name.encode('utf8')
     except Exception as e:
         pass
-    # print 'normalize_biothings'
+    # logging.debug('normalize_biothings')
     drugs = normalize_biothings(name)
     if len(drugs) == 0:
         # print 'normalize_pubchem', name

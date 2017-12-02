@@ -77,7 +77,7 @@ RUN cd /tmp && \
 
 # Install Jupyter notebook as moc
 RUN conda install --quiet --yes \
-    'notebook=4.1*' \
+    'notebook=5.0*' \
     terminado \
     && conda clean -tipsy
 
