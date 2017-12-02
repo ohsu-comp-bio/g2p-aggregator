@@ -8,11 +8,11 @@ do
 	sleep 10
 done
 
+sleep 30
 
-
-MM_TRIALS_START=0 MM_TRIALS_END=5000 python harvester.py --harvesters molecularmatch_trials --delete_source > MM_TRIALS.0.log &
+# MM_TRIALS_START=0 MM_TRIALS_END=5000 python harvester.py --harvesters molecularmatch_trials --delete_source > MM_TRIALS.0.log &
 echo -n ' molecularmatch_trials.'
-sleep 20
+# sleep 40
 MM_TRIALS_START=4999 MM_TRIALS_END=10000 python harvester.py --harvesters molecularmatch_trials > MM_TRIALS.4999.log &
 MM_TRIALS_START=9999 MM_TRIALS_END=15000 python harvester.py --harvesters molecularmatch_trials > MM_TRIALS.9999.log &
 MM_TRIALS_START=14999 MM_TRIALS_END=20000 python harvester.py --harvesters molecularmatch_trials > MM_TRIALS.14999.log &
