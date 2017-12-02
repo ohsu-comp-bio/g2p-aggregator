@@ -36,6 +36,7 @@ import requests
 import requests_cache
 import timeit
 import hashlib
+import location_normalizer
 
 DUPLICATES = []
 
@@ -178,6 +179,10 @@ def normalize(feature_association):
 
     reference_genome_normalizer \
         .normalize_feature_association(feature_association)
+
+    # if not feature_association['source'] == 'molecularmatch_trials':
+    #     location_normalizer.normalize_feature_association(feature_association)
+    location_normalizer.normalize_feature_association(feature_association)
 
 
 def main():

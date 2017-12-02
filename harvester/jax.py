@@ -13,6 +13,7 @@ import mutation_type as mut
 
 import cosmic_lookup_table
 from attrdict import AttrDict
+import time
 
 LOOKUP_TABLE = None
 gene_list = None
@@ -159,7 +160,7 @@ def convert(jax_evidence):
     # actually combinations and should be treated accordingly.
 
     # Parse molecular profile and use for variant-level information.
-    profile = evidence.molecularProfile.profileName.upper().replace(' - ', '-')
+    profile = evidence.molecularProfile.profileName.replace('Tp53', 'TP53').replace(' - ', '-')
     gene_index, mut_index, biomarkers, fusions = _parse_profile(profile)
 
     if not (len(gene_index) == len(mut_index) == len(biomarkers)):
@@ -172,10 +173,13 @@ def convert(jax_evidence):
 
     features = []
     parts = profile.split()
+
+    startTime = time.time()
     for i in range(len(gene_index)):
         feature = {}
         feature['geneSymbol'] = gene_index[i]
-        feature['name'] = ' '.join([gene_index[i], mut_index[i], biomarkers[i]])
+        feature['name'] = ' '.join([gene_index[i],
+                                    mut_index[i], biomarkers[i]])
         if biomarkers[i]:
             feature['biomarker_type'] = mut.norm_biomarker(biomarkers[i])
         else:
@@ -183,9 +187,12 @@ def convert(jax_evidence):
 
         # Look up variant and add position information.
         if not LOOKUP_TABLE:
+            print "LOOKUP_TABLE"
             LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
                            "./cosmic_lookup_table.tsv")
+        startTime2 = time.time()
         matches = LOOKUP_TABLE.get_entries(gene_index[i], mut_index[i])
+        print "Time taken LOOKUP_TABLE {} {} {}".format(gene_index[i], mut_index[i], time.time() - startTime2)
         if len(matches) > 0:
             # FIXME: just using the first match for now;
             # it's not clear what to do if there are multiple matches.
@@ -197,6 +204,8 @@ def convert(jax_evidence):
             feature['alt'] = match['alt']
             feature['referenceName'] = str(match['build'])
         features.append(feature)
+    print "Time taken len(gene_index) {}".format(time.time() - startTime)
+
     for fusion in fusions:
         for gene in fusion:
             feature = {}
@@ -250,10 +259,14 @@ def convert(jax_evidence):
 
 def harvest_and_convert(genes):
     """ get data from jax, convert it to ga4gh and return via yield """
+    startTime = time.time()
     for jax_evidence in harvest(genes):
+        # print "Time taken {}".format(time.time() - startTime)
         # print "harvester_yield {}".format(jax_evidence.keys())
+        startTime = time.time()
         for feature_association in convert(jax_evidence):
-            # print "jax convert_yield {}".format(feature_association.keys())
+            print "Time taken convert {}".format(time.time() - startTime)
+            #print "jax convert_yield {}".format(feature_association.keys())
             yield feature_association
 
 
