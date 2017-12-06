@@ -4,6 +4,8 @@ Python client interface to G2P database.
 
 import sys
 import argparse
+import ast
+
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -57,8 +59,8 @@ class G2PDatabase(object):
         pass
 
     def hits_to_dataframe(self, s):
-        start_columns = ['source', 'genes', 'drug']
-        end_columns = ['description', 'evidence_label', 'evidence_direction', 'evidence_url']
+        start_columns = ['source', 'genes', 'drug', 'phenotype', 'cgi_phenotype']
+        end_columns = ['description', 'evidence_label', 'evidence_direction', 'evidence_url', 'oncogenic']
         feature_cols = ['feature_geneSymbol', 'feature_name', 'feature_entrez_id',
                         'feature_chromosome', 'feature_start', 'feature_end',
                         'feature_ref', 'feature_alt', 'feature_referenceName',
@@ -75,6 +77,10 @@ class G2PDatabase(object):
         data = []
         for _, hit in enumerate(s.scan()):
             association_dict = hit['association'].to_dict()
+            if 'cgi' in hit:
+                cgi_dict = ast.literal_eval(hit['cgi'])
+            else: 
+                cgi_dict = {}
             genes = hit['genes']
             if isinstance(genes, basestring):
                 genes = [genes]
@@ -82,10 +88,15 @@ class G2PDatabase(object):
                 'source': hit['source'],
                 'genes': ':'.join(genes),
                 'drug': association_dict.get('drug_labels', ''),
+                'phenotype': association_dict.get('phenotype', {'type': {'term': ''}})
+                                             .get('type', {'term': ''})
+                                             .get('term', ''),
+                'cgi_phenotype': cgi_dict.get('Primary Tumor acronym', ''),
                 'description': hit['association']['description'],
                 'evidence_label': association_dict.get('evidence_label', ''),
                 'evidence_direction': association_dict.get('response_type', ''),
-                'evidence_url': association_dict.get('publication_url', '')
+                'evidence_url': association_dict.get('publication_url', ''),
+                'oncogenic': association_dict.get('oncogenic', '')
             }
 
             # FIXME: this yields only the last feature of association, not all features.
