@@ -347,7 +347,7 @@ class App extends Component {
                       if (evidence.length == 0) {
                         return <span/>
                       }
-                      const publications = evidence.map(e=>e.info.publications || []).map(p=>p)
+                      const publications = evidence.map(e=> e.info ? e.info.publications : []).map(p=>p)
                       const links = publications.map(p=>(<a key={p} href={p} target="_blank" >{p}</a>))
                       return <span>{links}</span>
                     }
