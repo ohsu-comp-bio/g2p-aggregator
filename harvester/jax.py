@@ -247,9 +247,9 @@ def convert(jax_evidence):
         association['publication_url'] = evidence.references[0].url
 
     association['drug_labels'] = evidence.therapy.therapyName
-    feature_association = {'genes': ','.join(set(gene_index)),
+    feature_association = {'genes': list(set(gene_index)),
                            'feature_names':
-                                    evidence.molecularProfile.profileName,
+                           evidence.molecularProfile.profileName,
                            'features': features,
                            'association': association,
                            'source': 'jax',
