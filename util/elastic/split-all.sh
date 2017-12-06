@@ -1,4 +1,4 @@
-cat all.json | tee  \
+python get_index.py --index associations | tee  \
   >(grep '"source":"cgi"' > cgi.json ) \
   >(grep '"source":"jax"' > jax.json ) \
   >(grep '"source":"oncokb"' > oncokb.json ) \
@@ -8,4 +8,6 @@ cat all.json | tee  \
   >(grep '"source":"jax_trials"' > jax_trials.json ) \
   >(grep '"source":"jax_trials"' > jax_trials.json ) \
   >(grep '"source":"molecularmatch_trials"' > molecularmatch_trials.json ) \
-> /dev/null
+  >(grep '"source":"brca"' > brca.json ) \
+  >(grep '"source":"civic"' > civic.json ) \
+> all.json
