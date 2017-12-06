@@ -31,3 +31,6 @@ harvester/*.sqlite3
 harvester/*log
 harvester/.zotero
 harvester/zotero_help.py
+
+# json dump files
+util/**/*.json
