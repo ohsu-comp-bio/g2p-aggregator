@@ -22,8 +22,10 @@ services:
       - transport.host=127.0.0.1
       - xpack.security.enabled=false
       - path.repo=/util/elastic/backups
-
-
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+      # - http.cors.allow-methods=OPTIONS, HEAD, GET, POST, PUT, DELETE
+      # - http.cors.allow-headers="X-Requested-With,X-Auth-Token,Content-Type, Content-Length, Authorization"
 
   kibana:
     container_name: kibana_g2p
