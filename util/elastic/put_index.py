@@ -21,9 +21,9 @@ def _stdin_actions(args):
         count = count + 1
         if count > args.skip:
             hit = json.loads(line)
-            hit = _del_source(hit)
             hit = _fix_features(hit)
             hit = _fix_genes(hit)
+            hit = _stringify(hit)
             yield {
                 '_index': args.index,
                 '_op_type': 'index',
@@ -71,8 +71,20 @@ def _del_source(hit):
     return hit
 
 
-# Use DSL to query genomic location, subset of fields,
+def _stringify(hit):
+    """ store some fields as json strings, convert from obj"""
+    sources = set(['cgi', 'jax', 'civic', 'oncokb', 'molecularmatch_trials',
+                   'molecularmatch', 'pmkb', 'sage', 'brca', 'jax_trials'])
+    props = set(hit.keys())
+    source = sources.intersection(props)
+    if len(source) == 1:
+        source = list(source)[0]
+        hit[source] = json.dumps(hit[source])
+    return hit
+
+
 def _from_stdin(args):
+    """ Use DSL to query genomic location, subset of fields, """
     # get connection info from env
     HOST = [os.environ.get('ES', 'localhost:9200')]
     client = Elasticsearch(HOST)
@@ -87,7 +99,8 @@ def _from_stdin(args):
                    )
     else:
         for d in _stdin_actions(args):
-            pass
+            if args.verbose:
+                print json.dumps(d)
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
@@ -109,4 +122,4 @@ if __name__ == '__main__':
 
     args = argparser.parse_args()
     _from_stdin(args)
-    print FIX_COUNTERS
+    sys.stderr.write(json.dumps(FIX_COUNTERS))
