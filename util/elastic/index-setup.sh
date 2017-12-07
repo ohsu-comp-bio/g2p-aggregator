@@ -1,13 +1,11 @@
 #!/bin/bash
 
 # setup elastic search
-if [ -z "$1" ]
+if [ -z "$ES" ]
   then
     ES=http://localhost:9200
-  else
-    ES=$1
 fi
-
+echo setting up $ES
 curl  -X DELETE $ES"/associations-new"
 echo deleted
 
@@ -47,60 +45,68 @@ echo deleted
 # }'
 echo created
 
-
 curl -XPUT $ES"/associations-new" -H 'Content-Type: application/json' -d'
 {
-  "settings" : {
-      "index" : {
-        "mapping.total_fields.limit": 30000
-      }
+  "settings":{
+    "index":{
+      "mapping.total_fields.limit":30000
+    }
   },
-
-  "mappings": {
-    "association": {
-      "properties" : {
-          "civic" : {
-              "type" : "string", "store" : "yes", "include_in_all" : false
-          },
-          "cgi" : {
-              "type" : "string", "store" : "yes", "include_in_all" : false
-          },
-          "oncokb" : {
-              "type" : "string", "store" : "yes", "include_in_all" : false
-          },
-          "jax" : {
-              "type" : "string", "store" : "yes", "include_in_all" : false
-          },
-          "pmkb" : {
-              "type" : "string", "store" : "yes", "include_in_all" : false
-          },
-          "molecularmatch" : {
-              "type" : "string", "store" : "yes", "include_in_all" : false
-          },
-          "sage" : {
-              "type" : "string", "store" : "yes", "include_in_all" : false
-          },
-          "jax_trials" : {
-              "type" : "string", "store" : "yes", "include_in_all" : false
-          },
-          "brca" : {
-              "type" : "string", "store" : "yes", "include_in_all" : false
-          },
-          "molecularmatch_trials" : {
-              "type" : "string", "store" : "yes", "include_in_all" : false
-          }
+  "mappings":{
+    "association":{
+      "properties":{
+        "civic":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "cgi":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "oncokb":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "jax":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "pmkb":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "molecularmatch":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "sage":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "jax_trials":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "brca":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "molecularmatch_trials":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        }
       },
-      "dynamic_templates": [
+      "dynamic_templates":[
         {
-          "strings": {
-            "match_mapping_type": "string",
-            "mapping": {
-              "type": "text",
-              "fields": {
-                "keyword": {
-                  "type":  "keyword",
-                  "ignore_above": 1024,
-                  "store": true
+          "strings":{
+            "match_mapping_type":"string",
+            "mapping":{
+              "type":"text",
+              "fields":{
+                "keyword":{
+                  "type":"keyword",
+                  "ignore_above":1024,
+                  "store":true
                 }
               }
             }
