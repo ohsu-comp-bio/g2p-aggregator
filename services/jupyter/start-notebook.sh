@@ -14,8 +14,8 @@ if [ $UID == 0 ] ; then
     fi
 
     # Start the notebook server
-    exec su $NB_USER -c "env PATH=$PATH jupyter notebook $*"
+    exec su $NB_USER -c "env PATH=$PATH jupyter notebook --NotebookApp.iopub_data_rate_limit=10000000000 $*"
 else
     # Otherwise just exec the notebook
-    exec jupyter notebook $*
+    exec jupyter notebook --NotebookApp.iopub_data_rate_limit=10000000000 $*
 fi

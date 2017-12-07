@@ -11,6 +11,7 @@ c = get_config()
 c.NotebookApp.ip = '*'
 c.NotebookApp.port = 8888
 c.NotebookApp.open_browser = False
+c.NotebookApp.iopub_data_rate_limit = 10000000000
 
 # Set a certificate if USE_HTTPS is set to any value
 if 'USE_HTTPS' in os.environ:
@@ -24,7 +25,7 @@ if 'USE_HTTPS' in os.environ:
                 pass
             else: raise
         # Generate a certificate if one doesn't exist on disk
-        subprocess.check_call(['openssl', 'req', '-new', 
+        subprocess.check_call(['openssl', 'req', '-new',
             '-newkey', 'rsa:2048', '-days', '365', '-nodes', '-x509',
             '-subj', '/C=XX/ST=XX/L=XX/O=generated/CN=generated',
             '-keyout', PEM_FILE, '-out', PEM_FILE])
@@ -37,4 +38,3 @@ if 'PASSWORD' in os.environ:
     from IPython.lib import passwd
     c.NotebookApp.password = passwd(os.environ['PASSWORD'])
     del os.environ['PASSWORD']
-
