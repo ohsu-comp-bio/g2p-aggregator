@@ -139,4 +139,7 @@ RUN pip install pip --upgrade  \
   && pip install elasticsearch \
   && pip install plotly \
   && pip install elasticsearch-dsl \
-  && pip install pandas
+  && pip install pandas \
+  && pip install holoviews \
+  && pip install pyupset \
+  && pip install bokeh
