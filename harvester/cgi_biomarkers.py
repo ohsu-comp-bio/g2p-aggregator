@@ -120,6 +120,9 @@ def convert(evidence):
     association = el.evidence_label(evidence['Evidence level'], association)
     association = ed.evidence_direction(evidence['Association'], association)
 
+    if "oncogenic" in evidence['Biomarker']:
+        association['oncogenic'] = evidence['Biomarker'] + evidence['Alteration type']
+
     association['publication_url'] = pubs[0]
     association['drug_labels'] = evidence['Drug full name']
     feature_association = {'genes': genes,

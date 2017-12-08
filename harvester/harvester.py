@@ -18,6 +18,7 @@ import molecularmatch
 import pmkb
 import drug_normalizer
 import disease_normalizer
+import oncogenic_normalizer
 import sage
 import brca
 import jax_trials
@@ -134,6 +135,7 @@ def normalize(feature_association):
     """ standard representation of drugs,disease etc. """
     drug_normalizer.normalize_feature_association(feature_association)
     disease_normalizer.normalize_feature_association(feature_association)
+    oncogenic_normalizer.normalize_feature_association(feature_association)
 
 
 def main():
