@@ -263,8 +263,9 @@ class G2PDatabase(object):
             s = s.params(size=size)
             s = s.query("query_string", query=query_string).source(includes=fields)   
             if verbose:
-                print s.to_dict()
-            # creat df with the first level of json formatted by pandas            
+                print json.dumps(s.to_dict(),indent=4, separators=(',', ': '))
+
+            # create df with the first level of json formatted by pandas            
             df = json_normalize([hit.to_dict() for hit in s.scan()])   
 
             # some generators to further denormalize creating a flat panda
@@ -273,6 +274,9 @@ class G2PDatabase(object):
                 for index, row  in df.iterrows():
                     for environmentalContext in row['association.environmentalContexts']:
                         ec = copy.deepcopy(environmentalContext)
+                        for n in ['id', 'term']:
+                            if n in ec:    
+                                ec['environmentalContext.{}'.format(n)] = ec.pop(n)                        
                         ec.update(row)            
                         yield ec            
 
@@ -282,6 +286,15 @@ class G2PDatabase(object):
                     for feature in row['features']:
                         f = copy.deepcopy(feature)
                         f['gene_list'] = ','.join(row.genes)
+                        #
+                        for n in ['start', 'ref','alt', 'description', 'entrez_id', 'geneSymbol',
+                                   'chromosome', 'name', 'referenceName', 'end','biomarker_type']:
+                            if n in f:    
+                                f['feature.{}'.format(n)] = f.pop(n)
+                        if 'links' in f:
+                            del f['links']
+                        if 'synonyms' in f:
+                            del f['synonyms']
                         f.update(row)            
                         yield f 
 
@@ -294,6 +307,10 @@ class G2PDatabase(object):
                         e.update(row)            
                         yield e
 
+            rename = {'association.evidence_label': 'evidence_label',
+             'association.phenotype.type.id': 'phenotype.id',
+             'association.phenotype.type.term': 'phenotype.term'}
+            df = df.rename(columns=rename)
             df = pd.DataFrame(environment_centric(df))
             del df['association.environmentalContexts']
             df = pd.DataFrame(feature_centric(df))
