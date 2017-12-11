@@ -13,6 +13,8 @@ import json
 from pandas.io.json import json_normalize    
 import copy
 
+import location_normalizer
+
 
 import pandas as pd
 
@@ -263,10 +265,16 @@ class G2PDatabase(object):
             s = s.params(size=size)
             s = s.query("query_string", query=query_string).source(includes=fields)   
             if verbose:
-                print json.dumps(s.to_dict(),indent=4, separators=(',', ': '))
+                print json.dumps(s.to_dict(),indent=2, separators=(',', ': '))
 
+            def hit_with_id(hit):
+                '''include the unique id with the source data'''
+                h = hit.to_dict()
+                h['evidence.id'] = hit.meta.id
+                return h
+                
             # create df with the first level of json formatted by pandas            
-            df = json_normalize([hit.to_dict() for hit in s.scan()])   
+            df = json_normalize([hit_with_id(hit) for hit in s.scan()])   
 
             # some generators to further denormalize creating a flat panda
             def environment_centric(df):
@@ -285,10 +293,14 @@ class G2PDatabase(object):
                 for index, row  in df.iterrows():
                     for feature in row['features']:
                         f = copy.deepcopy(feature)
+                        genomic_hgvs = location_normalizer.genomic_hgvs(f)
+                        if genomic_hgvs is None:
+                            genomic_hgvs = 'no_hgvs:{}'.format(f['name'].encode('ascii', 'ignore'))
+                        f['genomic_hgvs'] = genomic_hgvs
                         f['gene_list'] = ','.join(row.genes)
-                        #
+                        # decorate the feature components with 'feature.' prefix
                         for n in ['start', 'ref','alt', 'description', 'entrez_id', 'geneSymbol',
-                                   'chromosome', 'name', 'referenceName', 'end','biomarker_type']:
+                                   'chromosome', 'name', 'referenceName', 'end','biomarker_type', 'genomic_hgvs']:
                             if n in f:    
                                 f['feature.{}'.format(n)] = f.pop(n)
                         if 'links' in f:
@@ -311,12 +323,20 @@ class G2PDatabase(object):
              'association.phenotype.type.id': 'phenotype.id',
              'association.phenotype.type.term': 'phenotype.term'}
             df = df.rename(columns=rename)
+            denormalization_msg = {}
+            denormalization_msg['original'] = len(df)
             df = pd.DataFrame(environment_centric(df))
+            denormalization_msg['environment_centric'] = len(df)
             del df['association.environmentalContexts']
             df = pd.DataFrame(feature_centric(df))
+            denormalization_msg['feature_centric'] = len(df)
             del df['features']
             del df['genes']
             df = pd.DataFrame(evidence_centric(df))
+            denormalization_msg['evidence_centric'] = len(df)
+            if verbose:
+                print json.dumps(denormalization_msg,indent=2, separators=(',', ': '))
+                
             del df['association.evidence']            
             return df
         
