@@ -245,7 +245,8 @@ class G2PDatabase(object):
 
     def associations_dataframe(self, query_string=None, size=1000, verbose=False):
             '''
-            Get a data frame with relevant information for analysis
+            Get a data frame with relevant information for analysis.
+            By default this excludes trials and limited to evidence with fully normalized features, environment and phenotype
             :query_string -- ES query string, defaults to only features with genomic location, no trials
             :size -- number of documents to fetch per scan
             :verbose -- print the query
@@ -294,8 +295,10 @@ class G2PDatabase(object):
                     for feature in row['features']:
                         f = copy.deepcopy(feature)
                         genomic_hgvs = location_normalizer.genomic_hgvs(f)
+                        # skip any embedded features w/out coordinates
                         if genomic_hgvs is None:
                             genomic_hgvs = 'no_hgvs:{}'.format(f['name'].encode('ascii', 'ignore'))
+                            continue
                         f['genomic_hgvs'] = genomic_hgvs
                         f['gene_list'] = ','.join(row.genes)
                         # decorate the feature components with 'feature.' prefix
@@ -340,7 +343,61 @@ class G2PDatabase(object):
             del df['association.evidence']            
             return df
         
-        
+
+    def genie_associations(self, associations_df, genie_variants_path, genie_clinical_path):
+            '''
+            join the genie data with the association dataframe
+            :associations_df -- existing associations_df
+            :genie_variants_path -- full path name to genie variants
+            :genie_clinical_path -- full path name to genie clinical            
+            '''
+            # Load GENIE variants.
+            genie_variants_df = pd.read_csv(genie_variants_path, sep='\t', comment='#')
+            genie_clinical_df = pd.read_csv(genie_clinical_path, sep='\t', comment='#')    
+            
+            # join clinical and variants
+            genie_clinical_df.set_index(['SAMPLE_ID'])
+            genie_variants_df.set_index(['Tumor_Sample_Barcode'])
+
+            genie_df = pd.concat([genie_variants_df, genie_clinical_df], axis=1)
+            genie_df.groupby(['Tumor_Sample_Barcode'])
+
+            # resulting data set should have same length as variants
+            if not len(genie_df) == len(genie_variants_df):
+                # verify sample keys joining variants and clinical
+                sys.stderr.write('ERROR: clinical_df joined with genie_variants_df unexpected length')
+                sys.stderr.write('clinical_df samples len %s' % len(genie_clinical_df['SAMPLE_ID']))
+                sys.stderr.write('genie_df samples len %s' %  len(genie_variants_df['Tumor_Sample_Barcode']))
+                sys.stderr.write('genie_clinical_df samples not in genie_df %s' %  
+                                 len(set(genie_clinical_df['SAMPLE_ID']) - set(genie_variants_df['Tumor_Sample_Barcode'])))
+                sys.stderr.write('genie_df samples not in genie_clinical_df %s' %
+                                 len(set(genie_variants_df['Tumor_Sample_Barcode']) -  set(genie_clinical_df['SAMPLE_ID'])))
+                sys.stderr.write('genie_df  len %s' % len(genie_df))
+                raise Exception('ERROR: genie_clinical_path joined with genie_variants_path unexpected length')
+            # join combined variants/clinical with G2P
+            genie_df.set_index(['Chromosome',
+                           'Start_Position',
+                           'End_Position',
+                           'Reference_Allele',
+                           'Tumor_Seq_Allele2'])
+
+            associations_df.set_index(['feature.chromosome',
+                                       'feature.start',
+                                       'feature.end',
+                                       'feature.ref',
+                                       'feature.alt' ])
+            # join the dataframes
+            genie_associations_df = pd.concat([genie_df, associations_df], axis=1)
+            genie_associations_df.groupby(['feature.chromosome', 'feature.start' , 'feature.end' , 
+                                'feature.ref'    , 'feature.alt' ])
+
+            if not len(genie_df) == len(genie_associations_df):
+                sys.stderr.write('ERROR: genie_df  len %s' % len(genie_df))
+                sys.stderr.write('associations_df  len %s' %  len(associations_df))
+                sys.stderr.write('genie_associations_df  len %s' %  len(genie_associations_df))
+                raise Exception('ERROR: genie_df joined with associations_df unexpected length')                
+            return genie_associations_df    
+            
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
