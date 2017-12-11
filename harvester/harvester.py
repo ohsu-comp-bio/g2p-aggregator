@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from __future__ import print_function
 import sys
 import argparse
 sys.path.append('silos')  # NOQA
@@ -135,8 +134,9 @@ def normalize(feature_association):
     """ standard representation of drugs,disease etc. """
     drug_normalizer.normalize_feature_association(feature_association)
     disease_normalizer.normalize_feature_association(feature_association)
-    oncogenic_normalizer.normalize_feature_association(feature_association)
-
+    feature_association = [feature_association]
+    feature_association = oncogenic_normalizer.normalize_feature_association(feature_association)
+    return feature_association
 
 def main():
     if args.delete_index:
@@ -146,8 +146,9 @@ def main():
         for silo in silos:
             feature_association['tags'] = []
             feature_association['dev_tags'] = []
-            normalize(feature_association)
-            silo.save(feature_association)
+            feature_association = normalize(feature_association)
+            for asso in feature_association:
+                silo.save(asso)
 
             # try:
             #     # add tags field for downstream tagger use cases
