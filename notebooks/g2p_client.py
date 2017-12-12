@@ -352,7 +352,18 @@ class G2PDatabase(object):
             :genie_clinical_path -- full path name to genie clinical            
             '''
             # Load GENIE variants.
-            genie_variants_df = pd.read_csv(genie_variants_path, sep='\t', comment='#')
+            # prevents `DtypeWarning` 
+            # map unknown (all null) types, 
+            # see https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+(MAF)+Specification
+            # (17,18,23,24,25,29)
+            dtype={"Match_Norm_Seq_Allele1": str,
+                   "Match_Norm_Seq_Allele2": str,
+                   "Verification_Status": str,
+                   "Validation_Status": str,
+                   "Mutation_Status": str,
+                   "Score": str
+                  }
+            genie_variants_df = pd.read_csv(genie_variants_path, sep='\t', comment='#', dtype=dtype)
             genie_clinical_df = pd.read_csv(genie_clinical_path, sep='\t', comment='#')    
             
             # join clinical and variants
