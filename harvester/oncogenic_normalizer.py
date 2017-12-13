@@ -36,8 +36,7 @@ def normalize_cgi_oncogenic(asso, gene_set):
         CGI_TABLE = CGI_Oncogenic('../data/cgi_oncogenic_mutations.tsv')
     tt = new_asso['cgi']['Primary Tumor type']
     for gene in gene_set:
-        blerg = CGI_TABLE.get_muts(gene, tt)
-        for match in blerg:
+        for match in CGI_TABLE.get_muts(gene, tt):
             # replicate relevant feature set (in case there's more than one)
             for feature in new_asso['features']:
                 if gene == feature['geneSymbol']:
@@ -48,21 +47,27 @@ def normalize_cgi_oncogenic(asso, gene_set):
                         feature['start'] = locus[1]
                         feature['ref'] = locus[2]
                         feature['alt'] = locus[3]
-                        new_asso['association']['cgiValidatedOncogenicMutations'] = match
-                        asso_set.append(new_asso)
+            new_asso['association']['cgiValidatedOncogenicMutations'] = match
+            asso_set.append(new_asso)
     return asso_set
 
 
-#def normalize_oncokb_oncogenic(asso, gene_set):
-#    asso_set = [asso]
-#    new_asso = deepcopy(asso)
-#    # make some edits to new_asso
-#    ONCOKB_TABLE = None
-#    if not ONCOKB_TABLE:
-#        ONCOKB_TABLE
-#
-#    asso_set.append(new_asso)
-#    return asso_set
+def normalize_oncokb_oncogenic(asso, gene_set):
+    asso_set = [asso]
+    new_asso = deepcopy(asso)
+    # make some edits to new_asso
+    ONCOKB_TABLE = None
+    if not ONCOKB_TABLE:
+        ONCOKB_TABLE = ONCOKB_Oncogenic('../data/oncokb_all_mutations.tsv')
+    for gene in gene_set:
+        for match in ONCOKB_TABLE.get_muts(gene):
+            for feature in new_asso['features']:
+                if gene == feature['geneSymbol']:
+                    feature['name'] = match['Alteration']
+                    # catch locus edits later; from COSMIC? CGI?
+            new_asso['association']['oncokbOncogenicMutations'] = match
+            asso_set.append(new_asso)
+    return asso_set
 
 
 
@@ -76,13 +81,13 @@ def normalize_feature_association(feature_association):
         return feature_association
     if source == 'cgi':
         return normalize_cgi_oncogenic(asso, genes)
-#    elif source == 'oncokb':
-#        return normalize_oncokb_oncogenic(asso, genes)
+    elif source == 'oncokb':
+        return normalize_oncokb_oncogenic(asso, genes)
 
 class CGI_Oncogenic(object):
     """
-    Parses downloaded TSV of validated oncogenic mutations from CGI and searches for ongenic mutations by gene:
-https://www.cancergenomeinterpreter.org/mutations
+    Parses downloaded TSV of validated oncogenic mutations from CGI and searches for oncogenic mutations by gene:
+    https://www.cancergenomeinterpreter.org/mutations
     """
     def __init__(self, mut_file):
         self.muts = pandas.read_csv(mut_file, sep='\t')
@@ -90,11 +95,31 @@ https://www.cancergenomeinterpreter.org/mutations
 
     def get_muts(self, gene, tumor):
         if gene in self.gene_df_cache:
-            muts = self.gene_df_cache['gene']
+            muts = self.gene_df_cache[gene]
         else:
             muts = self.muts[self.muts['gene'] == gene]
             self.gene_df_cache[gene] = muts
         muts = muts[muts['cancer_acronym'].str.contains(tumor + '|CANCER')]
         return muts.to_dict(orient='records')
+
+class ONCOKB_Oncogenic(object):
+    """
+    Parses downloaded TSV of all mutations from OncoKB and searches for oncogenic mutations by gene: 
+    http://oncokb.org/#/dataAccess
+    """
+    def __init__(self, mut_file):
+        self.muts = pandas.read_csv(mut_file, sep='\t')
+        self.gene_df_cache = {}
+
+    def get_muts(self, gene):
+        if gene in self.gene_df_cache:
+            muts = self.gene_df_cache[gene]
+        else:
+            muts = self.muts[self.muts['Gene'] == gene]
+            self.gene_df_cache[gene] = muts
+        muts = muts[muts['Oncogenicity'].str.contains('Oncogenic')].fillna('')
+        return muts.to_dict(orient='records')
+
+
 
 
