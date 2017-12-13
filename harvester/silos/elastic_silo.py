@@ -4,7 +4,9 @@ from elasticsearch.client import IndicesClient
 import sys
 import json
 import logging
-from elasticsearch import Elasticsearch, RequestsHttpConnection, serializer, compat, exceptions  # NQQA
+from elasticsearch import Elasticsearch, RequestsHttpConnection, \
+    serializer, compat, exceptions
+from elasticsearch.helpers import bulk
 
 # module level funtions
 
@@ -108,6 +110,24 @@ class ElasticSilo:
         # except Exception as e:
         #     logging.error(json.dumps(feature_association))
         #     raise e
+
+    def save_bulk(self, feature_association_generator):
+        """ write to es """
+        # prevent field explosion
+        def _bulker(feature_association_generator):
+            for feature_association in feature_association_generator:
+                feature_association = self._stringify_sources(feature_association)  # NOQA
+                yield {
+                    '_index': self._index,
+                    '_op_type': 'index',
+                    '_type': 'association',
+                    '_source': feature_association
+                }
+
+        result = bulk(self._es,
+                      (d for d in _bulker(feature_association_generator)),
+                      request_timeout=120)
+        logging.info(result)
 
 
 class JSONSerializerPython2(serializer.JSONSerializer):

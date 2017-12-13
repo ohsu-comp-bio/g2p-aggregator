@@ -3,8 +3,8 @@ import re
 import logging
 import pydash
 # cache responses
-import requests_cache
-requests_cache.install_cache('harvester')
+# import requests_cache
+# requests_cache.install_cache('harvester')
 
 """
 curl 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/Bayer/synonyms/JSON' | jq '.InformationList.Information[] | [.CID, .Synonym[0]] '
@@ -29,8 +29,17 @@ def _decompose(name):
     no_punct = ' '.join(name_parts).strip()
     name_parts = no_punct.split()
     pairs = [' '.join(c) for c in _chunks(name_parts, 2)]
+    logging.debug('pairs {} {} >{}<'.format(pairs, len(name_parts), no_punct))
+    if len(name_parts) == 1:
+        logging.debug('returning [no_punct] {}'.format([no_punct]))
+        return [no_punct]
+    if name_parts == no_punct.split():
+        logging.debug('returning [name_parts] {}'.format(name_parts))
+        return name_parts
     if [no_punct] == pairs:
+        logging.debug('returning pairs + name_parts {}'.format(pairs + name_parts))
         return pairs + name_parts
+    logging.debug('returning [no_punct] + pairs + name_parts {}'.format([no_punct] + pairs + name_parts))
     return [no_punct] + pairs + name_parts
 
 
@@ -104,6 +113,7 @@ def normalize_biothings(name):
             logging.info("NOFINDS_BIOTHINGS {}".format(name))
             return []
         name_parts = _decompose(name)
+        logging.debug(name_parts)
         compounds = []
         for name_part in name_parts:
             if len(name_part) < 3:
@@ -232,14 +242,14 @@ def normalize_chembl(name):
             url = 'https://www.ebi.ac.uk/chembl/api/data/chembl_id_lookup/search?q={}'.format(name_part)  # NOQA
             r = requests.get(url,
                              headers={'Accept': 'application/json'},
-                             timeout=60)
+                             timeout=5)
             rsp = r.json()
             if 'chembl_id_lookups' in rsp and len(rsp['chembl_id_lookups']) > 0:
                 lookup = rsp['chembl_id_lookups'][0]
                 url = 'https://www.ebi.ac.uk{}'.format(lookup['resource_url'])
                 data = requests.get(url,
                                     headers={'Accept': 'application/json'},
-                                    timeout=60).json()
+                                    timeout=5).json()
                 if 'molecule_synonyms' not in data:
                     continue
                 molecule_synonyms = data['molecule_synonyms']
@@ -274,7 +284,6 @@ def normalize(name):
         name = name.encode('utf8')
     except Exception as e:
         pass
-    # logging.debug('normalize_biothings')
     drugs = normalize_biothings(name)
     if len(drugs) == 0:
         # print 'normalize_pubchem', name
@@ -335,5 +344,6 @@ def normalize_feature_association(feature_association):
         if (compound['synonym']):
             drug_labels.append(compound['synonym'])
     association['environmentalContexts'] = environmental_contexts
+
     if len(drug_labels) > 0:
         association['drug_labels'] = ','.join(drug_labels)

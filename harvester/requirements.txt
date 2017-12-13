@@ -7,3 +7,4 @@ requests-cache==0.4.13
 pydash==4.1.0
 synapseclient==1.7.2
 PyYAML==3.12
+hgvs==1.1.0.post1
