@@ -9,17 +9,16 @@ import mutation_type as mut
 from warnings import warn
 
 resourceURLs = {
-    "assertions": "/v2/search/assertions"
+    "assertions": "/v2/assertion/search"
 }
 mmService = "http://api.molecularmatch.com"
 
 
 apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
 
-# TODO this is an anomaly: in order to get all genes query with string
-# that is not matched by anything?
-DEFAULT_GENES = ["XXXX"]
+# DEFAULT_GENES = []
 
+HASH_KEYS = []
 
 # with open("gene_symbols.txt") as f:
 #     content = f.readlines()
@@ -30,15 +29,16 @@ def get_evidence(gene_ids):
     """ load from remote api """
     if not apiKey:
         raise ValueError('Please set MOLECULAR_MATCH_API_KEY in environment')
+    # if not gene_ids:
+    #     gene_ids = DEFAULT_GENES
     # first look for all drugs that impact this gene
-    if not gene_ids:
-        gene_ids = DEFAULT_GENES
     for gene in gene_ids:
+        count = 0
         start = 0
-        limit = 20
+        limit = 50
         url = mmService + resourceURLs["assertions"]
         filters = [{'facet': 'GENE',
-                    'term': '{}'.format(gene)
+                    'term': '{}'.format(gene),
                     }]
         while start >= 0:
             payload = {
@@ -52,15 +52,16 @@ def get_evidence(gene_ids):
                 r = requests.post(url, data=payload)
                 assertions = r.json()
                 if assertions['total'] == 0:
-                    print('no more pages')
                     start = -1
+                    continue
                 else:
                     start = start + limit
                 logging.info(
-                    "page {} of {}. total {}".format(
+                    "page {} of {}. total {} count {}".format(
                         assertions['page'],
                         assertions['totalPages'],
-                        assertions['total']
+                        assertions['total'],
+                        count
                         )
                 )
                 # filter those drugs, only those with diseases
@@ -85,12 +86,18 @@ def get_evidence(gene_ids):
                     #     )
 
                     # process all rows
-                    yield hit
+                    count = count + 1
+                    hit['harvested_gene'] = gene
+                    if not hit['hashKey'] in HASH_KEYS:
+                        HASH_KEYS.append(hit['hashKey'])
+                        yield hit
+                    else:
+                        logging.info('duplicate: {}'.format(hit['hashKey']))
 
             except Exception as e:
                 logging.error(
                     "molecularmatch error fetching {}".format(gene),
-                    exc_info=1
+                    # exc_info=1
                 )
                 start = -1
 
@@ -132,9 +139,6 @@ def convert(evidence):
             if tag['facet'] == 'GENE':
                 gene = tag['term']
 
-    if not gene and mutation:
-        gene = mutation.split(' ')[0]
-
     features = []
     for mutation_evidence in evidence['mutations']:
         feature = {}
@@ -155,22 +159,20 @@ def convert(evidence):
 
         # Add variant-level information.
         # TODO: only looks at first location, not all locations.
-        try:
+        if ('GRCh37_location' in mutation_evidence and
+                len(mutation_evidence['GRCh37_location']) > 0):
             grch37_mutation = mutation_evidence['GRCh37_location'][0]
-            feature['ref'] = grch37_mutation['ref']
-            feature['chromosome'] = str(grch37_mutation['chr'])
-            feature['start'] = grch37_mutation['start']
-            feature['alt'] = grch37_mutation['alt']
-            #  TODO: add build/reference information
-        except:
-            try:
-                grch37_mutation = mutation_evidence['GRCh37_location'][1]
-                feature['chromosome'] = str(grch37_mutation['chr'])
-                feature['start'] = grch37_mutation['start']
+            feature['referenceName'] = 'GRCh37'
+            if 'ref' in grch37_mutation:
                 feature['ref'] = grch37_mutation['ref']
+            if 'alt' in grch37_mutation:
                 feature['alt'] = grch37_mutation['alt']
-            except:
-                pass
+            if 'chr' in grch37_mutation:
+                feature['chromosome'] = str(grch37_mutation['chr'])
+            if 'start' in grch37_mutation:
+                feature['start'] = int(grch37_mutation['start'])
+            if 'stop' in grch37_mutation:
+                feature['end'] = int(grch37_mutation['stop'])
 
         biomarker_types = []
         if 'mutation_type' in mutation_evidence:
@@ -210,6 +212,11 @@ def convert(evidence):
 
     association = {}
     association['description'] = narrative
+    association['variant_name'] = []
+    for v in evidence['variantInfo']:
+        for l in v['locations']:
+            if 'amino_acid_change' in l:
+                association['variant_name'].append(l['amino_acid_change'])
     association['environmentalContexts'] = []
     association['environmentalContexts'].append({
         'description': drug_label})
@@ -276,8 +283,17 @@ def convert(evidence):
 
 def harvest(genes):
     """ get data from mm """
-    for evidence in get_evidence(genes):
-        yield evidence
+    if genes:
+        for evidence in get_evidence(genes):
+            yield evidence
+    else:
+        # TODO mm has no semantics for 'give me all genes', so we will try all
+        # gene symbols in a curated set
+        with open("mm-genenames.txt") as f:
+            for line in f:
+                symbol = line.rstrip()
+                for evidence in get_evidence([symbol]):
+                    yield evidence
 
 
 def harvest_and_convert(genes):

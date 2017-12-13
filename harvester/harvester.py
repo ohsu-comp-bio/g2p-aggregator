@@ -14,6 +14,7 @@ import civic
 import oncokb
 import cgi_biomarkers
 import molecularmatch
+import molecularmatch_trials
 import pmkb
 import drug_normalizer
 import disease_normalizer
@@ -21,6 +22,10 @@ import oncogenic_normalizer
 import sage
 import brca
 import jax_trials
+
+import drug_normalizer
+import disease_normalizer
+import reference_genome_normalizer
 
 from elastic_silo import ElasticSilo
 import elastic_silo
@@ -31,6 +36,12 @@ import file_silo
 
 import requests
 import requests_cache
+import timeit
+import hashlib
+import location_normalizer
+
+DUPLICATES = []
+
 # cache responses
 requests_cache.install_cache('harvester')
 
@@ -42,7 +53,8 @@ argparser.add_argument('--harvesters',  nargs='+',
                                [cgi_biomarkers,jax,civic,oncokb,
                                pmkb]''',
                        default=['cgi_biomarkers', 'jax', 'civic',
-                                'oncokb', 'pmkb', 'brca', 'jax_trials'])
+                                'oncokb', 'pmkb', 'brca', 'jax_trials',
+                                'molecularmatch_trials'])
 
 
 argparser.add_argument('--silos',  nargs='+',
@@ -92,6 +104,24 @@ else:
     logging.info("genes: %r" % args.genes)
 
 
+def is_duplicate(feature_association):
+    """ return true if already harvested """
+    is_dup = False
+    m = hashlib.md5()
+    try:
+        m.update(json.dumps(feature_association, sort_keys=True))
+        hexdigest = m.hexdigest()
+        if hexdigest in DUPLICATES:
+            is_dup = True
+            logging.info('is duplicate {}'.format(
+                feature_association['association']['evidence']))
+        else:
+            DUPLICATES.append(hexdigest)
+    except Exception as e:
+        logging.warn('duplicate {}'.format(e))
+    return is_dup
+
+
 def _make_silos(args):
     """ construct silos """
     silos = []
@@ -132,8 +162,30 @@ def harvest(genes):
 
 def normalize(feature_association):
     """ standard representation of drugs,disease etc. """
+    start_time = timeit.default_timer()
+
     drug_normalizer.normalize_feature_association(feature_association)
+    elapsed = timeit.default_timer() - start_time
+    if elapsed > 1:
+        environmentalContexts = feature_association['association'].get(
+            'environmentalContexts', None)
+        logging.info('drug_normalizer {} {}'.format(elapsed,
+                                                    environmentalContexts))
+
+    start_time = timeit.default_timer()
     disease_normalizer.normalize_feature_association(feature_association)
+    elapsed = timeit.default_timer() - start_time
+    if elapsed > 1:
+        disease = feature_association['association']['phenotype']['description']
+        logging.info('disease_normalizer {} {}'.format(elapsed, disease))
+
+    reference_genome_normalizer \
+        .normalize_feature_association(feature_association)
+
+    # if not feature_association['source'] == 'molecularmatch_trials':
+    #     location_normalizer.normalize_feature_association(feature_association)
+    location_normalizer.normalize_feature_association(feature_association)
+
     feature_association = [feature_association]
     feature_association = oncogenic_normalizer.normalize_feature_association(feature_association)
     return feature_association
@@ -148,7 +200,8 @@ def main():
             feature_association['dev_tags'] = []
             feature_association = normalize(feature_association)
             for asso in feature_association:
-                silo.save(asso)
+                if not is_duplicate(asso):
+                    silo.save(asso)
 
             # try:
             #     # add tags field for downstream tagger use cases
