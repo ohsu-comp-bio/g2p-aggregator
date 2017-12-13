@@ -1,7 +1,7 @@
 import sys
 sys.path.append('.')  # NOQA
 
-from drug_normalizer import normalize, normalize_chembl
+from drug_normalizer import normalize, normalize_chembl, _decompose
 import requests
 import requests_cache
 import logging
@@ -33,12 +33,14 @@ def test_combination():
 
 def test_celecoxib():
     compounds = normalize('celecoxib')
+    assert len(compounds) == 1
     assert compounds[0]['ontology_term'] == 'compound:CID2662'
     assert compounds[0]['synonym'].lower() == 'celecoxib'
 
 
 def test_chembl_asprin():
     compounds = normalize_chembl('asprin')
+    assert len(compounds) == 1
     assert compounds[0]['ontology_term'] == 'compound:CHEMBL25'
     assert compounds[0]['synonym'].lower() == 'aspirin'
 
@@ -66,6 +68,7 @@ def test_chembl_HDAC_inhibitors():
 def test_cgi_drug_full_name():
     compounds = normalize('Imatinib (BCR-ABL inhibitor 1st gen&KIT inhibitor)')
     assert len(compounds) == 1
+    assert compounds[0]['synonym'] == 'Imatinib'
 
 
 def test_cgi_drug_plus_drug():
@@ -80,7 +83,7 @@ def test_gefintinib():
 
 def test_gefitnib():
     compounds = normalize('gefitnib')
-    assert len(compounds) == 1
+    assert len(compounds) == 0
 
 
 def test_dacomitinib():
@@ -103,3 +106,8 @@ def test_NSC_87877():
     compounds = normalize('NSC-87877')
     print compounds
     assert len(compounds) == 1
+
+
+def test_decompose():
+    assert _decompose('XXXXX') == ['XXXXX']
+    assert _decompose("Trametinib + Dabrafenib") == ['Trametinib', 'Dabrafenib']
