@@ -42,6 +42,11 @@ class FileSilo:
         except Exception as e:
             logging.info("file silo: delete failed {}".format(e))
 
+    def save_bulk(self, feature_association_generator):
+        """ write to file """
+        for feature_association in feature_association_generator:
+            self.save(feature_association)
+
     def save(self, feature_association):
         """ write dict to file """
         source = feature_association['source']
