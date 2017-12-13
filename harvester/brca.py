@@ -35,7 +35,7 @@ def convert(gene_data):
         feature = {}
         feature['geneSymbol'] = brca['Gene_Symbol']
         # feature['entrez_id'] = ?
-        builds = ['Hg38', 'Hg37', 'Hg36']
+        builds = ['Hg37', 'Hg38',  'Hg36']
         for build in builds:
             if '{}_Start'.format(build) in brca:
                 feature['start'] = brca['{}_Start'.format(build)]
@@ -47,9 +47,11 @@ def convert(gene_data):
         feature['ref'] = brca['Ref']
         feature['alt'] = brca['Alt']
         feature['name'] = brca['Protein_Change']
+        feature['biomarker_type'] = mut.norm_biomarker(
+                                    brca['Mutation_type_BIC'])
         if len(feature['name']) == 0:
             feature['name'] = brca['HGVS_cDNA']
-        # feature['biomarker_type'] = ?
+
         association = {}
         association['description'] = brca['Pathogenicity_expert']
         association['environmentalContexts'] = []
@@ -74,7 +76,7 @@ def convert(gene_data):
         }]
         # add summary fields for Display
         association['oncogenic'] = brca['Clinical_Significance_ClinVar'].split(',')[0]
-        association['evidence_label'] = None
+        association['evidence_label'] = 'D'
         feature_association = {'genes': [brca['Gene_Symbol']],
                                'features': [feature],
                                'feature_names': [feature['name']],

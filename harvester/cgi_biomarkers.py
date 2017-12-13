@@ -79,9 +79,12 @@ def convert(evidence):
         feature['geneSymbol'] = gene
         feature['name'] = evidence['individual_mutation']
         feature['description'] = evidence['Alteration']
+        feature['referenceName'] = 'GRCh37'
         features.append(feature)
 
     association = {}
+    if evidence['individual_mutation']:
+        association['variant_name'] = evidence['individual_mutation'].split(':')[1]
     association['description'] = '{} {} {}'.format(gene,
                                                    evidence['Drug full name'],
                                                    evidence['Association'])

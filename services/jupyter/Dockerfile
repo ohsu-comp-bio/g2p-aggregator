@@ -77,7 +77,7 @@ RUN cd /tmp && \
 
 # Install Jupyter notebook as moc
 RUN conda install --quiet --yes \
-    'notebook=4.1*' \
+    'notebook=5.0*' \
     terminado \
     && conda clean -tipsy
 
@@ -139,4 +139,7 @@ RUN pip install pip --upgrade  \
   && pip install elasticsearch \
   && pip install plotly \
   && pip install elasticsearch-dsl \
-  && pip install pandas
+  && pip install pandas \
+  && pip install holoviews \
+  && pip install pyupset \
+  && pip install bokeh

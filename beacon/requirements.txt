@@ -1,0 +1,10 @@
+pytest
+flask
+flasgger
+elasticsearch
+elasticsearch-dsl
+certifi
+requests==2.18.4
+Flask-Cors==2.0.1
+Flask-Testing==0.6.2
+Flask-WebTest==0.0.9

@@ -35,9 +35,12 @@ class FileSilo:
 
     def delete_source(self, source):
         """ delete source from index """
-        os.remove(
-            os.path.join(
-                self._file_output_dir, '{}.json'.format(source)))
+        try:
+            os.remove(
+                os.path.join(
+                    self._file_output_dir, '{}.json'.format(source)))
+        except Exception as e:
+            logging.info("file silo: delete failed {}".format(e))
 
     def save(self, feature_association):
         """ write dict to file """
