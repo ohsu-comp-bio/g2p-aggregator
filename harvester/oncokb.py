@@ -56,21 +56,9 @@ def convert(gene_data):
     global LOOKUP_TABLE
     gene = gene_data['gene']
     oncokb = {'clinical': [], 'biological': []}
-    if 'oncokb' in gene_data:
-        oncokb = gene_data['oncokb']
-    for clinical in oncokb['clinical']:
-        variant = clinical['variant']
-        alteration = variant['alteration']
-        gene_data = variant['gene']
 
-        feature = {}
-        feature['geneSymbol'] = gene
-        feature['name'] = variant['name']
-        feature['description'] = variant['name']
-        feature['entrez_id'] = gene_data['entrezGeneId']
-        feature['biomarker_type'] = mut.norm_biomarker(
-            variant['consequence']['term'])
-
+    def _enrich_feature(gene, feature):
+        global LOOKUP_TABLE
         # Look up variant and add position information.
         if not LOOKUP_TABLE:
             LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
@@ -88,6 +76,43 @@ def convert(gene_data):
             feature['referenceName'] = str(match['build'])
         else:
             feature = enrich(feature)
+        return feature
+
+    if 'oncokb' in gene_data:
+        oncokb = gene_data['oncokb']
+    # this section yields a feature association for the predictive evidence
+    for clinical in oncokb['clinical']:
+        variant = clinical['variant']
+        alteration = variant['alteration']
+        gene_data = variant['gene']
+
+        # if feature is 'Oncogenic Mutations' then merge in biological
+        features = []
+        if variant['name'] == 'Oncogenic Mutations':
+            for biological in oncokb['biological']:
+                if biological['oncogenic'] in ['Likely Oncogenic', 'Oncogenic']:
+                    variant = biological['variant']
+                    gene_data = variant['gene']
+                    alteration = variant['alteration']
+                    feature = {}
+                    feature['geneSymbol'] = gene
+                    feature['description'] = variant['name']
+                    feature['name'] = variant['name']
+                    feature['entrez_id'] = gene_data['entrezGeneId']
+                    feature['biomarker_type'] = mut.norm_biomarker(
+                        variant['consequence']['term'])
+                    feature = _enrich_feature(gene, feature)
+                    features.append(feature)
+        else:
+            feature = {}
+            feature['geneSymbol'] = gene
+            feature['name'] = variant['name']
+            feature['description'] = variant['name']
+            feature['entrez_id'] = gene_data['entrezGeneId']
+            feature['biomarker_type'] = mut.norm_biomarker(
+                variant['consequence']['term'])
+            feature = _enrich_feature(gene, feature)
+            features.append(feature)
 
         association = {}
         association['description'] = clinical['level_label']
@@ -128,15 +153,17 @@ def convert(gene_data):
                 break
 
         association['drug_labels'] = ','.join([drug for drug in clinical['drug']])   # NOQA
-        feature_names = feature["geneSymbol"] + ' ' + feature["name"]
+        feature_names = ', '.join(['{}:{}'.format(
+                                f["geneSymbol"], f["name"]) for f in features])
         feature_association = {'genes': [gene],
-                               'features': [feature],
+                               'features': features,
                                'feature_names': feature_names,
                                'association': association,
                                'source': 'oncokb',
                                'oncokb': {'clinical': clinical}}
         yield feature_association
 
+    # this section yields a feature association for the oncogenic evidence
     for biological in oncokb['biological']:
         variant = biological['variant']
         gene_data = variant['gene']

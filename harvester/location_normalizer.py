@@ -200,6 +200,7 @@ def _enrich(feature, allele_registry):
 def normalize_feature_association(feature_association):
     """ given the 'final' g2p feature_association,
     update it with genomic location """
+    allele_registry = None
     for feature in feature_association['features']:
         try:
             allele_registry = normalize(feature)
