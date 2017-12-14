@@ -169,9 +169,9 @@ def convert(evidence):
                 feature['alt'] = grch37_mutation['alt']
             if 'chr' in grch37_mutation:
                 feature['chromosome'] = str(grch37_mutation['chr'])
-            if 'start' in grch37_mutation:
+            if 'start' in grch37_mutation and grch37_mutation['start']:
                 feature['start'] = int(grch37_mutation['start'])
-            if 'stop' in grch37_mutation:
+            if 'stop' in grch37_mutation and grch37_mutation['stop']:
                 feature['end'] = int(grch37_mutation['stop'])
 
         biomarker_types = []
