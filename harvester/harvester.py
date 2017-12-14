@@ -43,7 +43,7 @@ import location_normalizer
 DUPLICATES = []
 
 # cache responses
-requests_cache.install_cache('harvester')
+requests_cache.install_cache('harvester', allowable_codes=(200, 404))
 
 
 argparser = argparse.ArgumentParser()

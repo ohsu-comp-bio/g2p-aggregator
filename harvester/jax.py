@@ -28,6 +28,7 @@ def _parse_profile(profile):
     global LOOKUP_TABLE
     global gene_list
     if not LOOKUP_TABLE:
+        logging.info('_parse_profile: init LOOKUP_TABLE')
         LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
                 "./cosmic_lookup_table.tsv")
     parts = profile.split()
@@ -187,12 +188,12 @@ def convert(jax_evidence):
 
         # Look up variant and add position information.
         if not LOOKUP_TABLE:
-            print "LOOKUP_TABLE"
+            logging.info("convert:init LOOKUP_TABLE")
             LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
                            "./cosmic_lookup_table.tsv")
         startTime2 = time.time()
         matches = LOOKUP_TABLE.get_entries(gene_index[i], mut_index[i])
-        print "Time taken LOOKUP_TABLE {} {} {}".format(gene_index[i], mut_index[i], time.time() - startTime2)
+        logging.info("Time taken LOOKUP_TABLE {} {} {}".format(gene_index[i], mut_index[i], time.time() - startTime2))
         if len(matches) > 0:
             # FIXME: just using the first match for now;
             # it's not clear what to do if there are multiple matches.
@@ -204,7 +205,7 @@ def convert(jax_evidence):
             feature['alt'] = match['alt']
             feature['referenceName'] = str(match['build'])
         features.append(feature)
-    print "Time taken len(gene_index) {}".format(time.time() - startTime)
+    logging.info("Time taken len(gene_index) {}".format(time.time() - startTime))
 
     for fusion in fusions:
         for gene in fusion:
@@ -265,8 +266,6 @@ def harvest_and_convert(genes):
         # print "harvester_yield {}".format(jax_evidence.keys())
         startTime = time.time()
         for feature_association in convert(jax_evidence):
-            print "Time taken convert {}".format(time.time() - startTime)
-            #print "jax convert_yield {}".format(feature_association.keys())
             yield feature_association
 
 
