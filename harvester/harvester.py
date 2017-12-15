@@ -76,6 +76,13 @@ argparser.add_argument('--genes',   nargs='+',
                        default=None)
 
 
+argparser.add_argument('--phases',   nargs='+',
+                       help='array of harvest phases to run '
+                            '[harvest,convert,enrich,all]. default is all',
+                       default=['all'],
+                       choices=['all', 'harvest'])
+
+
 elastic_silo.populate_args(argparser)
 kafka_silo.populate_args(argparser)
 file_silo.populate_args(argparser)
@@ -97,6 +104,7 @@ logging.info("elastic_search: %r" % args.elastic_search)
 logging.info("elastic_index: %r" % args.elastic_index)
 logging.info("delete_index: %r" % args.delete_index)
 logging.info("file_output_dir: %r" % args.file_output_dir)
+logging.info("phases: %r" % args.phases)
 
 if not args.genes:
     logging.info("genes: all")
@@ -160,6 +168,19 @@ def harvest(genes):
             yield feature_association
 
 
+def harvest_only(genes):
+    """ get evidence from all sources """
+    for h in args.harvesters:
+        harvester = sys.modules[h]
+        if args.delete_source:
+            for silo in silos:
+                if h == 'cgi_biomarkers':
+                    h = 'cgi'
+                silo.delete_source(h)
+        for evidence in harvester.harvest(genes):
+            yield {'source': h, h: evidence}
+
+
 def normalize(feature_association):
     """ standard representation of drugs,disease etc. """
     start_time = timeit.default_timer()
@@ -200,7 +221,10 @@ def main():
             if not is_duplicate(feature_association):
                 yield feature_association
 
-    silos[0].save_bulk(_check_dup(harvest(args.genes)))
+    if 'all' in args.phases:
+        silos[0].save_bulk(_check_dup(harvest(args.genes)))
+    else:
+        silos[0].save_bulk(harvest_only(args.genes))
 
 
 if __name__ == '__main__':
