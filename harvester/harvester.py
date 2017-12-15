@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from __future__ import print_function
 import sys
 import argparse
 sys.path.append('silos')  # NOQA
@@ -17,6 +16,9 @@ import cgi_biomarkers
 import molecularmatch
 import molecularmatch_trials
 import pmkb
+import drug_normalizer
+import disease_normalizer
+import oncogenic_normalizer
 import sage
 import brca
 import jax_trials
@@ -180,9 +182,9 @@ def normalize(feature_association):
     reference_genome_normalizer \
         .normalize_feature_association(feature_association)
 
-    # if not feature_association['source'] == 'molecularmatch_trials':
-    #     location_normalizer.normalize_feature_association(feature_association)
     location_normalizer.normalize_feature_association(feature_association)
+    # functionality for oncogenic_normalizer already mostly in harvesters
+    return feature_association
 
 
 def main():
@@ -194,18 +196,11 @@ def main():
         for feature_association in harvest:
             feature_association['tags'] = []
             feature_association['dev_tags'] = []
-            normalize(feature_association)
+            feature_association = normalize(feature_association)
             if not is_duplicate(feature_association):
                 yield feature_association
 
     silos[0].save_bulk(_check_dup(harvest(args.genes)))
-    # for feature_association in harvest(args.genes):
-    #     for silo in silos:
-    #         feature_association['tags'] = []
-    #         feature_association['dev_tags'] = []
-    #         normalize(feature_association)
-    #         if not is_duplicate(feature_association):
-    #             silo.save(feature_association)
 
 
 if __name__ == '__main__':
