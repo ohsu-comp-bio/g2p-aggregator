@@ -86,3 +86,4 @@ def test_profiles():
                 feature['alt'] = match['alt']
                 feature['referenceName'] = str(match['build'])
             features.append(feature)
+    assert len(features) == 0
