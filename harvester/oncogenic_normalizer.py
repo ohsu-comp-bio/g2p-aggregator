@@ -11,10 +11,13 @@ def parse_genomic_locus(locus):
     for gl in locii:
         parts = gl.split(':')
         # insertions and deletions
-        if 'del' in gl or 'ins' in gl:
+        if 'del' in gl:
             s = re.match('([0-9]*)[0-9_]*([A-Z]*)[a-z]*([A-Z]*)', parts[1].strip('g.'))
-            locii_return_set.append([parts[0].strip('chr'), s.group(1), s.group(2), s.group(3)])
+            locii_return_set.append([parts[0].strip('chr'), s.group(1), s.group(3), s.group(2)])
         # mutations
+        elif 'ins' in gl:
+            s = re.match('([0-9]*)[0-9_]*([A-Z]*)[a-z]*([A-Z]*)', parts[1].strip('g.'))
+            locii_return_set.append([parts[0].strip('chr'), s.group(1), s.group(2), s.group(3)]) 
         elif '>' in gl:
             s = re.match('([0-9]*)([A-Z]*)>([A-Z]*)', parts[1].strip('g.'))
             locii_return_set.append([parts[0].strip('chr'), s.group(1), s.group(2), s.group(3)])
@@ -28,61 +31,48 @@ def parse_genomic_locus(locus):
 
 def normalize_cgi_oncogenic(asso, gene_set):
     # add the asso to the set before edits are made
-    asso_set = [asso]
-    new_asso = deepcopy(asso)
     # grab only oncogenic mutations from cgi table that match gene and tumor
     CGI_TABLE = None
+    features = deepcopy(asso['features'])
     if not CGI_TABLE:
         CGI_TABLE = CGI_Oncogenic('../data/cgi_oncogenic_mutations.tsv')
-    tt = new_asso['cgi']['Primary Tumor type']
+    tt = asso['cgi']['Primary Tumor type']
+    print "INSIDE FUNCTION", tt
     for gene in gene_set:
+        print gene
         for match in CGI_TABLE.get_muts(gene, tt):
+            print match
             # replicate relevant feature set (in case there's more than one)
-            for feature in new_asso['features']:
+            for feature in asso['features']:
                 if gene == feature['geneSymbol']:
+                    print "GENE MATCH"
+                    f = deepcopy(feature)
                     # Look up position info
                     for locus in parse_genomic_locus(match['gdna']):
-                        feature['name'] = gene + match['gdna']
-                        feature['chromosome'] = locus[0]
-                        feature['start'] = locus[1]
-                        feature['ref'] = locus[2]
-                        feature['alt'] = locus[3]
-            new_asso['association']['cgiValidatedOncogenicMutations'] = match
-            asso_set.append(new_asso)
-    return asso_set
-
-
-def normalize_oncokb_oncogenic(asso, gene_set):
-    asso_set = [asso]
-    new_asso = deepcopy(asso)
-    # make some edits to new_asso
-    ONCOKB_TABLE = None
-    if not ONCOKB_TABLE:
-        ONCOKB_TABLE = ONCOKB_Oncogenic('../data/oncokb_all_mutations.tsv')
-    for gene in gene_set:
-        for match in ONCOKB_TABLE.get_muts(gene):
-            for feature in new_asso['features']:
-                if gene == feature['geneSymbol']:
-                    feature['name'] = match['Alteration']
-                    # catch locus edits later; from COSMIC? CGI?
-            new_asso['association']['oncokbOncogenicMutations'] = match
-            asso_set.append(new_asso)
-    return asso_set
-
+                        f['name'] = gene + match['gdna']
+                        f['chromosome'] = locus[0]
+                        f['start'] = locus[1]
+                        f['ref'] = locus[2]
+                        f['alt'] = locus[3]
+                        f['cgiValidatedOncogenicMutations'] = match
+                        features.append(f)
+                        print f
+    asso['features'] = features
+    return asso
 
 
 def normalize_feature_association(feature_association):
     # we only care about oncogenic mutations here
-    asso = feature_association[0]
-    association = asso['association']
-    source = asso['source']
-    genes = asso['genes']
+    association = feature_association['association']
+    source = feature_association['source']
+    genes = feature_association['genes']
     if 'oncogenic' not in association:
-        return feature_association
+        return
     if source == 'cgi':
-        return normalize_cgi_oncogenic(asso, genes)
-    elif source == 'oncokb':
-        return normalize_oncokb_oncogenic(asso, genes)
+        return normalize_cgi_oncogenic(feature_association, genes)
+#    elif source == 'oncokb':
+#        return normalize_oncokb_oncogenic(feature_association, genes)
+
 
 class CGI_Oncogenic(object):
     """
@@ -101,6 +91,26 @@ class CGI_Oncogenic(object):
             self.gene_df_cache[gene] = muts
         muts = muts[muts['cancer_acronym'].str.contains(tumor + '|CANCER')]
         return muts.to_dict(orient='records')
+
+
+# DEPRECATED
+def normalize_oncokb_oncogenic(asso, gene_set):
+    asso_set = [asso]
+    new_asso = deepcopy(asso)
+    # make some edits to new_asso
+    ONCOKB_TABLE = None
+    if not ONCOKB_TABLE:
+        ONCOKB_TABLE = ONCOKB_Oncogenic('../data/oncokb_all_mutations.tsv')
+    for gene in gene_set:
+        for match in ONCOKB_TABLE.get_muts(gene):
+            for feature in new_asso['features']:
+                if gene == feature['geneSymbol']:
+                    feature['name'] = match['Alteration']
+                    # catch locus edits later; from COSMIC? CGI?
+            new_asso['association']['oncokbOncogenicMutations'] = match
+            asso_set.append(new_asso)
+    return asso_set
+
 
 class ONCOKB_Oncogenic(object):
     """
