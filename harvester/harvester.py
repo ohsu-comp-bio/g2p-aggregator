@@ -205,7 +205,7 @@ def normalize(feature_association):
 
     location_normalizer.normalize_feature_association(feature_association)
     # functionality for oncogenic_normalizer already mostly in harvesters
-    return feature_association
+    oncogenic_normalizer.normalize_feature_association(feature_association)
 
 
 def main():
@@ -217,7 +217,7 @@ def main():
         for feature_association in harvest:
             feature_association['tags'] = []
             feature_association['dev_tags'] = []
-            feature_association = normalize(feature_association)
+            normalize(feature_association)
             if not is_duplicate(feature_association):
                 yield feature_association
 
