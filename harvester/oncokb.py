@@ -197,9 +197,11 @@ def convert(gene_data):
         association['description'] = variant['consequence']['description']
         association['environmentalContexts'] = []
 
-        association['phenotype'] = {
-            'description': 'cancer'
-        }
+        if biological['oncogenic'] in ['Likely Oncogenic', 'Oncogenic']:
+            association['phenotype'] = {
+                'description': 'cancer'
+            }
+
         association['evidence'] = [{
             "evidenceType": {
                 "sourceName": "oncokb",
