@@ -12,7 +12,7 @@ from elasticsearch_dsl import Search, Q
 from collections import OrderedDict
 from itertools import product
 import json
-from pandas.io.json import json_normalize    
+from pandas.io.json import json_normalize
 import copy
 
 import location_normalizer
@@ -33,18 +33,18 @@ class G2PDatabase(object):
     def query_all(self, trials=False, size=1000, verbose=False):
         """
         Returns all documents in the database.
-        
+
         :trials -- include trials, default False
         :size   -- number of rows to fetch in each chunk, default 1000
         :verbose -- print the query
         """
         s = Search(index=self.index).using(self.client).params(size=size)
         if trials:
-            s = s.query("match_all")                
+            s = s.query("match_all")
         else:
-            s = s.query("query_string", query="-source:*trials")            
+            s = s.query("query_string", query="-source:*trials")
         s = s.source(excludes=['cgi', 'jax', 'civic', 'oncokb', 'molecularmatch_trials',
-                              'molecularmatch', 'pmkb', 'sage', 'brca', 'jax_trials'])        
+                              'molecularmatch', 'pmkb', 'sage', 'brca', 'jax_trials'])
         if verbose:
             print s.to_dict()
         return s
@@ -97,7 +97,7 @@ class G2PDatabase(object):
             association_dict = hit['association'].to_dict()
             if 'cgi' in hit:
                 cgi_dict = ast.literal_eval(hit['cgi'])
-            else: 
+            else:
                 cgi_dict = {}
             genes = hit['genes']
             if isinstance(genes, basestring):
@@ -193,66 +193,6 @@ class G2PDatabase(object):
                  'phenotype_ontology_id': b.phenotype_id.buckets[0].key,
                  'phenotype_evidence_count':b.phenotype_id.buckets[0].doc_count} for b in aggs.phenotype_descriptions.buckets]
 
-    
-    def original_cgi_phenotypes(self, size=1000, verbose=False):
-        '''
-        Get original phenotype descriptions used by cgi
-        :size -- number of documents to fetch per scan
-        :verbose -- print the query
-        '''
-        # agg cgi phenotype_ids
-        query_string = '+source:cgi '
-        # create a search, ...
-        s = Search(using=self.client, index=self.index)
-        # with no data ..
-        s = s.params(size=0)
-        s = s.query("query_string", query=query_string)
-        # ... just aggregations
-        s.aggs.bucket('phenotype_ids', 'terms', field='association.phenotype.type.id.keyword')
-        if verbose:
-            print s.to_dict()
-        aggs = s.execute().aggregations
-        phenotype_ids = [b.key for b in aggs.phenotype_ids.buckets]
-        if verbose:
-            print phenotype_ids
-        
-        # get original cgi data
-        query_string = '+source:cgi '
-        s = Search(using=self.client, index=self.index)
-        s = s.params(size=size)
-        s = s.query("query_string", query=query_string) \
-             .source(includes=['cgi', 'association.phenotype.type.id', 'association.phenotype.description'])    
-        if verbose:
-            print s.to_dict()
-        # scan through entire set, deserialize original cgi payload and extract phenotype
-        cgi_phenotypes = {}    
-        for hit in s.scan():
-            key = None
-            if hit.association.phenotype.type.id:
-                key = hit.association.phenotype.type.id 
-            else:
-                key = hit.association.phenotype.description 
-            if key not in cgi_phenotypes:
-                cgi_phenotypes[key] = set([])
-                
-            cgi = json.loads(hit.cgi)
-            cgi_phenotypes[key].add(cgi['Primary Tumor acronym'])
-        
-        # xform set back to simple string        
-        # consider items where it was the only tumor
-        for key in cgi_phenotypes.keys():
-            found = False
-            originals = list(cgi_phenotypes[key])
-            for original in originals:
-                tumors = original.split(';')
-                if len(tumors) == 1:
-                    cgi_phenotypes[key] = tumors[0]
-                    found = True
-                    break
-            if not found:
-                cgi_phenotypes[key] = tumors[0]
-        return cgi_phenotypes    
-        
 
     def associations_dataframe(self, query_string=None, size=1000, verbose=False):
             '''
@@ -266,7 +206,7 @@ class G2PDatabase(object):
                       'association.phenotype.type.term', 'association.environmentalContexts.id',
                       'association.environmentalContexts.term', 'association.evidence.info.publications',
                       'features'
-                     ]  
+                     ]
             if not query_string:
                 query_string = ('-source:*trials '
                                 '+features.start:* '
@@ -275,7 +215,7 @@ class G2PDatabase(object):
                 )
             s = Search(using=self.client, index=self.index)
             s = s.params(size=size)
-            s = s.query("query_string", query=query_string).source(includes=fields)   
+            s = s.query("query_string", query=query_string).source(includes=fields)
             if verbose:
                 print json.dumps(s.to_dict(),indent=2, separators=(',', ': '))
 
@@ -284,9 +224,9 @@ class G2PDatabase(object):
                 h = hit.to_dict()
                 h['evidence.id'] = hit.meta.id
                 return h
-                
-            # create df with the first level of json formatted by pandas            
-            df = json_normalize([hit_with_id(hit) for hit in s.scan()])   
+
+            # create df with the first level of json formatted by pandas
+            df = json_normalize([hit_with_id(hit) for hit in s.scan()])
 
             # some generators to further denormalize creating a flat panda
             def environment_centric(df):
@@ -295,10 +235,10 @@ class G2PDatabase(object):
                     for environmentalContext in row['association.environmentalContexts']:
                         ec = copy.deepcopy(environmentalContext)
                         for n in ['id', 'term']:
-                            if n in ec:    
-                                ec['environmentalContext.{}'.format(n)] = ec.pop(n)                        
-                        ec.update(row)            
-                        yield ec            
+                            if n in ec:
+                                ec['environmentalContext.{}'.format(n)] = ec.pop(n)
+                        ec.update(row)
+                        yield ec
 
             def feature_centric(df):
                 """iterate through df. denormalize, create new row for each feature (variant) """
@@ -315,14 +255,14 @@ class G2PDatabase(object):
                         # decorate the feature components with 'feature.' prefix
                         for n in ['start', 'ref','alt', 'description', 'entrez_id', 'geneSymbol',
                                    'chromosome', 'name', 'referenceName', 'end','biomarker_type', 'genomic_hgvs']:
-                            if n in f:    
+                            if n in f:
                                 f['feature.{}'.format(n)] = f.pop(n)
                         if 'links' in f:
                             del f['links']
                         if 'synonyms' in f:
                             del f['synonyms']
-                        f.update(row)            
-                        yield f 
+                        f.update(row)
+                        yield f
 
             def evidence_centric(df):
                 """iterate through df. denormalize, create new row for each feature (variant) """
@@ -330,7 +270,7 @@ class G2PDatabase(object):
                     for evidence in row['association.evidence']:
                         e = {}
                         e['publication_count'] = len(evidence['info']['publications'])
-                        e.update(row)            
+                        e.update(row)
                         yield e
 
             rename = {'association.evidence_label': 'evidence_label',
@@ -350,21 +290,21 @@ class G2PDatabase(object):
             denormalization_msg['evidence_centric'] = len(df)
             if verbose:
                 print json.dumps(denormalization_msg,indent=2, separators=(',', ': '))
-                
-            del df['association.evidence']            
+
+            del df['association.evidence']
             return df
-        
+
 
     def genie_associations(self, associations_df, genie_variants_path, genie_clinical_path):
             '''
             join the genie data with the association dataframe
             :associations_df -- existing associations_df
             :genie_variants_path -- full path name to genie variants
-            :genie_clinical_path -- full path name to genie clinical            
+            :genie_clinical_path -- full path name to genie clinical
             '''
             # Load GENIE variants.
-            # prevents `DtypeWarning` 
-            # map unknown (all null) types, 
+            # prevents `DtypeWarning`
+            # map unknown (all null) types,
             # see https://wiki.nci.nih.gov/display/TCGA/Mutation+Annotation+Format+(MAF)+Specification
             # (17,18,23,24,25,29)
             dtype={"Match_Norm_Seq_Allele1": str,
@@ -375,8 +315,8 @@ class G2PDatabase(object):
                    "Score": str
                   }
             genie_variants_df = pd.read_csv(genie_variants_path, sep='\t', comment='#', dtype=dtype)
-            genie_clinical_df = pd.read_csv(genie_clinical_path, sep='\t', comment='#')    
-            
+            genie_clinical_df = pd.read_csv(genie_clinical_path, sep='\t', comment='#')
+
             # join clinical and variants
             genie_clinical_df.set_index(['SAMPLE_ID'])
             genie_variants_df.set_index(['Tumor_Sample_Barcode'])
@@ -390,7 +330,7 @@ class G2PDatabase(object):
                 sys.stderr.write('ERROR: clinical_df joined with genie_variants_df unexpected length')
                 sys.stderr.write('clinical_df samples len %s' % len(genie_clinical_df['SAMPLE_ID']))
                 sys.stderr.write('genie_df samples len %s' %  len(genie_variants_df['Tumor_Sample_Barcode']))
-                sys.stderr.write('genie_clinical_df samples not in genie_df %s' %  
+                sys.stderr.write('genie_clinical_df samples not in genie_df %s' %
                                  len(set(genie_clinical_df['SAMPLE_ID']) - set(genie_variants_df['Tumor_Sample_Barcode'])))
                 sys.stderr.write('genie_df samples not in genie_clinical_df %s' %
                                  len(set(genie_variants_df['Tumor_Sample_Barcode']) -  set(genie_clinical_df['SAMPLE_ID'])))
@@ -410,17 +350,52 @@ class G2PDatabase(object):
                                        'feature.alt' ])
             # join the dataframes
             genie_associations_df = pd.concat([genie_df, associations_df], axis=1)
-            genie_associations_df.groupby(['feature.chromosome', 'feature.start' , 'feature.end' , 
+            genie_associations_df.groupby(['feature.chromosome', 'feature.start' , 'feature.end' ,
                                 'feature.ref'    , 'feature.alt' ])
 
             if not len(genie_df) == len(genie_associations_df):
                 sys.stderr.write('ERROR: genie_df  len %s' % len(genie_df))
                 sys.stderr.write('associations_df  len %s' %  len(associations_df))
                 sys.stderr.write('genie_associations_df  len %s' %  len(genie_associations_df))
-                raise Exception('ERROR: genie_df joined with associations_df unexpected length')                
-            return genie_associations_df    
-            
-    
+                raise Exception('ERROR: genie_df joined with associations_df unexpected length')
+            return genie_associations_df
+
+    def harmonization_counts(self):
+        def _aggregate_by_source(aggregation_name, query_string):
+          """ simple terms count by source """
+          # build query
+          s = Search(using=self.client, index=self.index)
+          s = s.params(size=0)
+          s = s.query("query_string", query=query_string)
+          s.aggs.bucket(aggregation_name ,'terms', field='source.keyword')
+          # execute it
+          agg = s.execute().aggregations
+          # marshall to simple dict
+          aggregation_name = dir(agg)[0]
+          results = getattr(agg, aggregation_name)
+          buckets = []
+          for bucket in results.buckets:
+            row = {'aggregation_name': aggregation_name}
+            row['source'] = bucket.key
+            row['value'] = bucket.doc_count
+            buckets.append(row)
+          return buckets
+        # hold results
+        aggs = []
+        # name and query
+        aggs.extend(_aggregate_by_source('harmonized_features', '+features.start:*'))
+        aggs.extend(_aggregate_by_source('unharmonized_features', '-features.start:*'))
+        aggs.extend(_aggregate_by_source('harmonized_biomarkers', '+features.biomarker_type:*'))
+        aggs.extend(_aggregate_by_source('unharmonized_biomarkers', '-features.biomarker_type:*'))
+        aggs.extend(_aggregate_by_source('harmonized_phenotype', '-dev_tags:"no-doid"'))
+        aggs.extend(_aggregate_by_source('unharmonized_phenotype', '+dev_tags:"no-doid"'))
+        aggs.extend(_aggregate_by_source('harmonized_environment', '-dev_tags:"no-pubchem"'))
+        aggs.extend(_aggregate_by_source('unharmonized_environment', '+dev_tags:"no-pubchem"'))
+        # make df
+        df = pd.DataFrame([agg for agg in aggs])
+        df.fillna(0, inplace=True)
+        return df
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--host', help='ES host')
