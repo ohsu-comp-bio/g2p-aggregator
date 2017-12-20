@@ -6,9 +6,16 @@ if [ -z "$ES" ]
     ES=http://localhost:9200
 fi
 
+if [ -z "$REPOSITORY" ]
+  then
+    REPOSITORY=$1
+fi
+
+
+
 TS=$(date +"%Y%m%dt%H%M")
 
-curl -XPUT $ES'/_snapshot/s3_repository/snapshot_'$TS'?wait_for_completion=true&pretty' -d'
+curl -XPUT -H  "Content-Type: application/json" $ES'/_snapshot/'$REPOSITORY'/snapshot_'$TS'?wait_for_completion=true&pretty' -d'
 {
   "indices": ".kibana,associations-new",
   "ignore_unavailable": true,
