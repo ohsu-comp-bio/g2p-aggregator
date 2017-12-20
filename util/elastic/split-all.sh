@@ -6,7 +6,6 @@ python get_index.py --index associations | tee  \
   >(grep '"source":"molecularmatch"' > molecularmatch.json ) \
   >(grep '"source":"sage"' > sage.json ) \
   >(grep '"source":"jax_trials"' > jax_trials.json ) \
-  >(grep '"source":"jax_trials"' > jax_trials.json ) \
   >(grep '"source":"molecularmatch_trials"' > molecularmatch_trials.json ) \
   >(grep '"source":"brca"' > brca.json ) \
   >(grep '"source":"civic"' > civic.json ) \
