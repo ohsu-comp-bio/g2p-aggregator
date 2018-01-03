@@ -14,14 +14,10 @@ http.cors:
 ## To run the example:
 1. Clone this repo locally (or just download and unzip it)
 
-  ```sh
-  git clone https://github.com/scotchfield/elasticsearch-react-example.git
-  ```
-
 2. Move into the project
 
   ```sh
-  cd elasticsearch-react-example
+  cd services/ui
   ```
 
 3. Run npm install
@@ -31,3 +27,13 @@ http.cors:
   ```
 
 4. Run webpack (or webpack-dev-server) to build the index.js source file.
+
+  ```sh
+  npm run build
+  ```
+
+5. Run a server
+
+  ```sh
+  python -m  SimpleHTTPServer
+  ```

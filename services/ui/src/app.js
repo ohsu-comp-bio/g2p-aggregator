@@ -19,23 +19,11 @@ import {blue300, indigo900} from 'material-ui/styles/colors';
 import FontIcon from 'material-ui/FontIcon';
 import Avatar from 'material-ui/Avatar';
 
+const config = require('./config.json');
 
 let client = new elasticsearch.Client({
-  hosts: [
-    {
-      protocol: 'http',
-      port: 9200,
-      host: 'localhost'
-    }
-
-    // {
-    //   protocol: 'https',
-    //   port: 443,
-    //   host: 'g2p-test.ddns.net', // can also be hostname:
-    //   path: '/_plugin/kibana/es_admin', // can also be pathname:
-    // }
-  ],
-  log: "error"
+  host: config.host,
+  log: config.log
 });
 
 
@@ -92,9 +80,15 @@ class App extends Component {
   handleChipClick(sample_query_id) {
     const sample_queries = this.state.sample_queries;
     const sample_query_idx = sample_queries.map((q) => q.id).indexOf(sample_query_id);
-    sample_queries[sample_query_idx].checked = true
+    sample_queries[sample_query_idx].checked = !sample_queries[sample_query_idx].checked
+    let current_query = this.state.current_query ;
+    if (sample_queries[sample_query_idx].checked) {
+      current_query = this.state.current_query + ' ' + this.state.sample_queries[sample_query_idx].q;
+    } else {
+      current_query = current_query.replace(this.state.sample_queries[sample_query_idx].q, '');
+    }
     this.setState({
-      current_query: this.state.current_query + ' ' + this.state.sample_queries[sample_query_idx].q,
+      current_query: current_query,
       sample_queries: sample_queries
       },
       () => this.handleSearch()
