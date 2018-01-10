@@ -15,8 +15,8 @@ INDEX = 'associations'
 EXPECTED_CGI_EVIDENCE_COUNT = 1072
 EXPECTED_CGI_ONCOGENIC_EVIDENCE_COUNT = 301
 
-EXPECTED_ONCOKB_EVIDENCE_COUNT = 4048
-EXPECTED_ONCOKB_ONCGENIC_EVIDENCE_COUNT = 35
+EXPECTED_ONCOKB_EVIDENCE_COUNT = 4074
+EXPECTED_ONCOKB_ONCGENIC_EVIDENCE_COUNT = 38
 
 
 def test_cgi_evidence_counts():
@@ -50,7 +50,7 @@ def test_cgi_oncogenic_spotcheck_evidence_feature_counts():
     s = s.params(size=1)
     s = s.query("query_string", query=query)
     result = s.execute()
-    assert len(result.hits[0].features) == 39
+    assert len(result.hits[0].features) == 14
 
 
 def test_oncokb_evidence_counts():
@@ -83,4 +83,4 @@ def test_oncokb_oncogenic_spotcheck_evidence_feature_counts():
     s = s.params(size=1)
     s = s.query("query_string", query=query)
     result = s.execute()
-    assert len(result.hits[0].features) == 45
+    assert len(result.hits[0].features) == 43

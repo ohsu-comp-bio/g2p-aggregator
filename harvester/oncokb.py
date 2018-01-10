@@ -15,6 +15,7 @@ LOOKUP_TABLE = None
 
 
 def harvest(genes):
+    i = 0
     r = requests.get('http://oncokb.org/api/v1/levels')
     levels = r.json()
     if not genes:
@@ -45,10 +46,13 @@ def harvest(genes):
         if bio_r.status_code != 200:
             print "{} {} {}".format(gene, bio_url, bio_r.status_code)
         else:
+            print i
+            i = i + len(bio_r.json())
             gene_data['oncokb']['biological'] = bio_r.json()
             for biological in gene_data['oncokb']['biological']:
                 biological['level_label'] = 'NA'
         bio_r.close()
+        print i
         yield gene_data
 
 
