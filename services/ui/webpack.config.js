@@ -10,11 +10,15 @@ module.exports = {
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
-				loader: 'babel',
+				loader: 'babel-loader',
 				query: {
 					presets: ['es2015', 'react']
 				}
 			},
+			{
+        test: /\.json$/,
+        loader: 'json-loader'
+      },
 
 			// {
       //   test: /react-table.css$/,
