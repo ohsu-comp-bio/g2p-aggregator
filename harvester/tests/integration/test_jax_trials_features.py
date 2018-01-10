@@ -87,3 +87,5 @@ def test_profiles():
                 feature['referenceName'] = str(match['build'])
             features.append(feature)
     assert len(features) == 3
+    for feature in features:
+        assert 'start' not in feature
