@@ -29,7 +29,7 @@ Now:
 
 In  progress:
 
-* [Molecular match](https://www.molecularmatch.com/technology.html#api-documentation)
+* [MolecularMatch](https://api.molecularmatch.com/)
 * [BMEG](http://bmeg.compbio.ohsu.edu/)
 
 
