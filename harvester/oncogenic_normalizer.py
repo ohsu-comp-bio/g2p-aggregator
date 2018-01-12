@@ -89,7 +89,10 @@ class CGI_Oncogenic(object):
         else:
             muts = self.muts[self.muts['gene'] == gene]
             self.gene_df_cache[gene] = muts
-        muts = muts[muts['cancer_acronym'].str.contains(tumor + '|CANCER')]
+        for idx, row in muts.iterrows():
+            cts = row['cancer_acronym'].split(';')
+            if tumor not in cts and 'CANCER' not in cts:
+                muts.drop(idx, inplace=True)
         return muts.to_dict(orient='records')
 
 
