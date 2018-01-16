@@ -39,6 +39,9 @@ class CosmicLookup(object):
             # return null
             logging.warning('get_entries gene: %s, hgvs_p: %s', gene, hgvs_p)
             return []
+        # ensure caller passed a hgvs_p
+        if not hgvs_p or len(hgvs_p) == 0:
+            return []
         # Get lookup table.
         if gene in self.gene_df_cache:
             # Found gene-filtered lookup table in cache.

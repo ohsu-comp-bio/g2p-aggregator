@@ -21,9 +21,10 @@ def _stdin_actions(args):
         count = count + 1
         if count > args.skip:
             hit = json.loads(line)
-            hit = _fix_features(hit)
-            hit = _fix_genes(hit)
-            hit = _stringify(hit)
+            # hit = _fix_features(hit)
+            # hit = _fix_genes(hit)
+            # hit = _stringify(hit)
+            hit = _del_source(hit)
             yield {
                 '_index': args.index,
                 '_op_type': 'index',

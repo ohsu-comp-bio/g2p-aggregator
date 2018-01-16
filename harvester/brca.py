@@ -22,10 +22,10 @@ def harvest(genes=None):
         else:
             page_num = page_num + 1
             for record in payload['data']:
-                if not record['Pathogenicity_expert'] == 'Not Yet Reviewed':
-                    gene = record['Gene_Symbol']
-                    gene_data = {'gene': gene, 'brca': record}
-                    yield gene_data
+                # if not record['Pathogenicity_expert'] == 'Not Yet Reviewed':
+                gene = record['Gene_Symbol']
+                gene_data = {'gene': gene, 'brca': record}
+                yield gene_data
 
 
 def convert(gene_data):
@@ -55,10 +55,11 @@ def convert(gene_data):
         association = {}
         association['description'] = brca['Pathogenicity_expert']
         association['environmentalContexts'] = []
-        association['phenotype'] = {
-            'description': brca['Condition_ID_value_ENIGMA'],
-            # 'id': ?
-        }
+        if not brca['Condition_ID_value_ENIGMA'] == '-':
+            association['phenotype'] = {
+                'description': brca['Condition_ID_value_ENIGMA'],
+                # 'id': ?
+            }
 
         citations = brca['Clinical_significance_citations_ENIGMA']
         info = None
