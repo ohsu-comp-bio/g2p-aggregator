@@ -1,5 +1,5 @@
 import re
-import pandas as pd
+import pandas
 import json
 import copy
 import logging
@@ -14,57 +14,17 @@ import mutation_type as mut
 
 def _get_evidence(gene_ids, path='../data'):
     """ load tsv """
-    cgi_biomarkers_per_variant_df = pd.read_table(path + '/cgi_biomarkers_per_variant.tsv')
-    cgi_biomarkers_per_variant_df = cgi_biomarkers_per_variant_df.fillna('')
-
-    cgi_oncogenic_mutations_df = pd.read_table(path + '/cgi_oncogenic_mutations.tsv')
-    cgi_oncogenic_mutations_df = cgi_oncogenic_mutations_df.fillna('')
-    # collapse the table and group features
-    table = pd.pivot_table(cgi_biomarkers_per_variant_df,
-                           index=['Biomarker',
-                                  'Association',
-                                  'Drug',
-                                  'Drug family',
-                                  'Drug full name',
-                                  'Drug status',
-                                  'Evidence level',
-                                  'Metastatic Tumor Type',
-                                  'Primary Tumor acronym',
-                                  'Source',
-                                  'Primary Tumor type',
-                                  'Gene'],
-                           values=['gDNA',
-                                   'individual_mutation',
-                                   'Alteration type'],
-                           aggfunc={
-                                       'gDNA': lambda x:  {'v': [v for v in x]},
-                                       'individual_mutation': lambda x:  {'v': [v for v in x]},
-                                       'Alteration type': lambda x:  {'v': [v for v in x]},
-                                   }
-                           )
-    def _oncogenic_features(evidence):
-        """ ensure oncogenic features """
-        if 'oncogenic mutation' not in evidence['Biomarker']:
-            return evidence
-        features = []
-        onco_variants = cgi_oncogenic_mutations_df.query('gene == "{}"'.format(evidence['Gene']))
-        original_feature = evidence['features'][0]
-        for idx, row in onco_variants.iterrows():
-                d = row.to_dict()
-                d['gDNA'] = d['gdna']
-                del d['gdna']
-                d['name'] = original_feature.get('individual_mutation','')
-                d['alteration'] = original_feature.get('alteration','')
-                features.append(d)
-        evidence['features'] = features
-        return evidence
-
-    for idx, row in table.iterrows():
-        evidence = dict(
-                    dict(zip(table.index.names, idx)).items()  +
-                    {'features': [{ 'gDNA': gDNA, 'name': row['individual_mutation']['v'][idx], 'alteration':  row['Alteration type']['v'][idx]} for idx, gDNA in enumerate(row['gDNA']['v'])]}.items()
-                    )
-        yield  _oncogenic_features(evidence)
+    df = pandas.read_table(path + '/cgi_biomarkers_per_variant.tsv')
+    # change nan to blank string
+    df = df.fillna('')
+    # if no gene list return all
+    if not gene_ids:
+        dict_list = df.to_dict(orient='records')
+    else:
+        rows = df.loc[df['Gene'].isin(gene_ids)]
+        dict_list = rows.to_dict(orient='records')
+    for row in dict_list:
+        yield row
 
 
 def convert(evidence):
@@ -109,23 +69,22 @@ def convert(evidence):
 
     # Create document for insertion.
     genes = re.split('\W+', evidence['Gene'])
-    gene = filter(len, genes)
-
+    genes = filter(len, genes)
     features = []
-    for f in evidence['features']:
-        feature = split_gDNA(f['gDNA'])
+    for gene in genes:
+        feature = split_gDNA(evidence['gDNA'])
         feature['biomarker_type'] = mut.norm_biomarker(
-                                    f.get('alteration', 'MUT'),
+                                    evidence['Alteration type'],
                                     evidence['Biomarker'])
         feature['geneSymbol'] = gene
-        feature['name'] = f['name']
-        feature['description'] = f['alteration']
+        feature['name'] = evidence['individual_mutation']
+        feature['description'] = evidence['Alteration']
         feature['referenceName'] = 'GRCh37'
         features.append(feature)
 
     association = {}
-    # if evidence['individual_mutation']:
-    #     association['variant_name'] = evidence['individual_mutation'].split(':')[1]
+    if evidence['individual_mutation']:
+        association['variant_name'] = evidence['individual_mutation'].split(':')[1]
     association['description'] = '{} {} {}'.format(gene,
                                                    evidence['Drug full name'],
                                                    evidence['Association'])
@@ -165,7 +124,7 @@ def convert(evidence):
     association = ed.evidence_direction(evidence['Association'], association)
 
     if "oncogenic" in evidence['Biomarker']:
-        association['oncogenic'] = evidence['Biomarker'] # + evidence['features'][0]['alteration']
+        association['oncogenic'] = evidence['Biomarker']
 
     association['publication_url'] = pubs[0]
     association['drug_labels'] = evidence['Drug full name']
