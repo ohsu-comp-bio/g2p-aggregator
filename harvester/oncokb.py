@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+from pathlib import Path
+from os.path import exists
+import pandas as pd
+import json
 import requests
 import json
 from urllib import urlencode, quote_plus
@@ -12,9 +16,11 @@ import mutation_type as mut
 from feature_enricher import enrich
 
 LOOKUP_TABLE = None
-
+clinv = Path('../data/oncokb_allActionableVariants.txt')
+biov = Path('../data/oncokb_allAnnotatedVariants.txt')
 
 def harvest(genes):
+    i = 0
     r = requests.get('http://oncokb.org/api/v1/levels')
     levels = r.json()
     if not genes:
@@ -23,32 +29,80 @@ def harvest(genes):
         genes = []
         for gene in all_genes:
             genes.append(gene['hugoSymbol'])
+
+    # get all variants
+    print 'gathering all OncoKB variants'
+    url = 'http://oncokb.org/api/v1/variants'
+    r = requests.get(url)
+    variants = r.json()
+
+    if clinv.exists():
+        print 'Loading OncoKB clinical TSV'
+        # then use it to harvest from oncokb actionable
+        global v
+        v = pd.read_csv(clinv, sep='\t')
+        v = v[v['Gene'].isin(genes)]
+        cols = {'Gene': 'gene',
+                'Alteration': 'variant',
+                'Cancer Type': 'cancerType',
+                'Level': 'level',
+                'Drugs(s)': 'drug',
+                'PMIDs for drug': 'drugPmids',
+                'Abstracts for drug': 'drugAbstracts'}
+        v = v.rename(columns=cols)
+        v = v.fillna('')
+        for idx, row in v.iterrows():
+            url = 'http://oncokb.org/api/v1/variants/lookup?hugoSymbol={}&variant={}'
+            url = url.format(row['gene'], row['variant'])
+            r = requests.get(url)
+            for ret in r.json():
+                if str(ret['name']) == v['variant'][idx]:
+                    v.at[idx, 'variant'] = ret
+
+    if biov.exists():
+        print 'Loading OncoKB biological TSV'
+        # then use it to harvest from oncokb biologic
+        global b
+        b = pd.read_csv(biov, sep='\t')
+        b = b[b['Gene'].isin(genes)]
+        cols = {'Gene': 'gene',
+                'Alteration': 'variant',
+                'Oncogenicity': 'oncogenic',
+                'Mutation Effect': 'mutationEffect',
+                'PMIDs for Mutation Effect': 'mutationEffectPmids',
+                'Abstracts for Mutation Effect': 'mutationEffectAbstracts'}
+        b = b.rename(columns=cols)
+        b = b.fillna('')
+        for idx, row in b.iterrows():
+            FLAG = False
+            url = 'http://oncokb.org/api/v1/variants/lookup?hugoSymbol={}&variant={}'
+            url = url.format(row['gene'], row['variant'])
+            r = requests.get(url)
+            for ret in r.json():
+                if str(ret['name']) == b['variant'][idx]:
+                    b.at[idx, 'variant'] = ret
+                    FLAG = True
+            if FLAG == False:
+                check = row['variant'].replace('?', ' ').split()
+                for var in variants:
+                    i = 0
+                    if var['gene']['hugoSymbol'] == row['gene']:
+                        for bits in check:
+                            if bits in var['name']:
+                                i = i + 1
+                        if i == len(check):
+                            b.at[idx, 'variant'] = var
+
     for gene in set(genes):
         gene_data = {'gene': gene, 'oncokb': {}}
-        clin_url = 'http://oncokb.org/api/private/search/variants/clinical?hugoSymbol={}'  # NOQA
-        clin_url = clin_url.format(gene)
-        clin_r = requests.get(clin_url)
-        if clin_r.status_code != 200:
-            print "{} {} {}".format(gene, clin_url, clin_r.status_code)
-        else:
-            gene_data['oncokb']['clinical'] = clin_r.json()
-            for clinical in gene_data['oncokb']['clinical']:
-                key = "LEVEL_{}".format(clinical['level'])
-                if key in levels:
-                    clinical['level_label'] = levels[key]
-                else:
-                    print '{} not found'.format(clinical['level'])
-        clin_r.close()
-        bio_url = 'http://oncokb.org/api/private/search/variants/biological?hugoSymbol={}'  # NOQA
-        bio_url = bio_url.format(gene)
-        bio_r = requests.get(bio_url)
-        if bio_r.status_code != 200:
-            print "{} {} {}".format(gene, bio_url, bio_r.status_code)
-        else:
-            gene_data['oncokb']['biological'] = bio_r.json()
-            for biological in gene_data['oncokb']['biological']:
-                biological['level_label'] = 'NA'
-        bio_r.close()
+        gene_data['oncokb']['clinical'] = v[v['gene'].isin([gene])].to_dict(orient='records')
+        for clinical in gene_data['oncokb']['clinical']:
+            key = "LEVEL_{}".format(clinical['level'])
+            if key in levels:
+                clinical['level_label'] = levels[key]
+            else:
+                print '{} not found'.format(clinical['level'])
+        gene_data['oncokb']['biological'] = b[b['gene'].isin([gene])].to_dict(orient='records')
         yield gene_data
 
 
@@ -91,50 +145,59 @@ def convert(gene_data):
         if variant['name'] == 'Oncogenic Mutations':
             for biological in oncokb['biological']:
                 if biological['oncogenic'] in ['Likely Oncogenic', 'Oncogenic']:
-                    variant = biological['variant']
-                    gene_data = variant['gene']
-                    alteration = variant['alteration']
+                    var = biological['variant']
+                    gene_data = var['gene']
+                    alteration = var['alteration']
                     feature = {}
                     feature['geneSymbol'] = gene
-                    feature['description'] = variant['name']
-                    feature['name'] = variant['name']
+                    feature['description'] = var['name']
+                    feature['name'] = var['name']
                     feature['entrez_id'] = gene_data['entrezGeneId']
                     feature['biomarker_type'] = mut.norm_biomarker(
                         variant['consequence']['term'])
                     feature = _enrich_feature(gene, feature)
                     features.append(feature)
-        else:
-            feature = {}
-            feature['geneSymbol'] = gene
-            feature['name'] = variant['name']
-            feature['description'] = variant['name']
-            feature['entrez_id'] = gene_data['entrezGeneId']
-            feature['biomarker_type'] = mut.norm_biomarker(
-                variant['consequence']['term'])
-            feature = _enrich_feature(gene, feature)
-            features.append(feature)
+
+        feature = {}
+        feature['geneSymbol'] = gene
+        feature['name'] = variant['name']
+        feature['description'] = variant['name']
+        feature['entrez_id'] = gene_data['entrezGeneId']
+        feature['biomarker_type'] = mut.norm_biomarker(
+            variant['consequence']['term'])
+        feature = _enrich_feature(gene, feature)
+        features.append(feature)
 
         association = {}
         association['description'] = clinical['level_label']
         association['variant_name'] = variant['name']
         association['environmentalContexts'] = []
-        for drug in clinical['drug']:
+        for drug in clinical['drug'].split(', '):
             association['environmentalContexts'].append({'description': drug})
         association['phenotype'] = {
-            'description': clinical['cancerType']['mainType']['name'],
-            'id': '{}'.format(clinical['cancerType']['mainType']['id'])
+            'description': clinical['cancerType'],
         }
+        abstract = []
+        if clinical['drugAbstracts'] != '':
+            absts = clinical['drugAbstracts'].split('; ')
+            for i in range(len(absts)):
+                print absts[i]
+                abstract.append({'text': absts[i], 'link': ''})
+                for bit in abstract[i]['text'].split():
+                    if 'http' in bit:
+                        abstract[i]['link'] = bit
+        clinical['drugAbstracts'] = abstract
         association['evidence'] = [{
             "evidenceType": {
                 "sourceName": "oncokb",
                 "id": '{}-{}'.format(gene,
-                                     clinical['cancerType']['mainType']['id'])
+                                     clinical['cancerType'])
             },
             'description': clinical['level'],
             'info': {
                 'publications':
-                    [drugAbstracts['link']
-                        for drugAbstracts in clinical['drugAbstracts']]
+                    [drugAbstract['link']
+                        for drugAbstract in clinical['drugAbstracts']]
             }
         }]
         # add summary fields for Display
@@ -148,7 +211,7 @@ def convert(gene_data):
         if len(clinical['drugAbstracts']) > 0:
             association['publication_url'] = clinical['drugAbstracts'][0]['link']  # NOQA
         else:
-            for drugPmid in clinical['drugPmids']:
+            for drugPmid in clinical['drugPmids'].split(', '):
                 association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(drugPmid)  # NOQA
                 break
 
@@ -197,9 +260,11 @@ def convert(gene_data):
         association['description'] = variant['consequence']['description']
         association['environmentalContexts'] = []
 
-        association['phenotype'] = {
-            'description': 'cancer'
-        }
+        if biological['oncogenic'] in ['Likely Oncogenic', 'Oncogenic']:
+            association['phenotype'] = {
+                'description': 'cancer'
+            }
+
         association['evidence'] = [{
             "evidenceType": {
                 "sourceName": "oncokb",
@@ -210,7 +275,7 @@ def convert(gene_data):
             'info': {
                 'publications':
                     ['http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(Pmid)
-                        for Pmid in biological['mutationEffectPmids']]
+                        for Pmid in biological['mutationEffectPmids'].split(', ')]
             }
         }]
         # add summary fields for Display
@@ -225,11 +290,9 @@ def convert(gene_data):
 
         association['oncogenic'] = biological['oncogenic']
         association['evidence_label'] = None
-        association = ed.evidence_direction(biological['level_label'],
-                                            association, na=True)
 
         if len(biological['mutationEffectPmids']) > 0:
-            for drugPmid in biological['mutationEffectPmids']:
+            for drugPmid in biological['mutationEffectPmids'].split(', '):
                 association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(drugPmid)  # NOQA
                 break
 

@@ -15,19 +15,27 @@ attic
 .plotly
 .htpasswd
 util/elastic/backups
-data/*.json
-data/msk_impact_2017
-data/*.tsv
 
+# Don't save data in github, just the README.md where data comes from
+data/*.json
+data/*.txt
+data/msk_impact_2017*
+data/*.tsv
+harvester/data
 harvester/cosmic_lookup_table.tsv
 harvester/CosmicMutantExport.tsv.gz
 harvester/benchmark_results.txt
 harvester/cgi_mut_benchmarking.tsv
 harvester/oncokb_mut_benchmarking.tsv
+harvester/oncokb_all_actionable_variants*.*
+
+# ignore certs, etc.
 compbio-tls
 certs
 letsencrypt_certs
-harvester/oncokb_all_actionable_variants*.*
+
+# ignore viz created by notebooks
+notebooks/*.png
 
 # requests-cache(s)
 harvester/*.sqlite
