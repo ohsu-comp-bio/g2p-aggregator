@@ -11,19 +11,27 @@ bin/elasticsearch-plugin install repository-s3
 ```
 ##### restart elastic afterwards
 
+`dc restart  elastic`
 
 #### configure
+By convention, name the s3 client the same as the repository
+```
+
+bin/elasticsearch-keystore add s3.client.g2p-test-snapshots.access_key XXX
+bin/elasticsearch-keystore add s3.client.g2p-test-snapshots.secret_key XXX
+dc restart  elastic
+
+```
+
 
 see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
 ```
-curl -XPUT $ES'/_snapshot/s3_repository?pretty' -H 'Content-Type: application/json' -d'
+curl -XPUT $ES'/_snapshot/g2p-test?pretty' -H 'Content-Type: application/json' -d'
 {
   "type": "s3",
   "settings": {
-    "bucket": "XXXX",
-    "region": "us-west-2",
-    "access_key": "XXXXX",
-    "secret_key": "XXXXX"
+    "bucket": "g2p-test-snapshots",
+    "client": "g2p-test-snapshots"
   }
 }
 '
@@ -33,7 +41,7 @@ curl -XPUT $ES'/_snapshot/s3_repository?pretty' -H 'Content-Type: application/js
 ```
 $ curl -s $ES/_cat/repositories?v
 id            type
-s3_repository   s3
+g2p-test-snapshots   s3
 $ export REPOSITORY=s3_repository
 ```
 

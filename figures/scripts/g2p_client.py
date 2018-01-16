@@ -362,24 +362,24 @@ class G2PDatabase(object):
 
     def harmonization_counts(self):
         def _aggregate_by_source(aggregation_name, query_string):
-          """ simple terms count by source """
-          # build query
-          s = Search(using=self.client, index=self.index)
-          s = s.params(size=0)
-          s = s.query("query_string", query=query_string)
-          s.aggs.bucket(aggregation_name ,'terms', field='source.keyword')
-          # execute it
-          agg = s.execute().aggregations
-          # marshall to simple dict
-          aggregation_name = dir(agg)[0]
-          results = getattr(agg, aggregation_name)
-          buckets = []
-          for bucket in results.buckets:
-            row = {'aggregation_name': aggregation_name}
-            row['source'] = bucket.key
-            row['value'] = bucket.doc_count
-            buckets.append(row)
-          return buckets
+            """ simple terms count by source """
+            # build query
+            s = Search(using=self.client, index=self.index)
+            s = s.params(size=0)
+            s = s.query("query_string", query=query_string)
+            s.aggs.bucket(aggregation_name, 'terms', field='source.keyword')
+            # execute it
+            agg = s.execute().aggregations
+            # marshall to simple dict
+            aggregation_name = dir(agg)[0]
+            results = getattr(agg, aggregation_name)
+            buckets = []
+            for bucket in results.buckets:
+                row = {'aggregation_name': aggregation_name}
+                row['source'] = bucket.key
+                row['value'] = bucket.doc_count
+                buckets.append(row)
+            return buckets
         # hold results
         aggs = []
         # name and query
@@ -387,10 +387,10 @@ class G2PDatabase(object):
         aggs.extend(_aggregate_by_source('unharmonized_features', '-features.start:*'))
         aggs.extend(_aggregate_by_source('harmonized_biomarkers', '+features.biomarker_type:*'))
         aggs.extend(_aggregate_by_source('unharmonized_biomarkers', '-features.biomarker_type:*'))
-        aggs.extend(_aggregate_by_source('harmonized_phenotype', '-dev_tags:"no-doid"'))
-        aggs.extend(_aggregate_by_source('unharmonized_phenotype', '+dev_tags:"no-doid"'))
-        aggs.extend(_aggregate_by_source('harmonized_environment', '-dev_tags:"no-pubchem"'))
-        aggs.extend(_aggregate_by_source('unharmonized_environment', '+dev_tags:"no-pubchem"'))
+        aggs.extend(_aggregate_by_source('harmonized_phenotype', '+association.phenotype.type.id:*'))
+        aggs.extend(_aggregate_by_source('unharmonized_phenotype', '-association.phenotype.type.id:* '))
+        aggs.extend(_aggregate_by_source('harmonized_environment', '+association.environmentalContexts.id:*'))
+        aggs.extend(_aggregate_by_source('unharmonized_environment', '-association.environmentalContexts.id:*'))
         # make df
         df = pd.DataFrame([agg for agg in aggs])
         df.fillna(0, inplace=True)
