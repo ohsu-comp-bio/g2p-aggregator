@@ -97,7 +97,7 @@ def get_evidence(gene_ids):
             except Exception as e:
                 logging.error(
                     "molecularmatch error fetching {}".format(gene),
-                    # exc_info=1
+                    exc_info=1
                 )
                 start = -1
 
