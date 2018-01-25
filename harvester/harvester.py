@@ -43,7 +43,7 @@ import location_normalizer
 DUPLICATES = []
 
 # cache responses
-requests_cache.install_cache('harvester', allowable_codes=(200, 404))
+requests_cache.install_cache('harvester', allowable_codes=(200, 400, 404))
 
 
 argparser = argparse.ArgumentParser()
@@ -200,12 +200,25 @@ def normalize(feature_association):
         disease = feature_association['association']['phenotype']['description']
         logging.info('disease_normalizer {} {}'.format(elapsed, disease))
 
+    start_time = timeit.default_timer()
     reference_genome_normalizer \
         .normalize_feature_association(feature_association)
+    elapsed = timeit.default_timer() - start_time
+    if elapsed > 1:
+        logging.info('reference_genome_normalizer {}'.format(elapsed))
 
+    start_time = timeit.default_timer()
     location_normalizer.normalize_feature_association(feature_association)
+    elapsed = timeit.default_timer() - start_time
+    if elapsed > 1:
+        logging.info('location_normalizer {}'.format(elapsed))
+
+    start_time = timeit.default_timer()
     # functionality for oncogenic_normalizer already mostly in harvesters
     oncogenic_normalizer.normalize_feature_association(feature_association)
+    elapsed = timeit.default_timer() - start_time
+    if elapsed > 1:
+        logging.info('oncogenic_normalizer {}'.format(elapsed))
 
 
 def main():
