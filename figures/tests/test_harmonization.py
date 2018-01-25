@@ -2,7 +2,8 @@ import os
 import sys
 sys.path.append('./scripts')  # NOQA
 
-from harmonization import Harmonizations, Overlaps
+from harmonization import Harmonizations
+from overlaps import Overlaps
 
 HOST = 'localhost'
 INDEX = 'associations'
