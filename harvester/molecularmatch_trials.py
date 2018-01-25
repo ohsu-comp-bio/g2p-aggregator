@@ -10,6 +10,7 @@ from warnings import warn
 import sys
 import mutation_type as mut
 from feature_enricher import enrich
+import time
 
 DEFAULT_GENES = ['*']
 TRIAL_IDS = []
@@ -17,6 +18,12 @@ TRIAL_IDS = []
 
 def get_evidence(gene_ids):
     """ load from remote api """
+    # override with data from file if it exists
+    if os.path.isfile('molecularmatch_trials.json'):
+        for evidence in get_evidence_from_file('molecularmatch_trials.json'):
+            yield evidence
+        return
+    # otherwise, get data from remote api
     apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
     if not apiKey:
         raise ValueError('Please set MOLECULAR_MATCH_API_KEY in environment')
@@ -45,10 +52,12 @@ def get_evidence(gene_ids):
                 'filters': json.dumps(filters)
             }
             try:
+                time.sleep(2)  # rate limit
                 logging.info('%s %s', url, json.dumps(payload))
                 r = requests.post(url, data=payload, timeout=120)
                 assertions = r.json()
-                logging.debug(assertions)
+                if 'page' not in assertions:
+                    logging.info(assertions)
                 logging.info(
                     "page {} of {}. total {} count {}".format(
                         assertions['page'],
@@ -76,9 +85,19 @@ def get_evidence(gene_ids):
             except Exception as e:
                 logging.error(
                     "molecularmatch error fetching {}".format(gene),
-                    # exc_info=1
+                    exc_info=1
                 )
                 start = -1
+
+
+def get_evidence_from_file(filepath):
+    """ read raw mm data from file """
+    with open(filepath) as fp:
+        line = fp.readline()
+        while line:
+            evidence = json.loads(line)
+            yield evidence["molecularmatch_trials"]
+            line = fp.readline()
 
 
 def convert(evidence):
@@ -133,7 +152,7 @@ def convert(evidence):
 
         conditions = set([])
         for t in evidence_tags:
-            if t['facet'] == 'CONDITION':
+            if (t['facet'] == 'CONDITION' and t['filterType'] == 'include' and 'generatedByTerm' not in t and not t['suppress']):  # noqa
                 conditions.add(t['term'])
         conditions = list(conditions)
 
