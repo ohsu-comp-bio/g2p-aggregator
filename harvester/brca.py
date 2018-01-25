@@ -22,10 +22,10 @@ def harvest(genes=None):
         else:
             page_num = page_num + 1
             for record in payload['data']:
-                # if not record['Pathogenicity_expert'] == 'Not Yet Reviewed':
-                gene = record['Gene_Symbol']
-                gene_data = {'gene': gene, 'brca': record}
-                yield gene_data
+                if not record['Pathogenicity_expert'] == 'Not Yet Reviewed':
+                    gene = record['Gene_Symbol']
+                    gene_data = {'gene': gene, 'brca': record}
+                    yield gene_data
 
 
 def convert(gene_data):
