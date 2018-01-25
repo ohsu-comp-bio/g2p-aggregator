@@ -41,7 +41,8 @@ def normalize_bioontology(name):
         if ontology == 'obo':
             (ontology, id) = id.split('_')
         term = {'ontology_term': '{}:{}'.format(ontology, id),
-                'label': name}
+                'label': name,
+                'source': ontology}
         terms.append(term)
         family = get_family(term['ontology_term'])
         if family:
@@ -97,7 +98,8 @@ def normalize_ebi(name):
         return []
     doc = response['docs'][0]
     term = {'ontology_term': doc['obo_id'].encode('utf8'),
-            'label': doc['label'].encode('utf8')}
+            'label': doc['label'].encode('utf8'),
+            'source': 'http://purl.obolibrary.org/obo/doid'}
     family = get_family(doc['obo_id'])
     if family:
         term['family'] = family
@@ -172,6 +174,10 @@ def normalize(name):
                 names = re.split("[\,;]+", name)
                 for name_part in names:
                     normalized_diseases = normalize_ebi(name_part)
+                    # if we had to break this apart to find a hit,
+                    # add the original name back
+                    for normalized_disease in normalized_diseases:
+                        normalized_disease['label'] = name
                     diseases = diseases + normalized_diseases
             if len(diseases) == 0:
                 diseases = normalize_bioontology(name)
@@ -198,7 +204,8 @@ def normalize_feature_association(feature_association):
     # TODO we are only looking for exact match of one disease right now
     association['phenotype']['type'] = {
         'id': diseases[0]['ontology_term'],
-        'term': diseases[0]['label']
+        'term': diseases[0]['label'],
+        'source': diseases[0]['source']
     }
     if 'family' in diseases[0]:
         association['phenotype']['family'] = diseases[0]['family']

@@ -40,6 +40,9 @@ def allele_registry(hgvs):
     url = 'http://reg.genome.network/allele?hgvs={}' \
         .format(requests.utils.quote(hgvs))
     r = requests.get(url, headers={'Accept': 'application/json'})
+    if r.status_code not in [200, 400, 404]:
+        logging.info('unexpected allele_registry {} {}'.format(url,
+                                                               r.status_code))
     return r.json()
 
 
