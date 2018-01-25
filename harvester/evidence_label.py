@@ -62,9 +62,11 @@ def evidence_label(evidence, association, na=False):
     #      u'Phase 4', u'Unknown', u'Not Applicable', u'Phase 2/Phase 3'])
     molecularmatch_t_a = []
     molecularmatch_t_b = ['phase 1/phase 3', 'phase 3', 'phase 4',
-                          'phase 2/phase 3', 'phase 3/phase 4']
+                          'phase 2/phase 3', 'phase 3/phase 4',
+                          'phase 4/phase 4']
     molecularmatch_t_c = ['early phase 1', 'phase 1', 'phase 2a', 'phase 2b',
-                          'phase 1/phase 2', 'phase 2', 'phase 1 / phase 2']
+                          'phase 1/phase 2', 'phase 2', 'phase 1 / phase 2',
+                          'phase 1/phase 1']
     molecularmatch_t_d = ['phase 0', 'n/a', 'unknown', 'not applicable']
 
     ev_lab = {
