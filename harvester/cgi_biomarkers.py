@@ -7,7 +7,6 @@ import logging
 import cosmic_lookup_table
 import evidence_label as el
 import evidence_direction as ed
-import mutation_type as mut
 
 """ https://www.cancergenomeinterpreter.org/biomarkers """
 
@@ -73,9 +72,7 @@ def convert(evidence):
     features = []
     for gene in genes:
         feature = split_gDNA(evidence['gDNA'])
-        feature['biomarker_type'] = mut.norm_biomarker(
-                                    evidence['Alteration type'],
-                                    evidence['Biomarker'])
+        feature['biomarker_type'] = evidence['Alteration type']
         feature['geneSymbol'] = gene
         feature['name'] = evidence['individual_mutation']
         feature['description'] = evidence['Alteration']

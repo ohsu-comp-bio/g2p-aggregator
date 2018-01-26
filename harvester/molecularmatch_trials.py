@@ -5,10 +5,8 @@ import os
 import evidence_label as el
 import evidence_direction as ed
 import logging
-import mutation_type as mut
 from warnings import warn
 import sys
-import mutation_type as mut
 from feature_enricher import enrich
 
 DEFAULT_GENES = ['*']

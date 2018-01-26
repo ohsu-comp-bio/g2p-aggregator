@@ -19,6 +19,7 @@ import pmkb
 import drug_normalizer
 import disease_normalizer
 import oncogenic_normalizer
+import biomarker_normalizer
 import sage
 import brca
 import jax_trials
@@ -202,6 +203,7 @@ def normalize(feature_association):
 
     reference_genome_normalizer \
         .normalize_feature_association(feature_association)
+    biomarker_normalizer.normalize_feature_association(feature_association)
 
     location_normalizer.normalize_feature_association(feature_association)
     # functionality for oncogenic_normalizer already mostly in harvesters

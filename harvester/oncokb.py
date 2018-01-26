@@ -12,7 +12,6 @@ import cosmic_lookup_table
 
 import evidence_label as el
 import evidence_direction as ed
-import mutation_type as mut
 from feature_enricher import enrich
 
 LOOKUP_TABLE = None
@@ -153,8 +152,7 @@ def convert(gene_data):
                     feature['description'] = var['name']
                     feature['name'] = var['name']
                     feature['entrez_id'] = gene_data['entrezGeneId']
-                    feature['biomarker_type'] = mut.norm_biomarker(
-                        variant['consequence']['term'])
+                    feature['biomarker_type'] = variant['consequence']['term']
                     feature = _enrich_feature(gene, feature)
                     features.append(feature)
 
@@ -163,8 +161,7 @@ def convert(gene_data):
         feature['name'] = variant['name']
         feature['description'] = variant['name']
         feature['entrez_id'] = gene_data['entrezGeneId']
-        feature['biomarker_type'] = mut.norm_biomarker(
-            variant['consequence']['term'])
+        feature['biomarker_type'] = variant['consequence']['term']
         feature = _enrich_feature(gene, feature)
         features.append(feature)
 
@@ -236,8 +233,7 @@ def convert(gene_data):
         feature['geneSymbol'] = gene
         feature['name'] = variant['name']
         feature['entrez_id'] = gene_data['entrezGeneId']
-        feature['biomarker_type'] = mut.norm_biomarker(
-            variant['consequence']['term'])
+        feature['biomarker_type'] = variant['consequence']['term']
 
         # Look up variant and add position information.
         if not LOOKUP_TABLE:

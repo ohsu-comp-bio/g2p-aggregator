@@ -6,8 +6,6 @@ from inflection import parameterize, underscore
 import json
 import evidence_label as el
 import evidence_direction as ed
-import mutation_type as mut
-
 
 def harvest(genes=None):
     with open("../data/pmkb_interpretations.json", "r") as ins:
@@ -38,9 +36,7 @@ def convert(interpretation):
                 feature['end'] = int(stop)
                 feature['chromosome'] = str(chromosome)
                 feature['referenceName'] = 'GRCh37/hg19'
-                feature['biomarker_type'] = mut.norm_biomarker(
-                                                variant['variant_type']
-                                            )
+                feature['biomarker_type'] = variant['variant_type']
 
                 attributes = {}
                 for key in variant.keys():
