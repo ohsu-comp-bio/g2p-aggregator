@@ -91,7 +91,7 @@ cohorts.g2p_phenotypes_by_chromosome_figure(path='./images/g2p_phenotypes_by_chr
 ```
 
 
-### genie samples by phenotypes by chromosome
+### genie samples by chromosome
 
 ![genie_samples_by_chromosome](images/genie_samples_by_chromosome.png)
 *Show the evidence phenotypes mapped to tumor sample to feature chromosome.*
@@ -103,7 +103,7 @@ cohorts.genie_samples_by_chromosome_figure(path='./images/genie_samples_by_chrom
 
 
 
-### genie phenotypes by chromosome
+### genie samples by oncotree
 
 ![genie_samples_by_oncotree](images/genie_samples_by_oncotree.png)
 *Breakdown of top twenty genie clinical phenotypes in g2p knowledgebases.*
@@ -113,7 +113,7 @@ cohorts = Cohorts(es_host=args.host, index=args.index)
 cohorts.genie_samples_by_oncotree_figure(path='./images/genie_samples_by_oncotree.png')
 ```
 
-### genie phenotypes by chromosome
+### genie biomarkers
 
 ![genie_biomarkers.png](images/genie_biomarkers.png)
 *Breakdown of top twenty genie clinical phenotypes by bio marker type.*
@@ -122,5 +122,3 @@ cohorts.genie_samples_by_oncotree_figure(path='./images/genie_samples_by_oncotre
 cohorts = Cohorts(es_host=args.host, index=args.index)
 cohorts.genie_biomarkers_figure(path='./images/genie_biomarkers.png')
 ```
-
-

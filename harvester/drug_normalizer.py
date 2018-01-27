@@ -65,8 +65,9 @@ def normalize_pubchem_substance(name):
                 informationList = r.json()['InformationList']
                 information = informationList['Information'][0]
                 compounds.append({'ontology_term':
-                                  'substance:SID{}'.format(information['SID']),
-                                  'synonym': information['Synonym'][0]})
+                                  'SID{}'.format(information['SID']),
+                                  'synonym': information['Synonym'][0],
+                                  'source': 'http://rdf.ncbi.nlm.nih.gov/pubchem/substance'})
             else:
                 logging.info("NOFINDS_PUBCHEM_SUBSTANCE {}".format(name_part))
                 NOFINDS_PUBCHEM_SUBSTANCE.append(name_part)
@@ -97,7 +98,8 @@ def normalize_pubchem(name):
             informationList = r.json()['InformationList']
             information = informationList['Information'][0]
             compounds.append({'ontology_term':
-                              'compound:CID{}'.format(information['CID']),
+                              'CID{}'.format(information['CID']),
+                              'source': 'http://rdf.ncbi.nlm.nih.gov/pubchem/compound',
                               'synonym': information['Synonym'][0]})
     if len(compounds) == 0:
         NOFINDS_PUBCHEM.append(name)
@@ -203,16 +205,21 @@ def normalize_biothings(name):
                 approved_countries = list(set(approved_countries))
 
                 ontology_term = None
+                source = None
                 if 'pubchem' in hit:
-                    ontology_term = 'compound:{}'.format(hit['pubchem']['cid'])
+                    ontology_term = '{}'.format(hit['pubchem']['cid'])
+                    source = 'http://rdf.ncbi.nlm.nih.gov/pubchem/compound'
                 if not ontology_term and 'chebi' in hit:
                     ontology_term = hit['chebi']['chebi_id']
+                    source = 'http://purl.obolibrary.org/obo/chebi'
                 if not ontology_term and 'chembl' in hit:
                     ontology_term = hit['chembl']['molecule_chembl_id']
+                    source = 'http://rdf.ebi.ac.uk/terms/chembl'
 
                 compound = {'ontology_term': ontology_term,
                             'synonym': synonym_fda or synonym_usan or
                             synonym_inn or name_part,
+                            'source': source
                             }
                 if toxicity:
                     compound['toxicity'] = toxicity
@@ -264,10 +271,10 @@ def normalize_chembl(name):
                 if not (synonym_fda or synonym_usan or synonym_inn):
                     continue
                 compounds.append({'ontology_term':
-                                  '{}:{}'.format(lookup['entity_type'].lower(),
-                                                 lookup['chembl_id']),
+                                  '{}'.format(lookup['chembl_id']),
                                   'synonym': synonym_fda or synonym_usan or
-                                  synonym_inn})
+                                  synonym_inn,
+                                  'source': 'http://rdf.ebi.ac.uk/terms/chembl' })
         except Exception as e:
             pass
     return compounds
