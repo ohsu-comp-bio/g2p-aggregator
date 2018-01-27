@@ -108,6 +108,7 @@ mutant	substitution
 neg	loss_of_function_variant
 negative	negatively_autoregulated_gene
 nonsense	stop_gained
+polymorphism	polymorphic_sequence_variant
 positive	positively_autoregulated
 rearrange	gene_rearranged_at_DNA_level
 splice_region_variant	splice_region_variant
