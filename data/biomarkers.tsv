@@ -1,0 +1,116 @@
+#source_biomarker_name	sequence_ontology_biomarker_name
+3 Prime UTR Truncation	3_prime_UTR_truncation
+3 Prime UTR Variant	3_prime_UTR_variant
+3'UTR	3_prime_UTR_variant
+5 Prime UTR Exon Variant	5_prime_UTR_exon_variant
+5 Prime UTR Variant	5_prime_UTR_variant
+5'UTR	5_prime_UTR_variant
+Amino Acid Deletion	amino_acid_deletion
+Block Substitution	frameshift_variant
+CNA	copy_number_variation
+CNA;CNA	copy_number_variation
+CSQN=Frameshift	frameshift
+Chromosome Arm	chromosome_arm
+Coding Sequence Variant	coding_sequence_variant
+Coding Transcript Intron Variant	coding_transcript_intron_variant
+Coding Transcript Variant	coding_transcript_variant
+Complex	complex_structural_alteration
+Copy Number Change	copy_number_change
+Copy Number Variant	copy_number_variation
+Deletion	deletion
+Disruptive Inframe Deletion	disruptive_inframe_deletion
+Dna Binding Site	DNA_binding_site
+Dominant Negative Variant	dominant_negative_variant
+Exon Loss Variant	exon_loss_variant
+Exon Variant	exon_variant
+F	frameshift
+FUS	fusion
+Feature Truncation	feature_truncation
+Frame Shift	frameshift_variant
+Frameshift Elongation	frameshift_elongation
+Frameshift Truncation	frameshift_truncation
+Frameshift Variant	frameshift_variant
+Fusion	fusion
+Gain Of Function Variant	gain_of_function_variant
+Gain of Function	gain_of_function_variant
+Gene Fusion	gene_fusion
+Gene Silenced By Dna Methylation	gene_silenced_by_DNA_methylation
+Gene Variant	gene_variant
+IFD	deletion
+IFI	insertion
+In Frame	inframe_variant
+Inframe Deletion	inframe_deletion
+Inframe Indel	inframe_indel
+Inframe Insertion	inframe_insertion
+Inframe Variant	inframe_variant
+Insertion	insertion
+Intergenic	intergenic_variant
+Intron Variant	intron_variant
+IVS	iDNA
+Loss Of Function Variant	loss_of_function_variant
+Loss Of Heterozygosity	loss_of_heterozygosity
+Loss of Function	loss_of_function_variant
+M	missense_variant
+MUT	substitution
+MUT;MUT	substitution
+Microsatellite	microsatellite
+Minus 1 Frameshift Variant	minus_1_frameshift_variant
+Missense	missense_variant
+Missense Variant	missense_variant
+N	stop_gained
+Non Sense	stop_gained
+Nonsynonymous Variant	nonsynonymous_variant
+P	polymorphic_sequence_variant
+Plus 1 Frameshift Variant	plus_1_frameshift_variant
+Polymorphic Sequence Variant	polymorphic_sequence_variant
+Protein Altering Variant	protein_altering_variant
+Regulatory Region Variant	regulatory_region_variant
+S	splice_site_variant
+Short Tandem Repeat Variation	short_tandem_repeat_variation
+Silent Mutation	silent_mutation
+Snp	SNP
+Splice Acceptor Variant	splice_acceptor_variant
+Splice Donor Variant	splice_donor_variant
+Splice Site	splice_site
+Start Lost	start_lost
+Stop Gained	stop_gained
+Stop Lost	stop_lost
+Syn	synonymous
+Synonymous	synonymous
+Synonymous Variant	synonymous_variant
+Transcript Ablation	transcript_ablation
+Transcript Amplification	transcript_amplification
+Transcript Fusion	transcript_fusion
+Transcript Regulatory Region Fusion	transcript_regulatory_region_fusion
+Transcript Variant	transcript_variant
+Transcription Variant	transcription_variant
+Wild Type	wild_type
+act mut	gain_of_function_variant
+amp	feature_amplification
+del	deletion
+deletion	deletion
+domain	polypeptide_domain
+feature_truncation	feature_truncation
+frameshift	frameshift
+frameshift_variant	frameshift_variant
+fusion	fusion
+hotspot	mutational_hotspot
+inact mut	loss_of_function_variant
+indel	indel
+inframe_deletion	inframe_deletion
+inframe_insertion	inframe_insertion
+ins	insertion
+insertion	insertion
+loss	copy_number_loss
+missense	missense_variant
+missense_variant	missense_variant
+mutant	substitution
+neg	loss_of_function_variant
+negative	negatively_autoregulated_gene
+nonsense	stop_gained
+positive	positively_autoregulated
+rearrange	gene_rearranged_at_DNA_level
+splice_region_variant	splice_region_variant
+start_lost	start_lost
+stop_gained	stop_gained
+wild-type	wild_type
