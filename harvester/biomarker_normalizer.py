@@ -39,24 +39,27 @@ def get_soid_data(soid):
         the bioontology API and get the info about
         it from sequence ontology """
     if soid.startswith('SO'):
-        url = 'http://www.sequenceontology.org/browser/current_svn/export/term_only/csv_text/{}'.format(soid) # NOQA
-        r = requests.get(url, timeout=20)
-        data = _parse(r.text)
-        bsubtype = {'soid': data['accession'],
-                    'name': data['name'],
-                    'hierarchy': []}
-        if data['parents'] != '': 
-            # TODO: Deal with multiple parent lines up the tree.
-            parent = data['parents'].split(',')[0]
-            btype = get_soid_data(parent)
-            if btype['hierarchy']:
-                bsubtype['parent_soid'] = btype['parent_soid']
-                bsubtype['parent_name'] = btype['parent_name']
-            else:
-                bsubtype['parent_soid'] = btype['soid']
-                bsubtype['parent_name'] = btype['name']
-            btype['hierarchy'].append(btype['soid'])
-            bsubtype['hierarchy'] = btype['hierarchy']
+        try:
+            url = 'http://www.sequenceontology.org/browser/current_svn/export/term_only/csv_text/{}'.format(soid) # NOQA
+            r = requests.get(url, timeout=20)
+            data = _parse(r.text)
+            bsubtype = {'soid': data['accession'],
+                        'name': data['name'],
+                        'hierarchy': []}
+            if data['parents'] != '':
+                # TODO: Deal with multiple parent lines up the tree.
+                parent = data['parents'].split(',')[0]
+                btype = get_soid_data(parent)
+                if btype['hierarchy']:
+                    bsubtype['parent_soid'] = btype['parent_soid']
+                    bsubtype['parent_name'] = btype['parent_name']
+                else:
+                    bsubtype['parent_soid'] = btype['soid']
+                    bsubtype['parent_name'] = btype['name']
+                btype['hierarchy'].append(btype['soid'])
+                bsubtype['hierarchy'] = btype['hierarchy']
+        except:
+            return None
     return bsubtype
 
 def normalize(biomarker):
@@ -80,7 +83,6 @@ def normalize(biomarker):
                 btype = get_soid_data(idx.replace('_', ':'))
                 break
     if btype is None:
-        print biomarker
         BIOONTOLOGY_NOFINDS.append(quoted)
     return btype
 
