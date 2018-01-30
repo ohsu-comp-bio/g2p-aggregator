@@ -1,48 +1,17 @@
 #!/bin/bash
 
 # setup elastic search
-if [ -z "$1" ]
+if [ -z "$ES" ]
   then
     ES=http://localhost:9200
-  else
-    ES=$1
 fi
-
+echo setting up $ES
 curl  -X DELETE $ES"/associations-new"
 echo deleted
 
-curl -XPUT $ES"/associations-new" -H 'Content-Type: application/json' -d'
-{
-  "settings" : {
-      "index" : {
-        "mapping.total_fields.limit": 30000
-      }
-  },
-
-  "mappings": {
-    "association": {
-      "dynamic_templates": [
-        {
-          "strings": {
-            "match_mapping_type": "string",
-            "mapping": {
-              "type": "text",
-              "fields": {
-                "keyword": {
-                  "type":  "keyword",
-                  "ignore_above": 1024,
-                  "store": true
-                }
-              }
-            }
-          }
-        }
-      ]
-    }
-  }
-}'
-echo created
-
+# shards disk.indices disk.used disk.avail disk.total disk.percent host      ip        node
+#     21        9.7gb    20.4gb     42.2gb     62.7gb           32 127.0.0.1 127.0.0.1 -BRXEWH
+#     21                                                                               UNASSIGNED
 
 # curl -XPUT $ES"/associations-new" -H 'Content-Type: application/json' -d'
 # {
@@ -60,7 +29,13 @@ echo created
 #             "match_mapping_type": "string",
 #             "mapping": {
 #               "type": "text",
-#               "fielddata":true
+#               "fields": {
+#                 "keyword": {
+#                   "type":  "keyword",
+#                   "ignore_above": 1024,
+#                   "store": true
+#                 }
+#               }
 #             }
 #           }
 #         }
@@ -68,7 +43,81 @@ echo created
 #     }
 #   }
 # }'
-# echo created
+echo created
+
+curl -XPUT $ES"/associations-new" -H 'Content-Type: application/json' -d'
+{
+  "settings":{
+    "index":{
+      "mapping.total_fields.limit":30000
+    }
+  },
+  "mappings":{
+    "association":{
+      "properties":{
+        "civic":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "cgi":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "oncokb":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "jax":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "pmkb":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "molecularmatch":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "sage":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "jax_trials":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "brca":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        },
+        "molecularmatch_trials":{
+          "type":"keyword",
+          "store":true, "index":false, "ignore_above":0
+        }
+      },
+      "dynamic_templates":[
+        {
+          "strings":{
+            "match_mapping_type":"string",
+            "mapping":{
+              "type":"text",
+              "fields":{
+                "keyword":{
+                  "type":"keyword",
+                  "ignore_above":1024,
+                  "store":true
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+'
+echo created
 
 
 # curl  -X PUT $ES"/associations-new/_settings" -d'

@@ -12,9 +12,9 @@ import mutation_type as mut
 """ https://www.cancergenomeinterpreter.org/biomarkers """
 
 
-def _get_evidence(gene_ids, path='./cgi_biomarkers_per_variant.tsv'):
+def _get_evidence(gene_ids, path='../data'):
     """ load tsv """
-    df = pandas.read_table(path)
+    df = pandas.read_table(path + '/cgi_biomarkers_per_variant.tsv')
     # change nan to blank string
     df = df.fillna('')
     # if no gene list return all
@@ -79,9 +79,12 @@ def convert(evidence):
         feature['geneSymbol'] = gene
         feature['name'] = evidence['individual_mutation']
         feature['description'] = evidence['Alteration']
+        feature['referenceName'] = 'GRCh37'
         features.append(feature)
 
     association = {}
+    if evidence['individual_mutation']:
+        association['variant_name'] = evidence['individual_mutation'].split(':')[1]
     association['description'] = '{} {} {}'.format(gene,
                                                    evidence['Drug full name'],
                                                    evidence['Association'])
@@ -119,6 +122,9 @@ def convert(evidence):
 
     association = el.evidence_label(evidence['Evidence level'], association)
     association = ed.evidence_direction(evidence['Association'], association)
+
+    if "oncogenic" in evidence['Biomarker']:
+        association['oncogenic'] = evidence['Biomarker']
 
     association['publication_url'] = pubs[0]
     association['drug_labels'] = evidence['Drug full name']

@@ -1,8 +1,6 @@
 from __future__ import print_function
 import sys
 
-from lxml import html
-from lxml import etree
 import requests
 from inflection import parameterize, underscore
 import json
@@ -11,30 +9,12 @@ import evidence_direction as ed
 import mutation_type as mut
 
 
-def _eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
-
-
-def _include(interpretation, genes):
-    """ should this interpretation be included ? """
-    if not genes or len(genes) == 0:
-        return True
-    if interpretation['gene']['name'] in genes:
-        return True
-    return False
-
-
 def harvest(genes=None):
-    """ get data from pmkb """
-    url = 'https://ga4gh:g2p@pmkb.weill.cornell.edu/api/interpretations'
-    response = requests.get(url)
-    summaries = json.loads(response.text)
-    for interpretation in summaries['interpretations']:
-        if _include(interpretation, genes):
-            url = 'https://ga4gh:g2p@pmkb.weill.cornell.edu/api/interpretations/{}'.format(interpretation['id'])  # NOQA
-            response = requests.get(url)
-            detail = json.loads(response.text)
-            yield detail['interpretation']
+    with open("../data/pmkb_interpretations.json", "r") as ins:
+        for line in ins:
+            interpretations = json.loads(line)['interpretations']
+            for interpretation in interpretations:
+                yield interpretation
 
 
 def convert(interpretation):
@@ -54,8 +34,8 @@ def convert(interpretation):
                 a = coordinate.split(':')
                 chromosome = a[0]
                 start, stop = a[1].split('-')
-                feature['start'] = start
-                feature['end'] = stop
+                feature['start'] = int(start)
+                feature['end'] = int(stop)
                 feature['chromosome'] = str(chromosome)
                 feature['referenceName'] = 'GRCh37/hg19'
                 feature['biomarker_type'] = mut.norm_biomarker(
@@ -68,11 +48,25 @@ def convert(interpretation):
                         attributes[key] = {'string_value': variant[key]}
                 feature['attributes'] = attributes
 
+                # TODO - replace w/ biocommons/hgvs ?
+                if 'dna_change' in variant:
+                    dna_change = variant['dna_change']
+                    if dna_change and '>' in dna_change:
+                        prefix, alt = dna_change.split('>')
+                        ref = prefix[-len(alt):]
+                        if len(ref) > 0 and len(alt) > 0:
+                            feature['ref'] = ref
+                            feature['alt'] = alt
+
                 gene = variant['gene']['name']
 
                 association = {}
 
+                if attributes['amino_acid_change']['string_value']:
+                    association['variant_name'] = attributes['amino_acid_change']['string_value']
+
                 # association['evidence_label'] = interpretation['tier']
+                association['source_link'] = 'https://pmkb.weill.cornell.edu/variants/{}'.format(variant['id'])
                 association = el.evidence_label(str(interpretation['tier']),
                                                 association, na=True)
                 association = ed.evidence_direction(
@@ -127,27 +121,3 @@ def harvest_and_convert(genes):
         for feature_association in convert(evidence):
             # print "pmkb convert_yield {}".format(feature_association.keys())
             yield feature_association
-
-
-def _test_simple():
-    for gene in get_gene_symbols(['BRAF']):
-        therapies = get_gene_therapies(gene)
-        _eprint(len(therapies))
-        assert len(therapies) == 26
-        for therapy_url in therapies:
-            evidence = get_therapy(therapy_url)
-            _eprint(evidence.keys())
-            break
-
-
-def _test_harvest():
-    for feature_association in harvest_and_convert(None):
-        _eprint(feature_association)
-        break
-
-
-if __name__ == '__main__':
-    import requests_cache
-    # cache responses
-    requests_cache.install_cache('harvester')
-    _test_harvest()

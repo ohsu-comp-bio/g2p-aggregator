@@ -28,8 +28,9 @@ if __name__ == "__main__":
     print 'Registering Snapshot Repository'
     print data
     print 'waiting...'
-    resp = client.make_request(method='POST',
-            path='/_snapshot/backups',
+    headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+    resp = client.make_request(method='POST', headers=headers,
+            path='/_snapshot/' + os.environ['ESTEST_MANUAL_SNAPSHOT_S3_BUCKET'],
             data=data)
     body = resp.read()
     print body
