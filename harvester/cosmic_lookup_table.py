@@ -20,6 +20,13 @@ class CosmicLookup(object):
         self.lookup_table = pandas.read_csv(lookup_table_file, sep="\t")
         self.gene_df_cache = {}
 
+    def get_genes(self):
+        """
+        Returns a list of all genes represented in the cosmic table
+        """
+        gene_df = self.lookup_table[['gene']].drop_duplicates(keep='first')
+        return list(gene_df.values.flatten())
+
     def get_entries(self, gene, hgvs_p):
         """
         Returns a dataframe of results from filtering on gene and hgvs_p
@@ -32,16 +39,19 @@ class CosmicLookup(object):
             # return null
             logging.warning('get_entries gene: %s, hgvs_p: %s', gene, hgvs_p)
             return []
+        # ensure caller passed a hgvs_p
+        if not hgvs_p or len(hgvs_p) == 0:
+            return []
         # Get lookup table.
         if gene in self.gene_df_cache:
             # Found gene-filtered lookup table in cache.
-            lt = self.gene_df_cache['gene']
+            lt = self.gene_df_cache[gene]
         else:
             # Did not find gene-filtered lookup table in cache. Create it
             # and add it to the cache.
             lt = self.lookup_table
             lt = lt[lt['gene'] == gene]
-            self.gene_df_cache['gene'] = lt
+            self.gene_df_cache[gene] = lt
 
         hgvs_p = "p." + hgvs_p
         result = lt[(lt['gene'] == gene) & (lt['hgvs_p'].str.contains(hgvs_p))]

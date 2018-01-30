@@ -91,11 +91,13 @@ local restrictions = {
     ["/plugins.*"]                      = { "GET" },
     ["/es_admin.*"]                     = { "GET", "POST" },
 
-    ["/static.*"]                       = { "GET" }
+    ["/static.*"]                       = { "GET" },
+    ["/admin.*"]                        = { "GET" }
 
   },
 
   g2p = {
+
     ["^/$"]                             = { "GET" },
     ["^/?[^/]*/?[^/]*/_search"]         = { "GET", "POST" },
     ["^/?[^/]*/?[^/]*/_msearch"]        = { "GET", "POST" },
@@ -108,7 +110,11 @@ local restrictions = {
     ["/bundles.*"]                      = { "GET" },
     ["/api.*"]                          = { "GET", "POST" },
     ["/plugins.*"]                      = { "GET" },
-    ["/es_admin.*"]                     = { "GET", "POST" },
+
+    ["/es_admin.*"]                     = { "GET" },
+    ["/es_admin.*/_search"]             = { "GET", "POST" },
+    ["/es_admin.*/_msearch"]            = { "GET", "POST" },
+    ["/es_admin.*/_mget"]               = { "GET", "POST" },
 
     ["/static.*"]                       = { "GET" },
 
@@ -124,11 +130,12 @@ ngx.log(ngx.DEBUG, role)
 
 -- exit 403 when no matching role has been found
 if restrictions[role] == nil then
-  ngx.header.content_type = 'text/plain'
-  ngx.log(ngx.WARN, "Unknown role ["..role.."]")
-  ngx.status = 403
-  ngx.say("403 Forbidden: You don\'t have access to this resource.")
-  return ngx.exit(403)
+  -- ngx.header.content_type = 'text/plain'
+  -- ngx.log(ngx.WARN, "Unknown role ["..role.."]")
+  -- ngx.status = 403
+  -- ngx.say("403 Forbidden: You don\'t have access to this resource.")
+  -- return ngx.exit(403)
+  role = 'g2p'
 end
 
 -- get URL
@@ -158,6 +165,7 @@ for path, methods in pairs(restrictions[role]) do
     ngx.log(ngx.NOTICE, method.." "..uri.." matched: "..tostring(m).." "..tostring(path).." for "..role)
     break
   end
+
   -- ngx.log(ngx.WARN, method.." "..uri.." NO matched: m:"..tostring(m).." path:"..tostring(path).." for "..role)
 end
 

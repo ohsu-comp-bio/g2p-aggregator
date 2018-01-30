@@ -4,7 +4,9 @@ from elasticsearch.client import IndicesClient
 import sys
 import json
 import logging
-from elasticsearch import Elasticsearch, RequestsHttpConnection, serializer, compat, exceptions  # NQQA
+from elasticsearch import Elasticsearch, RequestsHttpConnection, \
+    serializer, compat, exceptions
+from elasticsearch.helpers import bulk
 
 # module level funtions
 
@@ -26,7 +28,9 @@ class ElasticSilo:
 
     def __init__(self, args):
         """ initialize, set endpoint & index name """
-        self._es = Elasticsearch([args.elastic_search], serializer=JSONSerializerPython2())  # NOQA
+        self._es = Elasticsearch([args.elastic_search],
+                                 serializer=JSONSerializerPython2(),
+                                 request_timeout=120)
         self._index = args.elastic_index
 
     def __str__(self):
@@ -52,19 +56,31 @@ class ElasticSilo:
                 }
               }
             }
-            self._es.delete_by_query(index=self._index, body=query)
+            self._es.delete_by_query(index=self._index,
+                                     # doc_type='association',
+                                     body=query,
+                                     timeout='2m',
+                                     request_timeout=120)
+            logging.info("deleted associations for {}.{}"
+                         .format(self._index, source))
+        except exceptions.NotFoundError as nf:
+            logging.info("index not found associations for {}.{}"
+                         .format(self._index, source))
+        except exceptions.ConflictError as ce:
+            logging.info("duplicate associations for {}.{}"
+                         .format(self._index, source))
         except Exception as e:
-            logging.exception
             logging.error(query)
-            pass
+            logging.exception(e)
+            raise e
 
     def _stringify_sources(self, feature_association):
         """ Maintaining the original document causes a 'field explosion'
         thousands on fields in a document. So, for now at least,
         maintain it as a string.
         """
-        sources = ['cgi', 'jax', 'civic', 'oncokb',
-                   'molecularmatch', 'pmkb', 'sage']
+        sources = ['cgi', 'jax', 'civic', 'oncokb', 'molecularmatch_trials',
+                   'molecularmatch', 'pmkb', 'sage', 'brca', 'jax_trials']
         for source in sources:
             if source in feature_association:
                 if not isinstance(feature_association[source], basestring):
@@ -76,11 +92,17 @@ class ElasticSilo:
         # prevent field explosion
         feature_association = self._stringify_sources(feature_association)
 
+        # if 'molecularmatch_trials' in feature_association:
+        #     del feature_association['molecularmatch_trials']
+
         # try:
         result = self._es.index(index=self._index,
                                 body=feature_association,
                                 doc_type='association',
-                                op_type='index')
+                                timeout='120s',
+                                request_timeout=120,
+                                op_type='index'
+                                )
 
         if result['_shards']['failed'] > 0:
             logging.error('failure updating association {}'
@@ -88,6 +110,24 @@ class ElasticSilo:
         # except Exception as e:
         #     logging.error(json.dumps(feature_association))
         #     raise e
+
+    def save_bulk(self, feature_association_generator):
+        """ write to es """
+        # prevent field explosion
+        def _bulker(feature_association_generator):
+            for feature_association in feature_association_generator:
+                feature_association = self._stringify_sources(feature_association)  # NOQA
+                yield {
+                    '_index': self._index,
+                    '_op_type': 'index',
+                    '_type': 'association',
+                    '_source': feature_association
+                }
+
+        result = bulk(self._es,
+                      (d for d in _bulker(feature_association_generator)),
+                      request_timeout=120)
+        logging.info(result)
 
 
 class JSONSerializerPython2(serializer.JSONSerializer):

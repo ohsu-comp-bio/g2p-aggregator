@@ -45,6 +45,11 @@ class KafkaSilo:
         # noop
         pass
 
+    def save_bulk(self, feature_association_generator):
+        """ write to kafka """
+        for feature_association in feature_association_generator:
+            self.save(feature_association)
+
     def save(self, feature_association):
         """ write dict to kafka """
         self._producer.send(self._kafka_topic, json.dumps(feature_association))
