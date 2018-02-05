@@ -15,6 +15,13 @@ import evidence_direction as ed
 from feature_enricher import enrich
 
 LOOKUP_TABLE = None
+
+# OncoKB harvester now pulls from the below downloadable OncoKB files
+# and supplements with additional variant data pulled from their public
+# API. This is because pulling from the private API gives unpredictable
+# results and their is no endpoint in the public API that gives the
+# same drug-gene-variant association information as was being
+# pulled from the private API.
 clinv = Path('../data/oncokb_allActionableVariants.txt')
 biov = Path('../data/oncokb_allAnnotatedVariants.txt')
 
