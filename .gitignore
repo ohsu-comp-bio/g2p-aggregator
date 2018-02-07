@@ -46,3 +46,4 @@ harvester/zotero_help.py
 
 # json dump files
 util/**/*.json
+util/bmeg/genenames.tsv
