@@ -65,8 +65,9 @@ if __name__ == '__main__':
             "subclass": "Benzene and substituted derivatives",
             "superclass": "Organic compounds"
           },
+          "source": "http://rdf.ncbi.nlm.nih.gov/pubchem/compound",
           "usan_stem": "tyrosine kinase inhibitors",
-          "toxicity": "The most common non-hematologic adverse reactions (≥ 20%) were hypertension, rash, abdominal pain, fatigue, headache, dry skin, constipation, arthralgia, nausea, and pyrexia. Hematologic adverse reactions included thrombocytopenia, anemia, neutropenia, lymphopenia, and leukopenia.",
+          "toxicity": "The most common non-hematologic adverse reactions (\u2265 20%) were hypertension, rash, abdominal pain, fatigue, headache, dry skin, constipation, arthralgia, nausea, and pyrexia. Hematologic adverse reactions included thrombocytopenia, anemia, neutropenia, lymphopenia, and leukopenia.",
           "approved_countries": [
             "Canada",
             "US"
@@ -78,6 +79,9 @@ if __name__ == '__main__':
       "description": "944396-07-0"
     }
 
-    assert {'environment:944396-07-0': {'description': '944396-07-0'}} == normalize({'association': {'environmentalContexts': [SIMPLE_ENV]}})[1]  # noqa
-    assert COMPLEX_ENV == normalize({'association': {'environmentalContexts': [COMPLEX_ENV]}})[1].values()[0]  # noqa
+    simple_rsp = normalize({'association': {'environmentalContexts': [SIMPLE_ENV]}})[1]
+    assert simple_rsp == {'treatment:944396-07-0': {'id': 'treatment:944396-07-0', 'name': '944396-07-0'}}  # noqa
+    complex_rsp = normalize({'association': {'environmentalContexts': [COMPLEX_ENV]}})[1].values()[0]
+    print complex_rsp
+    assert COMPLEX_ENV == complex_rsp  # noqa
     assert {} == normalize({'association': {'environmentalContexts': [SIMPLE_ENV, COMPLEX_ENV]}})[1]  # noqa
