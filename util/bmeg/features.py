@@ -52,12 +52,14 @@ def _variant(feature, gid):
         v['start'] = feature['start']
     if 'end' in feature:
         v['end'] = feature['end']
-    if 'end' in feature:
-        v['end'] = feature['end']
     if 'chromosome' in feature:
         v['reference_name'] = feature['chromosome']
     if 'referenceName' in feature:
         v['reference_genome'] = feature['referenceName']
+    if 'ref' in feature:
+        v['reference_bases'] = feature['ref']
+    if 'alt' in feature:
+        v['alternate_bases'] = [feature['alt']]
 
     return v
 
