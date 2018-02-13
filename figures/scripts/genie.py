@@ -133,15 +133,15 @@ def create_plot(data, layout=None, title='', xaxis_title= '', yaxis_title= '',
     plotly.offline.plot(fig, filename=filename)
 
 
-def load_g2p_df(refresh=False):
+def load_g2p_df(host, file, refresh=False):
     try:
         if refresh:
             raise Exception()
-        g2p_df = pd.read_csv(G2P_FILE, sep='\t', encoding='utf-8')
+        g2p_df = pd.read_csv(file, sep='\t', encoding='utf-8')
     except:
-        db = G2PDatabase(HOST)
+        db = G2PDatabase(host)
         g2p_df = db.associations_dataframe()
-        g2p_df.to_csv(G2P_FILE, sep='\t', encoding='utf-8')
+        g2p_df.to_csv(file, sep='\t', encoding='utf-8')
 
     return g2p_df
 
@@ -161,7 +161,7 @@ def print_cohort_stats(df):
     print '-------------'
 
 if __name__ == '__main__':
-    g2p_df = load_g2p_df()
+    g2p_df = load_g2p_df(HOST, G2P_FILE)
 
     genie_analysis = GENIEAnalysis(g2p_df=g2p_df)
     genie_analysis.load()
