@@ -64,8 +64,6 @@ class GENIEAnalysis:
         # Merge
         # The BIG merge of GENIE with G2P. Left join preserves all genie keys and
         # creates rows where there is an entry in G2P matching GENIE.
-        print self.genie_df.head()
-        print self.g2p_df.head()
         self.genie_g2p_df = pd.merge(self.genie_df, self.g2p_df, how='left',
                                      left_on=['Chromosome', 'Start_Position', 'Reference_Allele', 'Tumor_Seq_Allele2'],
                                      right_on=['feature.chromosome', 'feature.start', 'feature.ref', 'feature.alt'])
