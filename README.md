@@ -23,12 +23,13 @@ Now:
 * Cancer Genome Interpreter Cancer [bioMarkers database](https://www.cancergenomeinterpreter.org/biomarkers)
 * GA4GH [reference server](https://github.com/ga4gh/ga4gh-server)
 * Cornell [pmkb](https://pmkb.weill.cornell.edu)
+* [MolecularMatch](https://api.molecularmatch.com/)
 
 In  progress:
 
-* [MolecularMatch](https://api.molecularmatch.com/)
 * [BMEG](http://bmeg.compbio.ohsu.edu/)
 
+To see analysis of harmonization and overlaps see [figures](figures/README.md)
 
 ## How to use it?
 
