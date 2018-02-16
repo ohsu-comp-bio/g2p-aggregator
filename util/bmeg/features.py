@@ -3,6 +3,18 @@
 import genes
 import local
 import logging
+
+# biostream-schema
+from bmeg.clinical_pb2 import *
+from bmeg.cna_pb2 import *
+from bmeg.genome_pb2 import *
+from bmeg.phenotype_pb2 import *
+from bmeg.rna_pb2 import *
+from bmeg.variants_pb2 import *
+from google.protobuf import json_format
+import json
+from google.protobuf.json_format import MessageToJson
+
 logger = logging.getLogger(__name__)
 # keep track of what we've already exported
 exported = []
@@ -12,7 +24,7 @@ def feature_gid(f):
     """ given a feature, hash it"""
     a = []
     empty_count = 0
-    gid_name = 'variant:'
+    gid_name = ''  # no 'variant:' as start
     for p in ['referenceName', 'chromosome', 'start',
               'end', 'ref', 'alt']:
         a.append(str(f.get(p, '')))
@@ -27,7 +39,7 @@ def feature_gid(f):
                 logger.warn('no ensembl for {}'.format(geneSymbol))
         description = f.get('description', None)
         if not description:
-            gid_name = 'gene:'
+            gid_name = 'gene'
         else:
             a.append(description)
     return gid_name + ':'.join(a)
@@ -58,7 +70,7 @@ def _variant(feature, gid):
         v['reference_genome'] = feature['referenceName']
     if 'ref' in feature:
         v['reference_bases'] = feature['ref']
-    if 'alt' in feature:
+    if 'alt' in feature and feature['alt']:
         v['alternate_bases'] = [feature['alt']]
 
     return v
@@ -98,14 +110,17 @@ if __name__ == '__main__':
           "chromosome": "4",
           "name": "KIT V559_E561del"
         }
-    assert ({'features': ['gene:ENSG00000114999']}, {'gene:ENSG00000114999': {'geneSymbol': 'TTL'}}) == normalize({'features': [   # noqa
+    ttl = normalize({'features': [
         {
-        "geneSymbol": "TTL"
+            "geneSymbol": "TTL"
         }
     ]})
-    assert ({'features': ['feature:GRCh37:4:55593607:55593615:AGGTTGTTG:-']}, {'feature:GRCh37:4:55593607:55593615:AGGTTGTTG:-': {'start': 55593607, 'end': 55593615, 'description': 'KIT V559_E561del', 'name': 'KIT V559_E561del', 'referenceName': 'GRCh37', 'alt': '-', 'ref': 'AGGTTGTTG', 'chromosome': '4', 'biomarker_type': 'nonsense'}}) == normalize({'features': [  # noqa
+    assert ({'features': ['ENSG00000114999']}, {'ENSG00000114999': {'id': 'ENSG00000114999', 'names': []}}) == ttl    # noqa
+    complex_rsp = normalize({'features': [
         COMPLEX_FEATURE,
     ]})
+    # print complex_rsp
+    assert ({'features': ['GRCh37:4:55593607:55593615:AGGTTGTTG:-']}, {'GRCh37:4:55593607:55593615:AGGTTGTTG:-': {'end': 55593615, 'reference_genome': 'GRCh37', 'reference_name': '4', 'alternate_bases': ['-'], 'reference_bases': 'AGGTTGTTG', 'start': 55593607, 'variant_type': 'nonsense', 'names': ['KIT V559_E561del'], 'id': 'GRCh37:4:55593607:55593615:AGGTTGTTG:-'}}) == complex_rsp  # noqa
 
     complex_ttl = normalize({'features': [
         {
@@ -113,4 +128,8 @@ if __name__ == '__main__':
         },
         COMPLEX_FEATURE
     ]})
-    assert ({'features': ['feature:GRCh37:4:55593607:55593615:AGGTTGTTG:-', 'gene:ENSG00000114999']}, {}) == complex_ttl   # noqa
+    assert ({'features': ['GRCh37:4:55593607:55593615:AGGTTGTTG:-', 'ENSG00000114999']}, {}) == complex_ttl   # noqa
+
+    v = Variant()
+    o = json_format.Parse(json.dumps(complex_rsp[1]['GRCh37:4:55593607:55593615:AGGTTGTTG:-']), v, ignore_unknown_fields=False)
+    assert(MessageToJson(o))
