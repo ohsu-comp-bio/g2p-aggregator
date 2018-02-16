@@ -1,13 +1,9 @@
 # g2p-aggregator
 
-A prototype of the Genotype to phenotype user interface exists [here](https://g2p-ohsu.ddns.net/g2p).   
-
-
-![image](https://cloud.githubusercontent.com/assets/47808/26114835/35b36864-3a13-11e7-9297-7aa996bd965e.png)
-![image](https://cloud.githubusercontent.com/assets/47808/26114916/6d4ff44a-3a13-11e7-8c5f-09eda59955ac.png)
-
 
 ## What is it?  Why use it?
+
+![image](https://user-images.githubusercontent.com/47808/36181526-0920bd12-10da-11e8-8edf-538a7b2b8f3e.png)
 
 * For researchers, who need to investigate genotype phenotype associations, smmart-g2p is a search tool that aggregates evidence from several knowledge bases unlike ad-hoc searches, the product allows the researcher to focus on the evidence, not on the search. [more](docs/smmart.pdf)
 
@@ -15,6 +11,7 @@ A prototype of the Genotype to phenotype user interface exists [here](https://g2
 
 * Inform GA4GH G2P discussions
 
+A prototype of the Genotype to phenotype user interface exists [here](https://g2p-ohsu.ddns.net/g2p).   
 
 ##  Where does the data come from?
 
@@ -26,12 +23,13 @@ Now:
 * Cancer Genome Interpreter Cancer [bioMarkers database](https://www.cancergenomeinterpreter.org/biomarkers)
 * GA4GH [reference server](https://github.com/ga4gh/ga4gh-server)
 * Cornell [pmkb](https://pmkb.weill.cornell.edu)
+* [MolecularMatch](https://api.molecularmatch.com/)
 
 In  progress:
 
-* [MolecularMatch](https://api.molecularmatch.com/)
 * [BMEG](http://bmeg.compbio.ohsu.edu/)
 
+To see analysis of harmonization and overlaps see [figures](figures/README.md)
 
 ## How to use it?
 
