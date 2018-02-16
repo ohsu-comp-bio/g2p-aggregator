@@ -1,0 +1,106 @@
+---
+swagger: "2.0"
+info:
+  description: >-
+    This protocol defines the associations between genotype
+    and phenotype (G2P).  Associations can be made as a
+    result of literature curation, computational modeling,
+    inference, etc., and modeled and shared using this schema.
+  version: 0.4.0
+  title: "G2P API"
+  contact: {}
+host: "g2p-ohsu.ddns.net"
+basePath: "/v1/g2p"
+schemes:
+- "https"
+- "http"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /associations:
+    get:
+      summary: "Get the list of Associations"
+      description: "Search for evidence"
+      operationId: "searchAssociations"
+      parameters:
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        description: "Size of the page to retrieve."
+        x-example: 10
+      - name: "page"
+        in: "query"
+        required: false
+        type: "integer"
+        description: "Number of the page to retrieve."
+        x-example: 1
+      - name: "q"
+        in: "query"
+        required: false
+        type: "string"
+        description: "lucene query string"
+        x-example: "BRCA1  +association.evidence_label:A"
+      responses:
+        200:
+          description: "Status 200"
+          headers:
+            X-Page-Count:
+              type: "integer"
+              x-example: 1
+            X-Page-Number:
+              type: "integer"
+              x-example: 1
+            X-Page-Size:
+              type: "integer"
+              x-example: 25
+            X-Total-Count:
+              type: "integer"
+              x-example: 2
+        400:
+          description: "Status 400"
+          schema:
+            $ref: "#/definitions/Error"
+  /associations/{id}:
+    get:
+      tags:
+      - "Contacts"
+      summary: "Load an individual Association"
+      description: "Loads a Association"
+      operationId: "getAssociation"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+        400:
+          description: "Status 400"
+          schema:
+            $ref: "#/definitions/Error"
+    parameters:
+    - name: "id"
+      in: "path"
+      required: true
+      type: "string"
+      description: "Identifier of the Association"
+      x-example: "0e8dd830-ad98-11e6-bf2e-47644ada7c0f"
+definitions:
+  Error:
+    type: "object"
+    required:
+    - "code"
+    properties:
+      code:
+        type: "integer"
+        minimum: 400
+        maximum: 599
+      description:
+        type: "string"
+        example: "Bad query parameter [$size]: Invalid integer value [abc]"
+      reasonPhrase:
+        type: "string"
+        example: "Bad Request"
+    description: "This general error structure is used throughout this API."
+    example: "{\n  \"code\": 400,\n  \"description\": \"Bad query parameter [$size]:\
+      \ Invalid integer value [abc]\",\n  \"reasonPhrase\": \"Bad Request\"\n}"
