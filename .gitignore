@@ -28,6 +28,7 @@ harvester/benchmark_results.txt
 harvester/cgi_mut_benchmarking.tsv
 harvester/oncokb_mut_benchmarking.tsv
 harvester/oncokb_all_actionable_variants*.*
+data/local
 
 # ignore certs, etc.
 compbio-tls
