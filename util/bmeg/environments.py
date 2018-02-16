@@ -16,14 +16,26 @@ def environment_gid(f):
     """
     a = []
     gid_name = ''
-    for p in ['source', 'id']:
-        a.append(str(f.get(p, '')))
-    if 'source' not in f:
+    # source should be [CID, SID, CHEBI, CHEMBL, unknown]
+    # source should be [PUBCHEM, CHEBI, CHEMBL, unknown]
+    # TODO - add source to output
+    source = None
+    if 'source' in f:
+        if 'pubchem' in f['source']:
+            source = 'PUBCHEM'
+        if 'chebi' in f['source']:
+            source = 'CHEBI'
+        if 'chembl' in f['source']:
+            source = 'CHEMBL'
+        a.append(f.get('id'))
+    else:
         a = []
         description = f.get('description', None)
+        if not description:
+            description = 'None'
         a.append(description)
-        gid_name = 'treatment:'
-    return gid_name + '/'.join(a)
+        source = 'UNKNOWN'
+    return (':'.join(a), source)
 
 
 def normalize(hit):
@@ -37,12 +49,13 @@ def normalize(hit):
     # hash each environment
     if 'environmentalContexts' in hit['association']:
         for environment in hit['association']['environmentalContexts']:
-            gid = environment_gid(environment)
+            (gid, source) = environment_gid(environment)
             name = environment['description']
             if 'term' in environment:
                 name = environment['term']
             environments[gid] = {'id': gid,
-                                 'name': name
+                                 'name': name,
+                                 'source': [source]
                                  }
         hit['association']['environmentalContexts'] = list(environments.keys())
         for k in environments.keys():
@@ -79,9 +92,8 @@ if __name__ == '__main__':
       "description": "944396-07-0"
     }
 
-    simple_rsp = normalize({'association': {'environmentalContexts': [SIMPLE_ENV]}})[1]
-    assert simple_rsp == {'treatment:944396-07-0': {'id': 'treatment:944396-07-0', 'name': '944396-07-0'}}  # noqa
-    complex_rsp = normalize({'association': {'environmentalContexts': [COMPLEX_ENV]}})[1].values()[0]
-    print complex_rsp
-    assert COMPLEX_ENV == complex_rsp  # noqa
+    simple_rsp = normalize({'association': {'environmentalContexts': [SIMPLE_ENV]}})[1]  # noqa
+    assert simple_rsp == {'unknown:944396-07-0': {'id': 'unknown:944396-07-0', 'name': '944396-07-0'}}  # noqa
+    complex_rsp = normalize({'association': {'environmentalContexts': [COMPLEX_ENV]}})[1].values()[0]  # noqa
+    assert {'id': 'PUBCHEM:CID24826799', 'name': 'PONATINIB'} == complex_rsp  # noqa
     assert {} == normalize({'association': {'environmentalContexts': [SIMPLE_ENV, COMPLEX_ENV]}})[1]  # noqa

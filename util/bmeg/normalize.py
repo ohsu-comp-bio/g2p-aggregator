@@ -12,6 +12,18 @@ from environments import normalize as environments_normalize
 from phenotypes import normalize as phenotypes_normalize
 from association import normalize as association_normalize
 
+
+# biostream-schema
+from bmeg.clinical_pb2 import *
+from bmeg.cna_pb2 import *
+from bmeg.genome_pb2 import *
+from bmeg.phenotype_pb2 import *
+from bmeg.rna_pb2 import *
+from bmeg.variants_pb2 import *
+from google.protobuf import json_format
+import json
+from google.protobuf.json_format import MessageToJson, MessageToDict
+
 files = {}
 
 
@@ -58,6 +70,14 @@ def _close_all():
         files[k].close()
 
 
+def _writePB(cls, obj, file):
+    pb_obj = eval('{}()'.format(cls))
+    o = json_format.Parse(json.dumps(obj), pb_obj, ignore_unknown_fields=False)
+    data = MessageToDict(o)
+    file.write(json.dumps(data, separators=(',', ':')))
+    file.write('\n')
+
+
 def _bulk(_tuple):
     """ tuple to json file(s) """
     genes = _tuple[0]  # obj of genes; gid as key
@@ -77,39 +97,32 @@ def _bulk(_tuple):
         # write data
         data = dict(genes[gid])
         data['id'] = gid
-        files[genes_path].write(json.dumps(data, separators=(',', ':')))
-        files[genes_path].write('\n')
+        _writePB('Gene', data, files[genes_path])
 
     # write features
     for gid in features.keys():
         #  write data
         data = features[gid]
-        if gid.startswith('variant:'):
+        if not gid.startswith('gene:'):
             data['id'] = gid
-            files[features_path].write(json.dumps(data, separators=(',', ':')))
-            files[features_path].write('\n')
+            _writePB('Variant', data, files[features_path])
 
     # write environments
     for gid in environments.keys():
         data = environments[gid]
         data['id'] = gid
-        files[environments_path].write(json.dumps(data,
-                                                  separators=(',', ':')))
-        files[environments_path].write('\n')
+        _writePB('Compound', data, files[environments_path])
 
     # write phenotypes
     for gid in phenotypes.keys():
         data = phenotypes[gid]
         data['id'] = gid
-        files[phenotypes_path].write(json.dumps(data, separators=(',', ':')))
-        files[phenotypes_path].write('\n')
+        _writePB('Phenotype', data, files[phenotypes_path])
 
     # write association data
     del association['gid']
     association['id'] = association_gid
-    files[association_path].write(json.dumps(association,
-                                             separators=(',', ':')))
-    files[association_path].write('\n')
+    _writePB('G2PAssociation', association, files[association_path])
 
 
 def _from_stdin(args):
