@@ -64,6 +64,13 @@ class Harmonizations(object):
         return fig
 
 
+class RawCounts(object):
+    def __init__(self, es_host, index='associations'):
+        self.db = G2PDatabase(es_host, index)
+
+    def raw_counts_html(self, path):
+        raw_counts_df = self.db.raw_counts()
+        raw_counts_df.to_html(path)
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
@@ -79,6 +86,10 @@ if __name__ == '__main__':
                            default=False,
                            action="store_true")
     args = argparser.parse_args()
-    print 'producing harmonization_percentages.'
-    harmonizations = Harmonizations(es_host=args.host, index=args.index)
-    harmonizations.harmonization_percentages_figure(path='./images/harmonization_percentages.png')
+    # print 'producing harmonization_percentages.'
+    # harmonizations = Harmonizations(es_host=args.host, index=args.index)
+    # harmonizations.harmonization_percentages_figure(path='harmonization_percentages.png')
+
+    print 'producing raw counts.'
+    raw_counts = RawCounts(es_host=args.host, index=args.index)
+    raw_counts.raw_counts_html(path='./html/raw_counts.html')

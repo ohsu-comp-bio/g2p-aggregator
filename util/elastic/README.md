@@ -1,19 +1,11 @@
-# VERSION 0.7
+# G2P VERSION 0.8
 
 ## contents
 
+ui: https://g2p-test.ddns.net
+elastic search backups:  s3://g2p-test-snapshots "snapshot_20180125t1305" (contact for access)
+json files :  s3://g2p-0.8 (public access)
 
-```
-23604192 all.json
-    6624 cgi.json
-   36912 jax.json
-   10088 jax_trials.json
-   61808 molecularmatch.json
-23306360 molecularmatch_trials.json
-   17104 oncokb.json
-    3864 pmkb.json
-     200 sage.json
-```
 
 Each file is contains evidence documents from the respective source.
 `all.json` contains the aggregations of all sources.
@@ -33,15 +25,19 @@ pmkb | 600
 sage | 69
 
 
-
-
-
 evidence_label | count
 -- | --
 C | 33590
 D | 18764
 B | 7646
 A | 1715
+
+## changes
+
+* ontology terms (environment & phenotype) now have 'source' itemized separately
+* Evidence from brca no longer has "Unreviewed" variants
+* Molecular match trials CONDITION is now filtered to remove hierarchy terms, which previously accounted for many records identical except for phenotype
+
 
 ## structure
 
