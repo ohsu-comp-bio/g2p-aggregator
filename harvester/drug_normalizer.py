@@ -337,7 +337,8 @@ def normalize_feature_association(feature_association):
         ctx = {
             'id': compound['ontology_term'],
             'term': compound['synonym'],
-            'description': compound['synonym']
+            'description': compound['synonym'],
+            'source': compound['source']
         }
         if 'toxicity' in compound:
             ctx['toxicity'] = compound['toxicity']
