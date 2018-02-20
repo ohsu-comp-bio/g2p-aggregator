@@ -122,3 +122,8 @@ cohorts.genie_samples_by_oncotree_figure(path='./images/genie_samples_by_oncotre
 cohorts = Cohorts(es_host=args.host, index=args.index)
 cohorts.genie_biomarkers_figure(path='./images/genie_biomarkers.png')
 ```
+
+
+# Raw counts
+
+[raw counts](html/raw_counts.html)
