@@ -16,6 +16,7 @@ from g2p_client import G2PDatabase
 HOST = 'dms-dev.compbio.ohsu.edu'
 GENIE_VARIANTS = '../../data/data_mutations_extended.txt'
 GENIE_CLINICAL = '../../data/data_clinical.txt'
+G2P_FILE = './data/g2p.tsv'
 evidence_levels = ['A', 'B', 'C', 'D']
 evidence_directions = ['resistant', 'responsive']
 
@@ -27,6 +28,8 @@ class GENIEAnalysis:
         self.clinical_file = clinical_file
         self.genie_df = None
         self.g2p_df = g2p_df
+        self.genie_g2p_df = None
+
         self.occurence_thres = occurence_thres
         self.num_variants = 0
         self.num_donors = 0
@@ -57,7 +60,14 @@ class GENIEAnalysis:
         self.num_shared_variants = len(shared_variants)
         self.num_donors_with_shared_variants = get_num_donors(shared_variants)
 
-        return self.genie_df
+        # Merge
+        # The BIG merge of GENIE with G2P. Left join preserves all genie keys and
+        # creates rows where there is an entry in G2P matching GENIE.
+        self.genie_g2p_df = pd.merge(self.genie_df, self.g2p_df, how='left',
+                                     left_on=['Chromosome', 'Start_Position', 'Reference_Allele', 'Tumor_Seq_Allele2'],
+                                     right_on=['feature.chromosome', 'feature.start', 'feature.ref', 'feature.alt'])
+
+        return self.genie_g2p_df
 
     def get_shared_variants(self):
         return self.genie_df[self.genie_df['count'] >= self.occurence_thres]
@@ -81,6 +91,20 @@ class GENIEAnalysis:
         create_plot(data, title='GENIE: Variants per donor histogram',
                     xaxis_title='# variants per donor',
                     yaxis_title='count', filename=filename)
+
+    def matches_by_gene(self, filename='matches_by_gene'):
+        ''' Matches by gene. '''
+        genie_g2p_df_matches_df = self.genie_g2p_df[self.genie_g2p_df['evidence.id'].notnull()]
+        counts = genie_g2p_df_matches_df['Hugo_Symbol'].value_counts()
+
+        data = [
+            go.Bar(
+                x=counts.index,
+                y=counts.values
+            )
+        ]
+
+        create_plot(data, title='GENIE: Matches per gene', filename=filename)
 
 
 # Helper methods.
@@ -106,9 +130,17 @@ def create_plot(data, layout=None, title='', xaxis_title= '', yaxis_title= '',
     plotly.offline.plot(fig, filename=filename)
 
 
-def load_g2g2p_df():
-    db = G2PDatabase(HOST)
-    return db.associations_dataframe()
+def load_g2p_df(host, file, refresh=False):
+    try:
+        if refresh:
+            raise Exception()
+        g2p_df = pd.read_csv(file, sep='\t', encoding='utf-8')
+    except:
+        db = G2PDatabase(host)
+        g2p_df = db.associations_dataframe()
+        g2p_df.to_csv(file, sep='\t', encoding='utf-8')
+
+    return g2p_df
 
 def get_num_donors(df):
     ''' Returns number of donors in a dataframe. '''
@@ -126,7 +158,9 @@ def print_cohort_stats(df):
     print '-------------'
 
 if __name__ == '__main__':
-    genie_analysis = GENIEAnalysis()
+    g2p_df = load_g2p_df(HOST, G2P_FILE)
+
+    genie_analysis = GENIEAnalysis(g2p_df=g2p_df)
     genie_analysis.load()
 
     print "All of GENIE"
@@ -139,3 +173,4 @@ if __name__ == '__main__':
 
     genie_analysis.donor_variant_histogram()
     genie_analysis.gene_variant_bar_chart()
+    genie_analysis.matches_by_gene()

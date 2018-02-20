@@ -1,11 +1,12 @@
 import pytest
-import server
+import app as server
+server.test()
 
 
 @pytest.fixture
 def app(request):
     # get app from main
-    app = server.app
+    app = server.application
     return app
 
 

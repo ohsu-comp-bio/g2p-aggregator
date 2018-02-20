@@ -393,6 +393,47 @@ class G2PDatabase(object):
         aggs.extend(_aggregate_by_source('unharmonized_phenotype', '-association.phenotype.type.id:* '))
         aggs.extend(_aggregate_by_source('harmonized_environment', '+association.environmentalContexts.id:*'))
         aggs.extend(_aggregate_by_source('unharmonized_environment', '-association.environmentalContexts.id:*'))
+        aggs.extend(_aggregate_by_source('publications', '+association.evidence.info.publications.keyword:*'))
+
+        # make df
+        df = pd.DataFrame([agg for agg in aggs])
+        df.fillna(0, inplace=True)
+        return df
+
+    def raw_counts(self):
+        def _aggregate(aggregation_name, query_string, term):
+            """ simple terms count """
+            # build query
+            s = Search(using=self.client, index=self.index)
+            s = s.params(size=0)
+            s = s.query("query_string", query=query_string)
+            s.aggs.bucket(aggregation_name, 'terms',
+                          field=term, size=999999999)
+            # execute it
+            agg = s.execute().aggregations
+            # marshall to simple dict
+            aggregation_name = dir(agg)[0]
+            results = getattr(agg, aggregation_name)
+            row = {'aggregation_name': aggregation_name}
+            # total = results.sum_other_doc_count
+            # for bucket in results.buckets:
+            #     total += bucket.doc_count
+            # row['value'] = total
+            row['value'] = len(results.buckets)
+            return [row]
+        # hold results
+        aggs = []
+        # name and query
+        aggs.extend(_aggregate('harmonized_features', '+features.start:*', 'features.start'))
+        aggs.extend(_aggregate('unharmonized_features', '-features.start:*', 'features.description.keyword'))
+        aggs.extend(_aggregate('harmonized_phenotype', '+association.phenotype.type.id:*', 'association.phenotype.type.term.keyword'))
+        aggs.extend(_aggregate('unharmonized_phenotype', '-association.phenotype.type.id:*', 'association.phenotype.description.keyword'))
+        aggs.extend(_aggregate('harmonized_environment', '+association.environmentalContexts.id:*', 'association.environmentalContexts.term.keyword'))
+        aggs.extend(_aggregate('unharmonized_environment', '-association.environmentalContexts.id:*', 'association.environmentalContexts.description.keyword'))
+        aggs.extend(_aggregate('publications', '-source.keyword:*trials AND +association.evidence.info.publications:*', 'association.evidence.info.publications.keyword'))
+        aggs.extend(_aggregate('trials', '+source.keyword:*trials AND +association.evidence.info.publications:*', 'association.evidence.info.publications.keyword'))
+        aggs.extend(_aggregate('sources', '+source.keyword:*', 'source.keyword'))
+
         # make df
         df = pd.DataFrame([agg for agg in aggs])
         df.fillna(0, inplace=True)
