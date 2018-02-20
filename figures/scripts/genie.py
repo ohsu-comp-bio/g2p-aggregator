@@ -14,8 +14,8 @@ from g2p_client import G2PDatabase
 
 # Constants
 HOST = 'dms-dev.compbio.ohsu.edu'
-GENIE_VARIANTS = './data/data_mutations_extended_1.0.1.txt'
-GENIE_CLINICAL = './data/data_clinical_1.0.1.txt'
+GENIE_VARIANTS = '../../data/data_mutations_extended.txt'
+GENIE_CLINICAL = '../../data/data_clinical.txt'
 evidence_levels = ['A', 'B', 'C', 'D']
 evidence_directions = ['resistant', 'responsive']
 
@@ -39,7 +39,7 @@ class GENIEAnalysis:
         '''
 
         # Load GENIE variants.
-        genie_variants = pd.read_csv(self.variants_file, sep='\t', comment='#')
+        genie_variants = pd.read_csv(self.variants_file, sep='\t', comment='#', low_memory=False)
 
         # Load GENIE clinical data.
         genie_clinical = pd.read_csv(self.clinical_file, sep='\t', comment='#')
@@ -50,7 +50,6 @@ class GENIEAnalysis:
         # Add count column to store total occurences of a variant.
         variant_counts = self.genie_df.groupby(['Chromosome', 'Start_Position', 'End_Position', 'Reference_Allele', 'Tumor_Seq_Allele2']).size().rename('count').reset_index()
         self.genie_df = pd.merge(self.genie_df, variant_counts, on=['Chromosome', 'Start_Position', 'End_Position', 'Reference_Allele', 'Tumor_Seq_Allele2'])
-
         # Set attributes.
         self.num_variants = len(self.genie_df)
         self.num_donors = get_num_donors(self.genie_df)
