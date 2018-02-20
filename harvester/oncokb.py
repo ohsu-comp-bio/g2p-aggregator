@@ -177,6 +177,8 @@ def convert(gene_data):
         association['phenotype'] = {
             'description': clinical['cancerType'],
         }
+
+        # grab all publications from abstracts or PMIDs for piblication list
         abstract = []
         if clinical['drugAbstracts'] != '':
             absts = clinical['drugAbstracts'].split('; ')
@@ -186,7 +188,12 @@ def convert(gene_data):
                 for bit in abstract[i]['text'].split():
                     if 'http' in bit:
                         abstract[i]['link'] = bit
+        if clinical['drugPmids'] != '':
+            pmids = clinical['drugPmids'].split(', ')
+            for i in range(len(pmids)):
+                abstract.append({'text': '', 'link': 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(pmids[i])})
         clinical['drugAbstracts'] = abstract
+
         association['evidence'] = [{
             "evidenceType": {
                 "sourceName": "oncokb",
