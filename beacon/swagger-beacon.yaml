@@ -10,8 +10,10 @@ schemes:
   - http
   - https
 paths:
-  /:
+  /beacon:
     get:
+      tags:
+      - "Beacon"
       description: Get information about Beacon
       operationId: getBeacon
       produces:
@@ -22,8 +24,10 @@ paths:
           schema:
             items:
               $ref: '#/definitions/Beacon'
-  /query:
+  /beacon/query:
     get:
+      tags:
+      - "Beacon"                  
       description: Get response to a Beacon query for allele information.
       operationId: getBeaconAlleleResponse
       produces:
@@ -270,30 +274,30 @@ definitions:
         description: 'Reference name (chromosome). Accepting values 1-22, X, Y.'
         type: string
         enum:
-          - 1
-          - 2
-          - 3
-          - 4
-          - 5
-          - 6
-          - 7
-          - 8
-          - 9
-          - 10
-          - 11
-          - 12
-          - 13
-          - 14
-          - 15
-          - 16
-          - 17
-          - 18
-          - 19
-          - 20
-          - 21
-          - 22
-          - X
-          - Y
+          - '1'
+          - '2'
+          - '3'
+          - '4'
+          - '5'
+          - '6'
+          - '7'
+          - '8'
+          - '9'
+          - '10'
+          - '11'
+          - '12'
+          - '13'
+          - '14'
+          - '15'
+          - '16'
+          - '17'
+          - '18'
+          - '19'
+          - '20'
+          - '21'
+          - '22'
+          - 'X'
+          - 'Y'
       start:
         description: 'Position, allele locus (0-based)'
         type: integer

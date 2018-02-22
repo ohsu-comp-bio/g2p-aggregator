@@ -21,6 +21,8 @@ produces:
 paths:
   /associations:
     get:
+      tags:
+      - "Associations"      
       summary: "Get the list of Associations"
       description: "Search for evidence"
       operationId: "searchAssociations"
@@ -66,7 +68,7 @@ paths:
   /associations/{id}:
     get:
       tags:
-      - "Contacts"
+      - "Associations"
       summary: "Load an individual Association"
       description: "Loads a Association"
       operationId: "getAssociation"
