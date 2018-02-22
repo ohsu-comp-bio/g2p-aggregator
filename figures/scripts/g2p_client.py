@@ -202,7 +202,8 @@ class G2PDatabase(object):
             :size -- number of documents to fetch per scan
             :verbose -- print the query
             '''
-            fields = ['source', 'association.evidence_label', 'genes', 'association.phenotype.type.id',
+            fields = ['source', 'association.evidence_label', 'association.response_type', 'genes', 
+                      'association.phenotype.type.id',
                       'association.phenotype.type.term', 'association.environmentalContexts.id',
                       'association.environmentalContexts.term', 'association.evidence.info.publications',
                       'features'
@@ -274,6 +275,7 @@ class G2PDatabase(object):
                         yield e
 
             rename = {'association.evidence_label': 'evidence_label',
+             'association.response_type': 'response_type',
              'association.phenotype.type.id': 'phenotype.id',
              'association.phenotype.type.term': 'phenotype.term'}
             df = df.rename(columns=rename)
