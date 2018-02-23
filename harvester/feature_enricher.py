@@ -3,6 +3,7 @@ import requests
 import os
 import mutation_type as mut
 import logging
+import re
 
 
 def _enrich_gene(feature):
@@ -10,9 +11,9 @@ def _enrich_gene(feature):
     url = "http://mygene.info/v3/query?q={}&fields=genomic_pos_hg19".format(feature['description'])
     r = requests.get(url, timeout=60)
     hit = None
-    for hit in r.json()['hits']:
-        if 'genomic_pos_hg19' in hit:
-            hit = hit['genomic_pos_hg19']
+    for a_hit in r.json()['hits']:
+        if 'genomic_pos_hg19' in a_hit:
+            hit = a_hit['genomic_pos_hg19']
             break
     if hit:
         if 'chr' in hit:
@@ -42,10 +43,14 @@ def _enrich_feature(feature):
     url = "http://myvariant.info/v1/query?q={}".format(feature['description'])
     r = requests.get(url, timeout=60)
     hits = r.json()
-    if len(hits['hits']) > 0:
-        hit = hits['hits'][0]
-        hg19 = hit.get('hg19', {})
-        vcf = hit.get('vcf', {})
+    hit = None
+    for a_hit in hits['hits']:
+        if 'hg19' in a_hit and 'vcf' in a_hit:
+            hit = a_hit
+            break
+    if hit:
+        hg19 = hit.get('hg19')
+        vcf = hit.get('vcf')
         if 'ref' in vcf:
             feature['ref'] = vcf['ref']
         if 'alt' in vcf:
@@ -60,7 +65,8 @@ def _enrich_feature(feature):
 
         if 'biomarker_type' not in feature:
             if 'cadd' in hit and 'type' in hit['cadd']:
-                feature['biomarker_type'] = mut.norm_biomarker(hit['cadd']['type'])
+                feature['biomarker_type'] = \
+                    mut.norm_biomarker(hit['cadd']['type'])
 
     return feature
 
@@ -85,7 +91,8 @@ def enrich(feature):
             return feature
 
         # we can't normalize things without a description
-        description_length = len(feature['description'].split(' '))
+        description_parts = re.split(' +', feature['description'].strip())
+        description_length = len(description_parts)
         if description_length == 1:
             feature = _enrich_gene(feature)
         else:
