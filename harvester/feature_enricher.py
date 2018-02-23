@@ -39,7 +39,6 @@ def _enrich_feature(feature):
     #   "ref": "T",
     #   "alt": "A"
     # }
-    """ description contains a gene, get its location """
     url = "http://myvariant.info/v1/query?q={}".format(feature['description'])
     r = requests.get(url, timeout=60)
     hits = r.json()
