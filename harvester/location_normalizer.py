@@ -172,7 +172,7 @@ def normalize(feature):
     return allele
 
 
-def _enrich(feature, allele_registry):
+def _apply_allele_registry(feature, allele_registry):
     # there is a lot of info in registry, just get synonyms and links
     links = feature.get('links', [])
     synonyms = feature.get('synonyms', [])
@@ -202,6 +202,19 @@ def _enrich(feature, allele_registry):
         feature['links'] = links
 
 
+def _fix_location_end(feature):
+    """ if end not present, set it based on start, ref & alt length"""
+    end = feature.get('end', 0)
+    start = feature.get('start', 0)
+    ref_len = len(feature.get('ref', ''))
+    alt_len = len(feature.get('alt', ''))
+    offset = max(ref_len, alt_len)
+    if start > 0 and end == 0:
+        end = max(start, start + (offset - 1))
+        feature['end'] = end
+    return feature
+
+
 def normalize_feature_association(feature_association):
     """ given the 'final' g2p feature_association,
     update it with genomic location """
@@ -214,7 +227,8 @@ def normalize_feature_association(feature_association):
             allele_registry = normalize(feature)
             if allele_registry:
                 if '@id' in allele_registry:
-                    _enrich(feature, allele_registry)
+                    _apply_allele_registry(feature, allele_registry)
+            feature = _fix_location_end(feature)
         except Exception as e:
             logging.exception(
                 'exception {} feature {} allele {}'.format(e, feature,
