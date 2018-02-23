@@ -7,6 +7,7 @@ import hgvs.location
 import hgvs.posedit
 import hgvs.edit
 from hgvs.sequencevariant import SequenceVariant
+from feature_enricher import enrich
 
 
 def _complement(bases):
@@ -125,7 +126,8 @@ def genomic_hgvs(feature, complement=False, description=False):
     else:
         if 'dup' in feature_description:
             ref_alt = _get_ref_alt(feature_description)
-            posedit.edit = ref_alt + alt
+            if ref_alt:
+                posedit.edit = ref_alt + alt
 
     # Make the variant
     var = SequenceVariant(ac=ac, type='g', posedit=posedit)
@@ -206,6 +208,9 @@ def normalize_feature_association(feature_association):
     allele_registry = None
     for feature in feature_association['features']:
         try:
+            # ensure we have location
+            feature = enrich(feature)
+            # go get AR info
             allele_registry = normalize(feature)
             if allele_registry:
                 if '@id' in allele_registry:
