@@ -11,6 +11,7 @@ import argparse
 import sys
 import os
 import socket
+import json
 
 # backend
 from elasticsearch import Elasticsearch
@@ -29,7 +30,7 @@ from log_setup import init_logging
 # uwsgi --http :8080 -w app
 application = None
 # swagger doc
-beacon_api = None
+# beacon_api = None
 g2p_api = None
 # defaults
 ARGS = None
@@ -72,34 +73,28 @@ def _es():
     return Elasticsearch(['{}'.format(ARGS.elastic)])
 
 
-# These are imported by name by connexion so we assert it here.
-def getBeacon():
-    """ static beacon """
-    return VICC_BEACON
+# utilities used by controllers
+class Params():
+    """ turn parameter dict to a class"""
+    def __init__(self, args):
+        self.referenceName = args.get('referenceName', None)
+        self.start = args.get('start', None)
+        self.startMin = args.get('startMin', None)
+        self.startMax = args.get('startMax', None)
+        self.end = args.get('end', None)
+        self.endMin = args.get('endMin', None)
+        self.endMax = args.get('endMax', None)
+        self.referenceBases = args.get('referenceBases', None)
+        self.alternateBases = args.get('alternateBases', None)
+        self.assemblyId = args.get('assemblyId', None)
+        self.datasetIds = args.get('datasetIds', None)
+        self.includeDatasetResponses = args.get('includeDatasetResponses',
+                                                None)
 
 
-def getBeaconAlleleResponse(**kwargs):
-    """ lookup by allele (aka variant/feature) """
-
-    class Params():
-        def __init__(self, args):
-            self.referenceName = args.get('referenceName', None)
-            self.start = args.get('start', None)
-            self.startMin = args.get('startMin', None)
-            self.startMax = args.get('startMax', None)
-            self.end = args.get('end', None)
-            self.endMin = args.get('endMin', None)
-            self.endMax = args.get('endMax', None)
-            self.referenceBases = args.get('referenceBases', None)
-            self.alternateBases = args.get('alternateBases', None)
-            self.assemblyId = args.get('assemblyId', None)
-            self.datasetIds = args.get('datasetIds', None)
-            self.includeDatasetResponses = args.get('includeDatasetResponses',
-                                                    None)
-
+def _location_lookup(params):
+    """ perform elastic search query """
     client = _es()
-    params = Params(kwargs)
-    log.debug(params.__dict__)
 
     # build parameters for query, and echo query to response
     args = {}
@@ -123,7 +118,7 @@ def getBeaconAlleleResponse(**kwargs):
     count = q.count()
     return {
         "beaconId": VICC_BEACON['id'],
-        "apiVersion": beacon_api.specification['info']['version'],
+        "apiVersion": g2p_api.specification['info']['version'],
         "exists": count > 0,
         "datasetAlleleResponses": [
             {
@@ -137,8 +132,21 @@ def getBeaconAlleleResponse(**kwargs):
     }
 
 
+# These are imported by name by connexion so we create them here.
+def getBeacon():
+    """ static beacon """
+    return VICC_BEACON
+
+
+def getBeaconAlleleResponse(**kwargs):
+    """ lookup by allele (aka variant/feature) """
+    return _location_lookup(Params(kwargs))
+
+
 def postBeaconAlleleResponse(queryBeaconAllele):
-    pass
+    """ lookup by allele (aka variant/feature) """
+    log.debug(queryBeaconAllele)
+    return _location_lookup(Params(queryBeaconAllele))
 
 
 def searchAssociations(**kwargs):
@@ -146,8 +154,52 @@ def searchAssociations(**kwargs):
     log.debug(kwargs)
     client = _es()
     q = kwargs.get('q', '*')
-    s = Search(using=client)
-    return [hit.to_dict() for hit in s.query("query_string", query=q)]
+    s = Search(using=client, index='associations')
+    s = s.query("query_string", query=q)
+    # grab total before we apply size
+    total = s.count()
+    size = int(kwargs.get('size', '10'))
+    _from = int(kwargs.get('from', '1'))
+    # set sort order
+    sort = kwargs.get('sort', None)
+    if sort:
+        (field, order) = sort.split(':')
+        if order == 'desc':
+            field = '-{}'.format(field)
+        if '.keyword' not in field:
+            field = '{}.keyword'.format(field)
+        log.debug('set sort to {}'.format(field))
+        s = s.sort(field)
+    log.debug(s.to_dict())
+    return {
+        'hits': {
+            'total': total,
+            'hits': [hit.to_dict() for hit in s[_from:(_from+size)]]
+        }
+    }
+
+
+def associationTerms(**kwargs):
+    log.debug(kwargs)
+    client = _es()
+    q = kwargs.get('q', '*')
+    field = kwargs.get('f')
+    if not field.endswith('.keyword'):
+        field = '{}.keyword'.format(field)
+    # create a search, ...
+    s = Search(using=client, index='associations')
+    # with no data ..
+    s = s.params(size=0)
+    s = s.query("query_string", query=q)
+    # ... just aggregations
+    s.aggs.bucket('terms', 'terms', field=field)
+    print s.to_dict()
+    aggs = s.execute().aggregations
+    # map it to an array of objects
+    return aggs.to_dict()
+    # return [{'phenotype_description': b.key,
+    #          'phenotype_ontology_id': b.phenotype_id.buckets[0].key,
+    #          'phenotype_evidence_count':b.phenotype_id.buckets[0].doc_count} for b in aggs.phenotype_descriptions.buckets]
 
 
 def getAssociation(**kwargs):
@@ -164,7 +216,7 @@ def getAssociation(**kwargs):
 def configure_app(args):
     """ configure the app, import swagger """
     global application
-    global beacon_api
+#    global beacon_api
     global g2p_api
 
     def function_resolver(operation_id):
@@ -186,52 +238,57 @@ def configure_app(args):
     if args.swagger_host:
         swagger_host = args.swagger_host
     else:
-        host = socket.gethostname()
+        host = 'localhost'  # socket.gethostname()
         if args.port != 80:
             host += ':{}'.format(args.port)
         swagger_host = '{}'.format(host)
 
-    with open('swagger-beacon.yaml', 'r') as stream:
-        swagger_beacon = yaml.load(stream)
+    # with open('swagger-beacon.yaml', 'r') as stream:
+    #     swagger_beacon = yaml.load(stream)
+    #
+    # with open('swagger-g2p.yaml', 'r') as stream:
+    #     swagger_combined = yaml.load(stream)
+    #
+    # swagger_beacon['host'] = swagger_host
+    # swagger_combined['host'] = swagger_host
 
-    with open('swagger-g2p.yaml', 'r') as stream:
-        swagger_g2p = yaml.load(stream)
+    with open('swagger-combined.yaml', 'r') as stream:
+        swagger_combined = yaml.load(stream)
 
-    swagger_beacon['host'] = swagger_host
-    swagger_g2p['host'] = swagger_host
+    swagger_combined['host'] = swagger_host
+
     log.info('advertise swagger host as {}'.format(swagger_host))
 
     # remove schemes that do not apply
     if args.key_file:
-        swagger_beacon['schemes'].remove('http')
-        swagger_g2p['schemes'].remove('http')
+        # swagger_beacon['schemes'].remove('http')
+        swagger_combined['schemes'].remove('http')
     else:
-        swagger_beacon['schemes'].remove('https')
-        swagger_g2p['schemes'].remove('https')
+        # swagger_beacon['schemes'].remove('https')
+        swagger_combined['schemes'].remove('https')
 
-    beacon_api = app.add_api(swagger_beacon, base_path='/v1/beacon',
-                             resolver=function_resolver)
+    # beacon_api = app.add_api(swagger_beacon, base_path='/v1/beacon',
+    #                          resolver=function_resolver)
 
-    g2p_api = app.add_api(swagger_g2p, base_path='/v1/g2p',
+    g2p_api = app.add_api(swagger_combined, base_path='/v1',
                           resolver=function_resolver)
 
-    log.info('beacon_api.version {} g2p_api.version {}'.format(
-             beacon_api.specification['info']['version'],
+    log.info('g2p_api.version {}'.format(
              g2p_api.specification['info']['version']
              ))
     # set global
     application = app.app
-    return (app, beacon_api, g2p_api)
+    return (app, g2p_api)
 
 
 def run(args):
     """ configure and start the apps """
-    (app, beacon_api, g2p_api) = configure_app(args)
+    (app, g2p_api) = configure_app(args)
     if args.key_file:
         context = (args.certificate_file, args.key_file)
-        app.run(port=args.port, ssl_context=context)
+        app.run(port=args.port, ssl_context=context, host='0.0.0.0')
     else:
-        app.run(port=args.port)
+        app.run(port=args.port, host='0.0.0.0')
 
 
 def setup_args():
@@ -244,7 +301,7 @@ def setup_args():
     es_host = os.getenv('ES', 'http://localhost')
     argparser.add_argument('-ES', '--elastic', default=es_host)
     argparser.add_argument('-H', '--swagger_host', default=None,
-                           help='Swagger hostname, defaults to this host')
+                           help='Swagger hostname, defaults to localhost')
     return argparser.parse_args()
 
 
