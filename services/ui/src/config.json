@@ -1,9 +1,0 @@
-{
-  "host": {
-    "protocol": "https",
-    "port": 443,
-    "host": "dms-dev.compbio.ohsu.edu",
-    "path": "/api"
-  },
-  "log": "error"
-}

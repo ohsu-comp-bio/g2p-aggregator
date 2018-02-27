@@ -120,7 +120,7 @@ local restrictions = {
     ["/static.*"]                       = { "GET" },
 
     -- ["/kibana"]                       = { "GET", "POST" },
-    ["/elastic"]                      = { "GET", "POST" }
+    ["/v1.*"]                      = { "GET", "POST" }
   }
 
 }
