@@ -135,10 +135,3 @@ def test_TRAMETINIB():
     assert len(compounds) == 1
     assert compounds[0]['source']
     print compounds
-
-
-def test_Sorafenib():
-    compounds = normalize('Sorafenib')
-    print compounds
-    assert len(compounds) == 1
-    assert compounds[0]['source']

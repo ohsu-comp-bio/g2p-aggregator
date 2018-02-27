@@ -80,7 +80,7 @@ def convert(gene_data):
         association['evidence_label'] = 'D'
         feature_association = {'genes': [brca['Gene_Symbol']],
                                'features': [feature],
-                               'feature_names': feature['name'],
+                               'feature_names': [feature['name']],
                                'association': association,
                                'source': 'brca',
                                'brca': brca}
