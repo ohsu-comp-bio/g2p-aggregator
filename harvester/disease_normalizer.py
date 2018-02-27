@@ -185,7 +185,7 @@ def normalize(name):
         return diseases
     except Exception as e:
         logging.warning("Could not normalize {}".format(name))
-        # raise e
+        raise e
         return []
 
 
