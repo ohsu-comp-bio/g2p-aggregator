@@ -7,6 +7,7 @@ import hgvs.location
 import hgvs.posedit
 import hgvs.edit
 from hgvs.sequencevariant import SequenceVariant
+from feature_enricher import enrich
 
 
 def _complement(bases):
@@ -125,7 +126,8 @@ def genomic_hgvs(feature, complement=False, description=False):
     else:
         if 'dup' in feature_description:
             ref_alt = _get_ref_alt(feature_description)
-            posedit.edit = ref_alt + alt
+            if ref_alt:
+                posedit.edit = ref_alt + alt
 
     # Make the variant
     var = SequenceVariant(ac=ac, type='g', posedit=posedit)
@@ -170,7 +172,7 @@ def normalize(feature):
     return allele
 
 
-def _enrich(feature, allele_registry):
+def _apply_allele_registry(feature, allele_registry):
     # there is a lot of info in registry, just get synonyms and links
     links = feature.get('links', [])
     synonyms = feature.get('synonyms', [])
@@ -200,16 +202,33 @@ def _enrich(feature, allele_registry):
         feature['links'] = links
 
 
+def _fix_location_end(feature):
+    """ if end not present, set it based on start, ref & alt length"""
+    end = feature.get('end', 0)
+    start = feature.get('start', 0)
+    ref_len = len(feature.get('ref', ''))
+    alt_len = len(feature.get('alt', ''))
+    offset = max(ref_len, alt_len)
+    if start > 0 and end == 0:
+        end = max(start, start + (offset - 1))
+        feature['end'] = end
+    return feature
+
+
 def normalize_feature_association(feature_association):
     """ given the 'final' g2p feature_association,
     update it with genomic location """
     allele_registry = None
     for feature in feature_association['features']:
         try:
+            # ensure we have location
+            feature = enrich(feature)
+            # go get AR info
             allele_registry = normalize(feature)
             if allele_registry:
                 if '@id' in allele_registry:
-                    _enrich(feature, allele_registry)
+                    _apply_allele_registry(feature, allele_registry)
+            feature = _fix_location_end(feature)
         except Exception as e:
             logging.exception(
                 'exception {} feature {} allele {}'.format(e, feature,

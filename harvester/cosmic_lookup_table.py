@@ -50,11 +50,11 @@ class CosmicLookup(object):
             # Did not find gene-filtered lookup table in cache. Create it
             # and add it to the cache.
             lt = self.lookup_table
-            lt = lt[lt['gene'] == gene]
+            lt = lt[lt['gene'].str.contains(gene)]
             self.gene_df_cache[gene] = lt
 
         hgvs_p = "p." + hgvs_p
-        result = lt[(lt['gene'] == gene) & (lt['hgvs_p'].str.contains(hgvs_p))]
+        result = lt[(lt['gene'].str.contains(gene)) & (lt['hgvs_p'].str.contains(hgvs_p))]
         return result.to_dict(orient='records')
 
 #
