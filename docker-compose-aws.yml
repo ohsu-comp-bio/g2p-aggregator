@@ -2,13 +2,13 @@
 version: '2.1'
 
 services:
-  beacon:
-    container_name: beacon_g2p
+  api:
+    container_name: api
     build:
-      context: ./beacon/
+      context: ./services/api
     volumes:
       - "./util:/util/"
     ports:
-      - "${BEACON_PORT}:${BEACON_PORT}"
+      - "${API_PORT}:${API_PORT}"
     environment:
       - ES=${ES}
