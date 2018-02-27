@@ -17,7 +17,7 @@ def parse_genomic_locus(locus):
         # mutations
         elif 'ins' in gl:
             s = re.match('([0-9]*)[0-9_]*([A-Z]*)[a-z]*([A-Z]*)', parts[1].strip('g.'))
-            locii_return_set.append([parts[0].strip('chr'), s.group(1), s.group(2), s.group(3)]) 
+            locii_return_set.append([parts[0].strip('chr'), s.group(1), s.group(2), s.group(3)])
         elif '>' in gl:
             s = re.match('([0-9]*)([A-Z]*)>([A-Z]*)', parts[1].strip('g.'))
             locii_return_set.append([parts[0].strip('chr'), s.group(1), s.group(2), s.group(3)])
@@ -25,7 +25,7 @@ def parse_genomic_locus(locus):
         elif 'dup' in gl:
             s = re.match('([0-9]*)[0-9_]*([A-Z]*)[a-z]*([A-Z]*)', parts[1].strip('g.'))
             locii_return_set.append([parts[0].strip('chr'), s.group(1), s.group(3), ''])
-        else: 
+        else:
             raise SyntaxError('missed a case!')
     return locii_return_set
 
@@ -50,7 +50,7 @@ def normalize_cgi_oncogenic(asso, gene_set):
                         f['start'] = locus[1]
                         f['ref'] = locus[2]
                         f['alt'] = locus[3]
-                        f['cgiValidatedOncogenicMutations'] = match
+                        # f['cgiValidatedOncogenicMutations'] = match
                         features.append(f)
     asso['features'] = features
     return asso
@@ -112,7 +112,7 @@ def normalize_oncokb_oncogenic(asso, gene_set):
 
 class ONCOKB_Oncogenic(object):
     """
-    Parses downloaded TSV of all mutations from OncoKB and searches for oncogenic mutations by gene: 
+    Parses downloaded TSV of all mutations from OncoKB and searches for oncogenic mutations by gene:
     http://oncokb.org/#/dataAccess
     """
     def __init__(self, mut_file):
@@ -127,7 +127,3 @@ class ONCOKB_Oncogenic(object):
             self.gene_df_cache[gene] = muts
         muts = muts[muts['Oncogenicity'].str.contains('Oncogenic')].fillna('')
         return muts.to_dict(orient='records')
-
-
-
-

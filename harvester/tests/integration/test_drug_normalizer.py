@@ -116,3 +116,22 @@ def test_NSC_87877():
 def test_decompose():
     assert _decompose('XXXXX') == ['XXXXX']
     assert _decompose("Trametinib + Dabrafenib") == ['Trametinib', 'Dabrafenib']
+
+
+def test_Cisplatin():
+    compounds = normalize('Cisplatin')
+    assert len(compounds) == 1
+
+
+def test_CETUXIMAB():
+    compounds = normalize('CETUXIMAB')
+    assert len(compounds) == 1
+    assert compounds[0]['source']
+    print compounds
+
+
+def test_TRAMETINIB():
+    compounds = normalize('TRAMETINIB')
+    assert len(compounds) == 1
+    assert compounds[0]['source']
+    print compounds
