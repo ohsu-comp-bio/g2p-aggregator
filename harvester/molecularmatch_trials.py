@@ -9,6 +9,7 @@ import mutation_type as mut
 from warnings import warn
 import sys
 import mutation_type as mut
+from feature_enricher import enrich
 import time
 
 DEFAULT_GENES = ['*']
@@ -132,7 +133,7 @@ def convert(evidence):
         for t in evidence_tags:
             if t['facet'] == 'GENE':
                 genes.add(t['term'])
-                feature_objs.append({'description': t['term']})
+                feature_objs.append({'geneSymbol': t['term']})
         genes = list(genes)
 
         features = set([])
@@ -140,6 +141,8 @@ def convert(evidence):
             if t['facet'] == 'MUTATION':
                 features.add(t['term'])
         features = list(features)
+        for feature in features:
+            feature_objs.append(enrich({'description': feature}))
 
         drugs = set([])
         for t in evidence_tags:
