@@ -78,8 +78,7 @@ def convert(evidence):
                                     evidence['Biomarker'])
         feature['geneSymbol'] = gene
         feature['name'] = evidence['individual_mutation']
-        description_parts = re.split(' +|:|__', evidence['Alteration'].strip())
-        feature['description'] = ' '.join(description_parts)
+        feature['description'] = evidence['Alteration']
         feature['referenceName'] = 'GRCh37'
         features.append(feature)
 

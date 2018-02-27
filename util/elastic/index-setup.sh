@@ -55,18 +55,6 @@ curl -XPUT $ES"/associations-new" -H 'Content-Type: application/json' -d'
   "mappings":{
     "association":{
       "properties":{
-        "association": {
-          "properties":{
-            "environmentalContexts":{
-              "properties": {
-                "toxicity":{
-                  "type":"keyword",
-                  "store":true, "index":false, "ignore_above":0
-                }
-              }
-            }
-          }
-        },
         "civic":{
           "type":"keyword",
           "store":true, "index":false, "ignore_above":0
