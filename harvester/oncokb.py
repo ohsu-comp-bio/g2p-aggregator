@@ -13,11 +13,11 @@ import cosmic_lookup_table
 import evidence_label as el
 import evidence_direction as ed
 import mutation_type as mut
-from feature_enricher import enrich
 
 LOOKUP_TABLE = None
 clinv = Path('../data/oncokb_allActionableVariants.txt')
 biov = Path('../data/oncokb_allAnnotatedVariants.txt')
+
 
 def harvest(genes):
     i = 0
@@ -128,8 +128,7 @@ def convert(gene_data):
             feature['ref'] = match['ref']
             feature['alt'] = match['alt']
             feature['referenceName'] = str(match['build'])
-        else:
-            feature = enrich(feature)
+
         return feature
 
     if 'oncokb' in gene_data:
@@ -150,7 +149,7 @@ def convert(gene_data):
                     alteration = var['alteration']
                     feature = {}
                     feature['geneSymbol'] = gene
-                    feature['description'] = var['name']
+                    feature['description'] = '{} {}'.format(gene, var['name'])
                     feature['name'] = var['name']
                     feature['entrez_id'] = gene_data['entrezGeneId']
                     feature['biomarker_type'] = mut.norm_biomarker(
@@ -161,7 +160,7 @@ def convert(gene_data):
         feature = {}
         feature['geneSymbol'] = gene
         feature['name'] = variant['name']
-        feature['description'] = variant['name']
+        feature['description'] = '{} {}'.format(gene, variant['name'])
         feature['entrez_id'] = gene_data['entrezGeneId']
         feature['biomarker_type'] = mut.norm_biomarker(
             variant['consequence']['term'])
@@ -242,6 +241,8 @@ def convert(gene_data):
         feature = {}
         feature['geneSymbol'] = gene
         feature['name'] = variant['name']
+        feature['description'] = '{} {}'.format(gene.encode('utf8'),
+                                                variant['name'].encode('utf8'))
         feature['entrez_id'] = gene_data['entrezGeneId']
         feature['biomarker_type'] = mut.norm_biomarker(
             variant['consequence']['term'])
