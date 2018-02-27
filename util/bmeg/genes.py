@@ -69,3 +69,26 @@ if __name__ == '__main__':
     kit_brca1 = normalize({'genes': ['KIT', 'BRCA1']})
     # print kit_brca1
     assert ({'genes': ['ENSG00000157404', 'ENSG00000012048']}, {'ENSG00000012048': {'symbol': 'BRCA1', 'description': 'HGNC:1100', 'id': 'ENSG00000012048'}}) == kit_brca1  # noqa
+
+
+
+    import sys
+    # biostream-schema
+    from bmeg.clinical_pb2 import *
+    from bmeg.cna_pb2 import *
+    from bmeg.genome_pb2 import *
+    from bmeg.phenotype_pb2 import *
+    from bmeg.rna_pb2 import *
+    from bmeg.variants_pb2 import *
+    from google.protobuf import json_format
+    import json
+    from google.protobuf.json_format import MessageToJson, MessageToDict
+    def _writePB(cls, obj, file):
+        pb_obj = eval('{}()'.format(cls))
+        o = json_format.Parse(json.dumps(obj), pb_obj, ignore_unknown_fields=False)
+        data = MessageToDict(o)
+        file.write(json.dumps(data, separators=(',', ':')))
+        file.write('\n')
+
+
+    _writePB('G2PAssociation', kit[0], sys.stdout)

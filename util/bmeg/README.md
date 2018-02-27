@@ -22,7 +22,7 @@ wget https://www.genenames.org/cgi-bin/download?col=gd_hgnc_id&col=gd_app_sym&co
 
 *
 ```
-$ cat ../elastic/all.json  | python normalize.py`
+$ cat ../elastic/all.json  | python normalize.py
 $ ls -1 biostream/biostream/g2p/*.json
 biostream/biostream/g2p/Compound.json
 biostream/biostream/g2p/G2PAssociation.json
