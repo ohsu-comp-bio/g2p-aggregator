@@ -103,7 +103,7 @@ def _bulk(_tuple):
     for gid in features.keys():
         #  write data
         data = features[gid]
-        if not gid.startswith('gene:'):
+        if not gid.startswith('gene'):
             data['id'] = gid
             _writePB('Variant', data, files[features_path])
 
@@ -130,7 +130,12 @@ def _from_stdin(args):
     # write to ES
     if not args.dry_run:
         for _tuple in _stdin_actions(args):
+            # try:
             _bulk(_tuple)
+            # except Exception as e:
+            #     print _tuple
+            #     print e
+            #     raise e
     else:
         for d in _stdin_actions(args):
             if args.verbose:

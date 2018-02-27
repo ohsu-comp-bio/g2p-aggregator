@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 ASSOCIATION_KEYS = ["description", "evidence",   "gid",  'original',
-                    'source', 'features', 'phenotypes', 'environments']
+                    'source', 'features', 'phenotypes', 'environments',
+                    'genes']
 
 
 def association_gid(hit):
@@ -76,9 +77,9 @@ def normalize(hit):
         if 'genes' not in association:
             association['genes'] = []
         association['genes'].extend(
-            [f for f in association['features'] if f.startswith('gene:')])
+            [f.replace('gene', '') for f in association['features'] if f.startswith('gene')])
         association['features'] = \
-            [f for f in association['features'] if not f.startswith('gene:')]
+            [f for f in association['features'] if not f.startswith('gene')]
 
     # clean up any misc keys
     for p in association.keys():
