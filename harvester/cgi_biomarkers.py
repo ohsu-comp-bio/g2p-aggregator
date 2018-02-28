@@ -13,18 +13,51 @@ import mutation_type as mut
 
 
 def _get_evidence(gene_ids, path='../data'):
-    """ load tsv """
+    """ load tsv, yield object where values_cols are lists """
     df = pandas.read_table(path + '/cgi_biomarkers_per_variant.tsv')
     # change nan to blank string
     df = df.fillna('')
     # if no gene list return all
-    if not gene_ids:
-        dict_list = df.to_dict(orient='records')
-    else:
-        rows = df.loc[df['Gene'].isin(gene_ids)]
-        dict_list = rows.to_dict(orient='records')
-    for row in dict_list:
-        yield row
+    if gene_ids:
+        df = df.loc[df['Gene'].isin(gene_ids)]
+
+    groupby_cols = [
+        'Alteration',
+        'Alteration type',
+        'Assay type',
+        'Association',
+        'Biomarker',
+        'Curator',
+        'Drug',
+        'Drug family',
+        'Drug full name',
+        'Drug status',
+        'Evidence level',
+        'Gene',
+        'Metastatic Tumor Type',
+        'Primary Tumor acronym',
+        'Primary Tumor type',
+        'Source',
+        'Targeting'
+        ]
+    values_cols = [
+        'gDNA',
+        'cDNA',
+        'individual_mutation',
+        'info',
+        'region',
+        'strand',
+        'transcript'
+        ]
+    grouped = df.groupby(groupby_cols)
+
+    for name, group in grouped:
+        evidence = {}
+        for p in groupby_cols:
+            evidence[p] = group[p].values[0]
+        for p in values_cols:
+            evidence[p] = list(group[p].values)
+        yield evidence
 
 
 def convert(evidence):
@@ -69,24 +102,33 @@ def convert(evidence):
 
     # Create document for insertion.
     genes = re.split('\W+', evidence['Gene'])
+
+    alteration_types = re.split('\W+', evidence['Alteration type'])
     genes = filter(len, genes)
+    alteration_types = filter(len, alteration_types)
     features = []
-    for gene in genes:
-        feature = split_gDNA(evidence['gDNA'])
+
+    for idx, gDNA in enumerate(evidence['gDNA']):
+        feature = split_gDNA(gDNA)
+        alteration_type = alteration_types[0]
+        if len(alteration_types) > idx:
+            alteration_type = alteration_types[idx]
+        geneSymbol = genes[0]
+        if len(genes) > idx:
+            geneSymbol = genes[idx]
         feature['biomarker_type'] = mut.norm_biomarker(
-                                    evidence['Alteration type'],
-                                    evidence['Biomarker'])
-        feature['geneSymbol'] = gene
-        feature['name'] = evidence['individual_mutation']
-        description_parts = re.split(' +|:|__', evidence['Alteration'].strip())
+                                    alteration_type,
+                                    evidence['individual_mutation'][idx])
+        feature['name'] = evidence['individual_mutation'][idx]
+        description_parts = re.split(' +|:|__', evidence['individual_mutation'][idx].strip())
         feature['description'] = ' '.join(description_parts)
         feature['referenceName'] = 'GRCh37'
+        feature['geneSymbol'] = geneSymbol
         features.append(feature)
 
     association = {}
-    if evidence['individual_mutation']:
-        association['variant_name'] = evidence['individual_mutation'].split(':')[1]
-    association['description'] = '{} {} {}'.format(gene,
+
+    association['description'] = '{} {} {}'.format(' '.join(genes),
                                                    evidence['Drug full name'],
                                                    evidence['Association'])
     association['environmentalContexts'] = []
