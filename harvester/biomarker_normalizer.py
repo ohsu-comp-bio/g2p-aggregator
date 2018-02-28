@@ -16,7 +16,7 @@ with open('../data/biomarkers.tsv', 'r') as fi:
         if line.startswith('#'):
             continue
         bits = line.split('\t')
-        biomarker_alias[bits[0]] = bits[1]
+        biomarker_alias[bits[0]] = bits[1].strip('\n')
 
 def _alias(biomarker):
     if biomarker in biomarker_alias:
