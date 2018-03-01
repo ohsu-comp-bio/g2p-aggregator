@@ -12,3 +12,4 @@ services:
       - "${API_PORT}:${API_PORT}"
     environment:
       - ES=${ES}
+      - SWAGGER_HOST=${SWAGGER_HOST}

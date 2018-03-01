@@ -3,7 +3,7 @@ services:
 
   kibana:
     environment:
-    - SERVER_BASEPATH=/kibana  # for proxy 
+    - SERVER_BASEPATH=/kibana  # for proxy
 
   nginx:
     container_name: nginx_g2p
@@ -15,6 +15,10 @@ services:
       - "./services/nginx/.htpasswd:/usr/local/openresty/nginx/conf/.htpasswd"
       - "./certs:/certs"
       - "./services/nginx/g2p.html:/var/www/static-html/g2p.html"
+      - "./services/ui/index.html:/var/www/static-html/demo-ui/index.html"
+      - "./services/ui/index.js:/var/www/static-html/demo-ui/index.js"
+      - "./services/ui/config.json:/var/www/static-html/demo-ui/config.json"
+      - "./services/ui/favicon.ico:/var/www/static-html/demo-ui/favicon.ico"
     ports:
       - "443:443"
       - "80:80"
@@ -24,3 +28,4 @@ services:
     links:
       - elastic
       - kibana
+      - api

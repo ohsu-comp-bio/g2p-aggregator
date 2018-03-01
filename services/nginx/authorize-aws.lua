@@ -99,6 +99,8 @@ local restrictions = {
   g2p = {
 
     ["^/$"]                             = { "GET" },
+    ["^/demo-ui.*$"]                    = { "GET" },
+    ["^/*.j*$"]                         = { "GET" },
     ["^/.*$"]                           = { "GET" },
     ["^/?[^/]*/?[^/]*/_search"]         = { "GET", "POST" },
     ["^/?[^/]*/?[^/]*/_msearch"]        = { "GET", "POST" },

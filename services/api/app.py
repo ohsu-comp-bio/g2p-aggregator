@@ -259,18 +259,18 @@ def configure_app(args):
 
     log.info('advertise swagger host as {}'.format(swagger_host))
 
-    # remove schemes that do not apply
-    if args.key_file:
-        # swagger_beacon['schemes'].remove('http')
-        swagger_combined['schemes'].remove('http')
-    else:
-        # swagger_beacon['schemes'].remove('https')
-        swagger_combined['schemes'].remove('https')
+    # # remove schemes that do not apply
+    # if args.key_file:
+    #     # swagger_beacon['schemes'].remove('http')
+    #     swagger_combined['schemes'].remove('http')
+    # else:
+    #     # swagger_beacon['schemes'].remove('https')
+    #     swagger_combined['schemes'].remove('https')
 
     # beacon_api = app.add_api(swagger_beacon, base_path='/v1/beacon',
     #                          resolver=function_resolver)
 
-    g2p_api = app.add_api(swagger_combined, base_path='/v1',
+    g2p_api = app.add_api(swagger_combined, base_path='/api/v1',
                           resolver=function_resolver)
 
     log.info('g2p_api.version {}'.format(
