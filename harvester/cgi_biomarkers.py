@@ -109,6 +109,8 @@ def convert(evidence):
     features = []
 
     for idx, gDNA in enumerate(evidence['gDNA']):
+        if len(gDNA) == 0:
+            continue
         feature = split_gDNA(gDNA)
         alteration_type = alteration_types[0]
         if len(alteration_types) > idx:
@@ -125,6 +127,14 @@ def convert(evidence):
         feature['referenceName'] = 'GRCh37'
         feature['geneSymbol'] = geneSymbol
         features.append(feature)
+
+    if len(features) == 0:
+        description_parts = re.split(' +|:|__', evidence['Biomarker'].strip())
+        features.append({
+            'description': ' '.join(description_parts),
+            'name': ' '.join(description_parts),
+            'geneSymbol': genes[0]
+        })
 
     association = {}
 
