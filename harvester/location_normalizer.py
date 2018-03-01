@@ -132,7 +132,10 @@ def genomic_hgvs(feature, complement=False, description=False):
     # Make the variant
     var = SequenceVariant(ac=ac, type='g', posedit=posedit)
     # https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37.p13
-    return str(var)
+    try:
+        return str(var)
+    except Exception as e:
+        return None
 
 
 def normalize(feature):
@@ -145,29 +148,31 @@ def normalize(feature):
         return None
 
     hgvs = genomic_hgvs(feature)
-    allele = allele_registry(hgvs)
-    if ('errorType' in allele and
-            allele['errorType'] == 'IncorrectReferenceAllele'):
-        message = allele['message']
-        actualAllele = allele['actualAllele']
-
-        complement_ref = _complement(feature['ref'])
-        if complement_ref == actualAllele:
-            # print 'reverse strand re-try'
-            hgvs = genomic_hgvs(feature, complement=True)
-            allele = allele_registry(hgvs)
-        # else:
-        #     print 'complement_ref {} m[0] {}'.format(complement_ref,
-        #                                              actualAllele)
-
-    if ('errorType' in allele and
-            allele['errorType'] == 'IncorrectHgvsPosition'):
-        # print 'position error re-try'
-        hgvs = genomic_hgvs(feature, description=True)
+    allele = None
+    if hgvs:
         allele = allele_registry(hgvs)
+        if ('errorType' in allele and
+                allele['errorType'] == 'IncorrectReferenceAllele'):
+            message = allele['message']
+            actualAllele = allele['actualAllele']
 
-    if allele:
-        allele['hgvs_g'] = hgvs
+            complement_ref = _complement(feature['ref'])
+            if complement_ref == actualAllele:
+                # print 'reverse strand re-try'
+                hgvs = genomic_hgvs(feature, complement=True)
+                allele = allele_registry(hgvs)
+            # else:
+            #     print 'complement_ref {} m[0] {}'.format(complement_ref,
+            #                                              actualAllele)
+
+        if ('errorType' in allele and
+                allele['errorType'] == 'IncorrectHgvsPosition'):
+            # print 'position error re-try'
+            hgvs = genomic_hgvs(feature, description=True)
+            allele = allele_registry(hgvs)
+
+        if allele:
+            allele['hgvs_g'] = hgvs
 
     return allele
 
@@ -206,8 +211,12 @@ def _fix_location_end(feature):
     """ if end not present, set it based on start, ref & alt length"""
     end = feature.get('end', 0)
     start = feature.get('start', 0)
-    ref_len = len(feature.get('ref', ''))
-    alt_len = len(feature.get('alt', ''))
+    ref_len = 0
+    alt_len = 0
+    if feature.get('ref', None):
+        ref_len = len(feature.get('ref', ''))
+    if feature.get('alt', None):
+        alt_len = len(feature.get('alt', ''))
     offset = max(ref_len, alt_len)
     if start > 0 and end == 0:
         end = max(start, start + (offset - 1))
