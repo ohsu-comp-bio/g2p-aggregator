@@ -25,81 +25,79 @@ HASH_KEYS = []
 # DEFAULT_GENES = [x.strip() for x in content]
 
 
-def get_evidence(gene_ids):
+def get_evidence():
     """ load from remote api """
     if not apiKey:
         raise ValueError('Please set MOLECULAR_MATCH_API_KEY in environment')
     # if not gene_ids:
     #     gene_ids = DEFAULT_GENES
     # first look for all drugs that impact this gene
-    for gene in gene_ids:
-        count = 0
-        start = 0
-        limit = 50
-        url = mmService + resourceURLs["assertions"]
-        filters = [{'facet': 'GENE',
-                    'term': '{}'.format(gene),
-                    }]
-        while start >= 0:
-            payload = {
-                'apiKey': apiKey,
-                'limit': limit,
-                'start': start,
-                'filters': json.dumps(filters)
-            }
-            try:
-                logging.info('%s %s', url, json.dumps(payload))
-                r = requests.post(url, data=payload)
-                assertions = r.json()
-                if assertions['total'] == 0:
-                    start = -1
-                    continue
-                else:
-                    start = start + limit
-                logging.info(
-                    "page {} of {}. total {} count {}".format(
-                        assertions['page'],
-                        assertions['totalPages'],
-                        assertions['total'],
-                        count
-                        )
-                )
-                # filter those drugs, only those with diseases
-                for hit in assertions['rows']:
-                    # # do not process rows without drugs
-                    # if len(hit['therapeuticContext']) > 0:
-                    #     yield hit
-
-                    # # do not process rows that do not match our query
-                    # returned_gene = None
-                    # for tag in hit['tags']:
-                    #     if tag['facet'] == 'GENE':
-                    #         returned_gene = tag['term']
-                    # if returned_gene == gene:
-                    #     yield hit
-                    # else:
-                    #     raise ValueError(
-                    #         'evidence for {}, not {} - skipping'.format(
-                    #             returned_gene,
-                    #             gene
-                    #         )
-                    #     )
-
-                    # process all rows
-                    count = count + 1
-                    hit['harvested_gene'] = gene
-                    if not hit['hashKey'] in HASH_KEYS:
-                        HASH_KEYS.append(hit['hashKey'])
-                        yield hit
-                    else:
-                        logging.info('duplicate: {}'.format(hit['hashKey']))
-
-            except Exception as e:
-                logging.error(
-                    "molecularmatch error fetching {}".format(gene),
-                    exc_info=1
-                )
+    count = 0
+    start = 0
+    limit = 20
+    url = mmService + resourceURLs["assertions"]
+    filters = [{'facet': 'CONDITION',
+                'term': 'CANCER',
+                }]
+    while start >= 0:
+        payload = {
+            'apiKey': apiKey,
+            'limit': limit,
+            'start': start,
+            'filters': json.dumps(filters)
+        }
+        try:
+            logging.info('%s %s', url, json.dumps(payload))
+            r = requests.post(url, data=payload)
+            assertions = r.json()
+            if assertions['total'] == 0:
                 start = -1
+                continue
+            else:
+                start = start + limit
+            logging.info(
+                "page {} of {}. total {} count {}".format(
+                    assertions['page'],
+                    assertions['totalPages'],
+                    assertions['total'],
+                    count
+                    )
+            )
+            # filter those drugs, only those with diseases
+            for hit in assertions['rows']:
+                # # do not process rows without drugs
+                # if len(hit['therapeuticContext']) > 0:
+                #     yield hit
+
+                # # do not process rows that do not match our query
+                # returned_gene = None
+                # for tag in hit['tags']:
+                #     if tag['facet'] == 'GENE':
+                #         returned_gene = tag['term']
+                # if returned_gene == gene:
+                #     yield hit
+                # else:
+                #     raise ValueError(
+                #         'evidence for {}, not {} - skipping'.format(
+                #             returned_gene,
+                #             gene
+                #         )
+                #     )
+
+                # process all rows
+                count = count + 1
+                if not hit['hashKey'] in HASH_KEYS:
+                    HASH_KEYS.append(hit['hashKey'])
+                    yield hit
+                else:
+                    logging.info('duplicate: {}'.format(hit['hashKey']))
+
+        except Exception as e:
+            logging.error(
+                "molecularmatch error fetching {}".format('CANCER'),
+                exc_info=1
+            )
+            start = -1
 
 
 def convert(evidence):
@@ -286,19 +284,10 @@ def convert(evidence):
     yield feature_association
 
 
-def harvest(genes):
-    """ get data from mm """
-    if genes:
-        for evidence in get_evidence(genes):
-            yield evidence
-    else:
-        # TODO mm has no semantics for 'give me all genes', so we will try all
-        # gene symbols in a curated set
-        with open("mm-genenames.txt") as f:
-            for line in f:
-                symbol = line.rstrip()
-                for evidence in get_evidence([symbol]):
-                    yield evidence
+def harvest(genes=None):
+    """ get data from mm, ignores genes. gets all evidence for CANCER """
+    for evidence in get_evidence():
+        yield evidence
 
 
 def harvest_and_convert(genes):
