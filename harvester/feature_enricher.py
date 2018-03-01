@@ -11,10 +11,12 @@ def _enrich_gene(feature):
     url = "http://mygene.info/v3/query?q={}&fields=genomic_pos_hg19".format(feature['description'])
     r = requests.get(url, timeout=60)
     hit = None
-    for a_hit in r.json()['hits']:
-        if 'genomic_pos_hg19' in a_hit:
-            hit = a_hit['genomic_pos_hg19']
-            break
+    hits = r.json()
+    if 'hits' in hits:
+        for a_hit in hits['hits']:
+            if 'genomic_pos_hg19' in a_hit:
+                hit = a_hit['genomic_pos_hg19']
+                break
     if hit:
         if 'chr' in hit:
             feature['chromosome'] = str(hit['chr'])
@@ -44,10 +46,11 @@ def _enrich_feature(feature):
     r = requests.get(url, timeout=60)
     hits = r.json()
     hit = None
-    for a_hit in hits['hits']:
-        if 'hg19' in a_hit and 'vcf' in a_hit:
-            hit = a_hit
-            break
+    if 'hits' in hits:
+        for a_hit in hits['hits']:
+            if 'hg19' in a_hit and 'vcf' in a_hit:
+                hit = a_hit
+                break
     if hit:
         hg19 = hit.get('hg19')
         vcf = hit.get('vcf')
