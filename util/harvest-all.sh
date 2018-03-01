@@ -14,8 +14,8 @@ python harvester.py --harvesters jax_trials --delete_source  > jax_trials.log &
 sleep 10
 
 echo -n ' molecularmatch_trials.'
-# to have mm_trials simply download the data, uses --phases harvest
-python harvester.py --harvesters molecularmatch_trials --delete_source  > molecularmatch_trials.log &
+# to have mm_trials simply download the data, use  ``--phases harvest --silos file` options
+python harvester.py --harvesters molecularmatch_trials --delete_source --phases harvest  > molecularmatch_trials.log &
 
 
 echo 'All launched'
