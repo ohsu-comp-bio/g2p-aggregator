@@ -70,7 +70,7 @@ VICC_BEACON = {
 
 def _es():
     """ get an elastic search connection """
-    return Elasticsearch(['{}'.format(ARGS.elastic)])
+    return Elasticsearch(['{}'.format(ARGS.elastic)], verify_certs=False)
 
 
 # utilities used by controllers

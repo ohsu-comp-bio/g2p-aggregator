@@ -114,10 +114,10 @@ local restrictions = {
     ["/api.*"]                          = { "GET", "POST" },
     ["/plugins.*"]                      = { "GET" },
 
-    ["^/?[^/]*/?[^/]*/es_admin.*"]                     = { "GET" },
-    ["^/?[^/]*/?[^/]*/es_admin.*/_search"]             = { "GET", "POST" },
-    ["^/?[^/]*/?[^/]*/es_admin.*/_msearch"]            = { "GET", "POST" },
-    ["^/?[^/]*/?[^/]*/es_admin.*/_mget"]               = { "GET", "POST" },
+    ["^/?[^/]*/?[^/]*/elasticsearch"]                     = { "GET" },
+    ["^/?[^/]*/?[^/]*/elasticsearch/_search"]             = { "GET", "POST" },
+    ["^/?[^/]*/?[^/]*/elasticsearch/_msearch"]            = { "GET", "POST" },
+    ["^/?[^/]*/?[^/]*/elasticsearch/_mget"]               = { "GET", "POST" },
 
     ["/static.*"]                       = { "GET" },
 
@@ -169,7 +169,7 @@ for path, methods in pairs(restrictions[role]) do
     break
   end
 
-  ngx.log(ngx.WARN, method.." "..uri.." NO matched: m:"..tostring(m).." path:"..tostring(path).." for "..role)
+  -- ngx.log(ngx.WARN, method.." "..uri.." NO matched: m:"..tostring(m).." path:"..tostring(path).." for "..role)
 end
 
 if not allowed then

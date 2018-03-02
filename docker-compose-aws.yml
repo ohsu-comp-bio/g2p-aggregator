@@ -13,3 +13,27 @@ services:
     environment:
       - ES=${ES}
       - SWAGGER_HOST=${SWAGGER_HOST}
+
+  nginx:
+    container_name: nginx_g2p
+    image: openresty/openresty:trusty
+    depends_on:
+      - api
+    volumes:
+      - "./util:/util/"
+      - "./services/nginx/nginx_authorize_by_lua-aws.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro"
+      - "./services/nginx/authorize-aws.lua:/usr/local/openresty/nginx/conf/authorize.lua:ro"
+      - "./services/nginx/.htpasswd:/usr/local/openresty/nginx/conf/.htpasswd"
+      - "./certs:/certs"
+      - "./services/nginx/g2p.html:/var/www/static-html/g2p.html"
+      - "./services/ui/index.html:/var/www/static-html/demo-ui/index.html"
+      - "./services/ui/index.js:/var/www/static-html/demo-ui/index.js"
+      - "./services/ui/config.json:/var/www/static-html/demo-ui/config.json"
+      - "./services/ui/favicon.ico:/var/www/static-html/demo-ui/favicon.ico"
+
+    ports:
+      - "443:443"
+      - "80:80"
+    environment:
+      - SERVER_NAME=${SERVER_NAME}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
