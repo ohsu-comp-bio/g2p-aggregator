@@ -154,8 +154,6 @@ def convert(evidence):
 
         feature['geneSymbol'] = gene
         feature['name'] = mutation
-        feature['description'] = '{} {}'.format(gene, mutation)
-
 
         # Add variant-level information.
         # TODO: only looks at first location, not all locations.
@@ -261,13 +259,10 @@ def convert(evidence):
             for feature_tuple in minimal_features:
                 feature = {}
                 feature['geneSymbol'] = feature_tuple[0]
-                feature['description'] = feature['geneSymbol']
-
                 if not feature['geneSymbol'].isupper() and len(genes) > 0:
                     feature['geneSymbol'] = genes[0]
                 try:
                     feature['name'] = feature_tuple[1]
-
                 except IndexError:
                     pass
                 features.append(feature)

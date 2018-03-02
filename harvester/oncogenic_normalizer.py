@@ -37,7 +37,7 @@ def normalize_cgi_oncogenic(asso, gene_set):
     if not CGI_TABLE:
         CGI_TABLE = CGI_Oncogenic('../data/cgi_oncogenic_mutations.tsv')
     tt = asso['cgi']['Primary Tumor type']
-    # print "INSIDE FUNCTION", tt
+    print "INSIDE FUNCTION", tt
     for gene in gene_set:
         # print gene
         for match in CGI_TABLE.get_muts(gene, tt):
@@ -45,7 +45,7 @@ def normalize_cgi_oncogenic(asso, gene_set):
             # replicate relevant feature set (in case there's more than one)
             for feature in asso['features']:
                 if gene == feature['geneSymbol']:
-                    # print "GENE MATCH"
+                    print "GENE MATCH"
                     f = deepcopy(feature)
                     # Look up position info
                     for locus in parse_genomic_locus(match['gdna']):
@@ -56,7 +56,7 @@ def normalize_cgi_oncogenic(asso, gene_set):
                         f['alt'] = locus[3]
                         # f['cgiValidatedOncogenicMutations'] = match
                         features.append(f)
-                        # print f
+                        print f
     asso['features'] = features
     return asso
 
