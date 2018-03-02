@@ -47,3 +47,5 @@ harvester/zotero_help.py
 
 # json dump files
 util/**/*.json
+harvester/*.json
+harvester/molecularmatch_trials.json

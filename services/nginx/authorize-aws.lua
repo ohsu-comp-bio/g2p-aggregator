@@ -99,6 +99,8 @@ local restrictions = {
   g2p = {
 
     ["^/$"]                             = { "GET" },
+    ["^/demo-ui.*$"]                    = { "GET" },
+    ["^/*.j*$"]                         = { "GET" },
     ["^/.*$"]                           = { "GET" },
     ["^/?[^/]*/?[^/]*/_search"]         = { "GET", "POST" },
     ["^/?[^/]*/?[^/]*/_msearch"]        = { "GET", "POST" },
@@ -112,15 +114,15 @@ local restrictions = {
     ["/api.*"]                          = { "GET", "POST" },
     ["/plugins.*"]                      = { "GET" },
 
-    ["^/?[^/]*/?[^/]*/es_admin.*"]                     = { "GET" },
-    ["^/?[^/]*/?[^/]*/es_admin.*/_search"]             = { "GET", "POST" },
-    ["^/?[^/]*/?[^/]*/es_admin.*/_msearch"]            = { "GET", "POST" },
-    ["^/?[^/]*/?[^/]*/es_admin.*/_mget"]               = { "GET", "POST" },
+    ["^/?[^/]*/?[^/]*/elasticsearch"]                     = { "GET" },
+    ["^/?[^/]*/?[^/]*/elasticsearch/_search"]             = { "GET", "POST" },
+    ["^/?[^/]*/?[^/]*/elasticsearch/_msearch"]            = { "GET", "POST" },
+    ["^/?[^/]*/?[^/]*/elasticsearch/_mget"]               = { "GET", "POST" },
 
     ["/static.*"]                       = { "GET" },
 
     -- ["/kibana"]                       = { "GET", "POST" },
-    ["/elastic"]                      = { "GET", "POST" }
+    ["/v1.*"]                      = { "GET", "POST" }
   }
 
 }

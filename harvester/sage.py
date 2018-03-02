@@ -42,6 +42,7 @@ def convert(gene_data):
     for index, evidence_item in enumerate(evidence):
         feature = {
                     "geneSymbol": gene,
+                    "description": gene,
                     'entrez_id': evidence_item['entrez_id'],
                     'info': {
                         'germline_or_somatic':

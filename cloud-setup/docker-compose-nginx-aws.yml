@@ -11,6 +11,9 @@ services:
       - "./services/nginx/.htpasswd:/usr/local/openresty/nginx/conf/.htpasswd"
       - "./certs:/certs"
       - "./services/nginx/g2p.html:/var/www/static-html/g2p.html"
+      - "./services/ui/index.html:/var/www/static-html/demo-ui/index.html"
+      - "./services/ui/index.js:/var/www/static-html/demo-ui/index.js"
+      - "./services/ui/config.json:/var/www/static-html/demo-ui/config.json"
     ports:
       - "443:443"
       - "80:80"
@@ -18,7 +21,4 @@ services:
       - SERVER_NAME=${SERVER_NAME}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
     links:
-      - beacon
-    # extra_hosts:   
-    #   - "elastic:$ES_IP"
-    #   - "kibana:$ES_IP"
+      - api
