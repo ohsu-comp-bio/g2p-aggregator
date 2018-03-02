@@ -9,95 +9,84 @@ import mutation_type as mut
 from warnings import warn
 import sys
 import mutation_type as mut
-from feature_enricher import enrich
-import time
-
-DEFAULT_GENES = ['*']
-TRIAL_IDS = []
 
 
-def get_evidence(gene_ids=None):
-    """ load from remote api, ignores genes - returns all CANCER trials """
-    # override with data from file if it exists
-    if os.path.isfile('molecularmatch_trials.json'):
-        for evidence in get_evidence_from_file('molecularmatch_trials.json'):
-            yield evidence
-        return
-    # otherwise, get data from remote api
-    apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
-    if not apiKey:
-        raise ValueError('Please set MOLECULAR_MATCH_API_KEY in environment')
+def get_evidence(gene_ids):
+    """ load from remote api gene_ids ignored for now"""
 
-    if not gene_ids:
-        gene_ids = DEFAULT_GENES
+    # https://api.opentargets.io/v3/platform/public/evidence/filter
+    # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5461726/
 
-    count = 0
-    start = int(os.getenv('MM_TRIALS_START', 0))
-    end = int(os.getenv('MM_TRIALS_END', sys.maxint))
-    limit = 20
-    filters = [{'facet': 'CONDITION', 'term': 'CANCER'}]
-    resourceURLs = {
-        "trials": "/v2/trial/search"
+
+    {
+      "datatype": "known_drug",
+      "fields": [
+        "disease.efo_info.label",
+        "disease.id",
+        "id",
+        "scores.association_score",
+        "sourceID",
+        "target.gene_info.symbol",
+        "target.id",
+        "type",
+        "drug.molecule_name"
+      ],
+      "format": "json"
     }
-    mmService = "http://api.molecularmatch.com"
-    apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
-    url = mmService + resourceURLs["trials"]
 
-    while start >= 0:
-        payload = {
-            'apiKey': apiKey,
-            'limit': limit,
-            'start': start,
-            'filters': json.dumps(filters)
+
+
+    for gene in gene_ids:
+        count = 0
+        start = int(os.getenv('MM_TRIALS_START', 0))
+        end = int(os.getenv('MM_TRIALS_END', sys.maxint))
+        limit = 50
+        filters = [{'facet': 'MUTATION', 'term': '{}'.format(gene)}]
+        resourceURLs = {
+            "trials": "/v2/trial/search"
         }
-        try:
-            # time.sleep(2)  # rate limit
-            logging.info('%s %s', url, json.dumps(payload))
-            r = requests.post(url, data=payload, timeout=120)
-            assertions = r.json()
-            if 'page' not in assertions:
-                logging.info(assertions)
-            logging.info(
-                "page {} of {}. total {} count {}".format(
-                    assertions['page'],
-                    assertions['totalPages'],
-                    assertions['total'],
-                    count
-                    )
-            )
-            # filter those drugs, only those with diseases
-            for hit in assertions['rows']:
-                count += 1
-                yield hit
-            if assertions['total'] == 0:
-                start = -1
-                continue
-            else:
-                start = start + limit
-            if start > end:
-                logging.info("reached end {}".format(end))
-                start = -1
-        except requests.exceptions.ConnectionError as ce:
-            logging.error(
-                "molecularmatch ConnectionError, retrying. fetching {}"
-                .format(gene),
-            )
-        except Exception as e:
-            logging.error(
-                "molecularmatch error fetching {}".format(gene),
-                exc_info=1
-            )
-            start = -1
+        mmService = "http://api.molecularmatch.com"
+        apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
+        url = mmService + resourceURLs["trials"]
 
+        while start >= 0:
+            payload = {
+                'apiKey': apiKey,
+                'limit': limit,
+                'start': start,
+                'filters': json.dumps(filters)
+            }
+            try:
+                logging.info('%s %s', url, json.dumps(payload))
+                r = requests.post(url, data=payload)
+                assertions = r.json()
+                logging.debug(assertions)
+                logging.info(
+                    "page {} of {}. total {} count {}".format(
+                        assertions['page'],
+                        assertions['totalPages'],
+                        assertions['total'],
+                        count
+                        )
+                )
+                # filter those drugs, only those with diseases
+                for hit in assertions['rows']:
+                    yield hit
+                if assertions['total'] == 0:
+                    start = -1
+                    continue
+                else:
+                    start = start + limit
+                if start > end:
+                    logging.info("reached end {}".format(end))
+                    start = -1
 
-def get_evidence_from_file(filepath):
-    """ read raw mm data from file """
-    with open(filepath) as fp:
-        line = fp.readline()
-        while line:
-            evidence = json.loads(line)
-            yield evidence["molecularmatch_trials"]
-            line = fp.readline()
+            except Exception as e:
+                logging.error(
+                    "molecularmatch error fetching {}".format(gene),
+                    # exc_info=1
+                )
+                start = -1
 
 
 def convert(evidence):
@@ -133,16 +122,14 @@ def convert(evidence):
         for t in evidence_tags:
             if t['facet'] == 'GENE':
                 genes.add(t['term'])
+                feature_objs.append({'geneSymbol': t['term']})
         genes = list(genes)
 
         features = set([])
         for t in evidence_tags:
             if t['facet'] == 'MUTATION':
                 features.add(t['term'])
-                feature_objs.append({'description': t['term']})
         features = list(features)
-        for feature in features:
-            feature_objs.append(enrich({'description': feature}))
 
         drugs = set([])
         for t in evidence_tags:
@@ -151,11 +138,10 @@ def convert(evidence):
         drugs = list(drugs)
 
         conditions = set([])
-        priority_phenotype = None
         for t in evidence_tags:
-            if (t['facet'] == 'CONDITION' and t['filterType'] == 'include' and 'generatedByTerm' not in t and not t['suppress']):  # noqa
-                priority_phenotype = t['term']
-        conditions = [priority_phenotype]
+            if t['facet'] == 'CONDITION':
+                conditions.add(t['term'])
+        conditions = list(conditions)
 
         # TODO - only one phenotype per association
         for condition in conditions:
@@ -178,8 +164,7 @@ def convert(evidence):
                 }
             }]
             # add summary fields for Display
-            association = el.evidence_label(evidence['phase'],
-                                            association, na=False)
+            association['evidence_label'] = 'D'
             feature_association = {
                                    'genes': genes,
                                    'feature_names': features,

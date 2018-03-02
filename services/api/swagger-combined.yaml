@@ -1,11 +1,15 @@
 swagger: '2.0'
 info:
   version: 0.4.0
-  title: GA4GH Beacon API specification
+  title: GA4GH G2P & Beacon API specification
   description: >-
-    A Beacon is a web service for genetic data sharing that can be queried for information about specific alleles.
-host: egatest.crg.eu
-basePath: /requesterportal/v1/beacon
+      This protocol defines the associations between genotype
+      and phenotype (G2P).  Associations can be made as a
+      result of literature curation, computational modeling,
+      inference, etc., and modeled and shared using this schema.
+  contact: {}
+host: "g2p-ohsu.ddns.net"
+basePath: /
 schemes:
   - http
   - https
@@ -27,7 +31,7 @@ paths:
   /beacon/query:
     get:
       tags:
-      - "Beacon"                  
+      - "Beacon"
       description: Get response to a Beacon query for allele information.
       operationId: getBeaconAlleleResponse
       produces:
@@ -166,6 +170,8 @@ paths:
           schema:
             $ref: '#/definitions/BeaconAlleleResponse'
     post:
+      tags:
+      - "Beacon"
       description: Gets response to a beacon query for allele information.
       operationId: postBeaconAlleleResponse
       produces:
@@ -195,7 +201,127 @@ paths:
           description: Forbidden (e.g. the resource is protected for all users or the user is authenticated but s/he is not granted for this resource)
           schema:
             $ref: '#/definitions/BeaconAlleleResponse'
+  /associations:
+    get:
+      tags:
+      - "Associations"
+      summary: "Get the list of Associations"
+      description: "Search for evidence"
+      operationId: "searchAssociations"
+      parameters:
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        description: "Size of the page to retrieve."
+        x-example: 10
+      - name: "from"
+        in: "query"
+        required: false
+        type: "integer"
+        description: "The offset from the first result you want to fetch."
+        x-example: 1
+      - name: "q"
+        in: "query"
+        required: false
+        type: "string"
+        description: "lucene query string"
+        x-example: "BRCA1  +association.evidence_label:A"
+      - name: "sort"
+        in: "query"
+        required: false
+        type: "string"
+        description: "Sorting to perform. Can either be in the form of fieldName, or fieldName:asc/fieldName:desc."
+        # x-example: "genes:asc"
+        # x-example: "association.evidence_label:desc"
+      responses:
+        200:
+          description: "Status 200"
+        400:
+          description: "Status 400"
+          schema:
+            $ref: "#/definitions/Error"
+  /associations/{id}:
+    get:
+      tags:
+      - "Associations"
+      summary: "Load an individual Association"
+      description: "Loads a Association"
+      operationId: "getAssociation"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+        400:
+          description: "Status 400"
+          schema:
+            $ref: "#/definitions/Error"
+    parameters:
+    - name: "id"
+      in: "path"
+      required: true
+      type: "string"
+      description: "Identifier of the Association"
+      x-example: "0e8dd830-ad98-11e6-bf2e-47644ada7c0f"
+  /associations/terms:
+    get:
+      tags:
+      - "Associations"
+      summary: "Get top N terms in field"
+      description: "Return the top N terms of <field> that match query"
+      operationId: "associationTerms"
+      parameters:
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        description: "How many terms should be returned out of the overall terms list."
+        x-example: 10
+      - name: "q"
+        in: "query"
+        required: false
+        type: "string"
+        description: "lucene query string"
+        x-example: "BRCA1  +association.evidence_label:A"
+      - name: "f"
+        in: "query"
+        required: true
+        type: "string"
+        description: "Field name "
+        x-example: "association.evidence_label"
+        x-example: "genes"
+        x-example: "features.name"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/Terms"          
+        400:
+          description: "Status 400"
+          schema:
+            $ref: "#/definitions/Error"
+
 definitions:
+  Terms:
+    type: object
+    properties:
+      terms:
+        type: object
+        properties:
+          buckets:
+            type: array
+            items:
+              type: object
+              properties:
+                doc_count:
+                  type: integer
+                key:
+                  type: string
+          doc_count_error_upper_bound:
+            type: integer
+          sum_other_doc_count:
+            type: integer
+
   Beacon:
     type: object
     required:
@@ -641,3 +767,21 @@ definitions:
         type: string
         description: Version of the data use specification.
         example: v0.1
+  Error:
+    type: "object"
+    required:
+    - "code"
+    properties:
+      code:
+        type: "integer"
+        minimum: 400
+        maximum: 599
+      description:
+        type: "string"
+        example: "Bad query parameter [size]: Invalid integer value [abc]"
+      reasonPhrase:
+        type: "string"
+        example: "Bad Request"
+    description: "This general error structure is used throughout this API."
+    example: "{\n  \"code\": 400,\n  \"description\": \"Bad query parameter [size]:\
+      \ Invalid integer value [abc]\",\n  \"reasonPhrase\": \"Bad Request\"\n}"

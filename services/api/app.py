@@ -11,6 +11,7 @@ import argparse
 import sys
 import os
 import socket
+import json
 
 # backend
 from elasticsearch import Elasticsearch
@@ -69,7 +70,7 @@ VICC_BEACON = {
 
 def _es():
     """ get an elastic search connection """
-    return Elasticsearch(['{}'.format(ARGS.elastic)])
+    return Elasticsearch(['{}'.format(ARGS.elastic)], verify_certs=False)
 
 
 # utilities used by controllers
@@ -154,10 +155,26 @@ def searchAssociations(**kwargs):
     client = _es()
     q = kwargs.get('q', '*')
     s = Search(using=client, index='associations')
+    s = s.query("query_string", query=q)
+    # grab total before we apply size
+    total = s.count()
+    size = int(kwargs.get('size', '10'))
+    _from = int(kwargs.get('from', '1'))
+    # set sort order
+    sort = kwargs.get('sort', None)
+    if sort:
+        (field, order) = sort.split(':')
+        if order == 'desc':
+            field = '-{}'.format(field)
+        if '.keyword' not in field:
+            field = '{}.keyword'.format(field)
+        log.debug('set sort to {}'.format(field))
+        s = s.sort(field)
+    log.debug(s.to_dict())
     return {
         'hits': {
-            'total': s.count(),
-            'hits': [hit.to_dict() for hit in s.query("query_string", query=q)]
+            'total': total,
+            'hits': [hit.to_dict() for hit in s[_from:(_from+size)]]
         }
     }
 
@@ -166,18 +183,20 @@ def associationTerms(**kwargs):
     log.debug(kwargs)
     client = _es()
     q = kwargs.get('q', '*')
-    f = kwargs.get('f')
+    field = kwargs.get('f')
+    if not field.endswith('.keyword'):
+        field = '{}.keyword'.format(field)
     # create a search, ...
     s = Search(using=client, index='associations')
     # with no data ..
     s = s.params(size=0)
     s = s.query("query_string", query=q)
     # ... just aggregations
-    s.aggs.bucket(f, 'terms', field=f)
+    s.aggs.bucket('terms', 'terms', field=field)
     print s.to_dict()
     aggs = s.execute().aggregations
     # map it to an array of objects
-    return aggs
+    return aggs.to_dict()
     # return [{'phenotype_description': b.key,
     #          'phenotype_ontology_id': b.phenotype_id.buckets[0].key,
     #          'phenotype_evidence_count':b.phenotype_id.buckets[0].doc_count} for b in aggs.phenotype_descriptions.buckets]
@@ -240,18 +259,18 @@ def configure_app(args):
 
     log.info('advertise swagger host as {}'.format(swagger_host))
 
-    # remove schemes that do not apply
-    if args.key_file:
-        # swagger_beacon['schemes'].remove('http')
-        swagger_combined['schemes'].remove('http')
-    else:
-        # swagger_beacon['schemes'].remove('https')
-        swagger_combined['schemes'].remove('https')
+    # # remove schemes that do not apply
+    # if args.key_file:
+    #     # swagger_beacon['schemes'].remove('http')
+    #     swagger_combined['schemes'].remove('http')
+    # else:
+    #     # swagger_beacon['schemes'].remove('https')
+    #     swagger_combined['schemes'].remove('https')
 
     # beacon_api = app.add_api(swagger_beacon, base_path='/v1/beacon',
     #                          resolver=function_resolver)
 
-    g2p_api = app.add_api(swagger_combined, base_path='/v1',
+    g2p_api = app.add_api(swagger_combined, base_path='/api/v1',
                           resolver=function_resolver)
 
     log.info('g2p_api.version {}'.format(

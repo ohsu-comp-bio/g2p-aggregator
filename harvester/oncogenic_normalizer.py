@@ -39,9 +39,9 @@ def normalize_cgi_oncogenic(asso, gene_set):
     tt = asso['cgi']['Primary Tumor type']
     print "INSIDE FUNCTION", tt
     for gene in gene_set:
-        print gene
+        # print gene
         for match in CGI_TABLE.get_muts(gene, tt):
-            print match
+            # print match
             # replicate relevant feature set (in case there's more than one)
             for feature in asso['features']:
                 if gene == feature['geneSymbol']:

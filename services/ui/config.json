@@ -1,0 +1,4 @@
+{
+  "associations": "/api/v1/associations",
+  "terms": "/api/v1/associations/terms"
+}
