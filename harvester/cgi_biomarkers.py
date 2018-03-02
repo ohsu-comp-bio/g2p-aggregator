@@ -35,7 +35,6 @@ def _get_evidence(gene_ids, path='../data'):
         'Evidence level',
         'Gene',
         'Metastatic Tumor Type',
-        'Primary Tumor acronym',
         'Primary Tumor type',
         'Source',
         'Targeting'
