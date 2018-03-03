@@ -53,7 +53,8 @@ class CosmicLookup(object):
             lt = lt[lt['gene'] == gene]
             self.gene_df_cache[gene] = lt
 
-        hgvs_p = "p." + hgvs_p
+        if hgvs_p[:2] != "p.":
+            hgvs_p = "p." + hgvs_p
         result = lt[(lt['gene'] == gene) & (lt['hgvs_p'].str.contains(hgvs_p))]
         return result.to_dict(orient='records')
 

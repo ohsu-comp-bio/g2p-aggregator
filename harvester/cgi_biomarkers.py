@@ -1,3 +1,4 @@
+import sys
 import re
 import pandas
 import json
@@ -8,6 +9,9 @@ import cosmic_lookup_table
 import evidence_label as el
 import evidence_direction as ed
 import mutation_type as mut
+
+LOOKUP_TABLE = None
+
 
 """ https://www.cancergenomeinterpreter.org/biomarkers """
 
@@ -99,6 +103,9 @@ def convert(evidence):
         except Exception as e:
             return {}
 
+    # need gobal LOOKUP_TABLE variable
+    global LOOKUP_TABLE
+
     # Create document for insertion.
     genes = re.split('\W+', evidence['Gene'])
 
@@ -107,25 +114,52 @@ def convert(evidence):
     alteration_types = filter(len, alteration_types)
     features = []
 
-    for idx, gDNA in enumerate(evidence['gDNA']):
-        if len(gDNA) == 0:
-            continue
-        feature = split_gDNA(gDNA)
-        alteration_type = alteration_types[0]
-        if len(alteration_types) > idx:
-            alteration_type = alteration_types[idx]
-        geneSymbol = genes[0]
-        if len(genes) > idx:
-            geneSymbol = genes[idx]
-        feature['biomarker_type'] = mut.norm_biomarker(
-                                    alteration_type,
-                                    evidence['individual_mutation'][idx])
-        feature['name'] = evidence['individual_mutation'][idx]
-        description_parts = re.split(' +|:|__', evidence['individual_mutation'][idx].strip())
-        feature['description'] = ' '.join(description_parts)
-        feature['referenceName'] = 'GRCh37'
-        feature['geneSymbol'] = geneSymbol
-        features.append(feature)
+    gDNA = evidence['gDNA']
+    indiv_mut = evidence['individual_mutation']
+    if len(gDNA) != 0 or len(indiv_mut) != 0:
+        if not LOOKUP_TABLE:
+            LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
+                "./cosmic_lookup_table.tsv")
+        if len(indiv_mut) != len(gDNA):
+            print "WE HAVE A PROBLEM!!!"
+            print gDNA
+            print indiv_mut
+            sys.exit()
+        for idx, emut in enumerate(indiv_mut):
+            # get genomic locus from COSMIC; if mutation not in COSMIC,
+            # get locus info from given gDNA instead
+            feature = {}
+            print emut
+            if len(emut) > 0:
+                gene, prot = emut.split(':')
+                matches = LOOKUP_TABLE.get_entries(gene, prot)
+                if len(matches) > 0:
+                    # FIXME: just using the first match for now;
+                    # it's not clear what to do if there are multiple matches.
+                    match = matches[0]
+                    feature['chromosome'] = str(match['chrom'])
+                    feature['start'] = match['start']
+                    feature['end'] = match['end']
+                    feature['ref'] = match['ref']
+                    feature['alt'] = match['alt']
+                    feature['referenceName'] = str(match['build'])
+            else:
+                if len(gDNA[idx]) == 0:
+                    continue
+                feature = split_gDNA(gDNA[idx])
+            alteration_type = alteration_types[0]
+            if len(alteration_types) > idx:
+                alteration_type = alteration_types[idx]
+            if not gene:
+                gene = genes[0]
+                if len(genes) > idx:
+                    gene = genes[idx]
+            feature['biomarker_type'] = mut.norm_biomarker(alteration_type, emut)
+            feature['name'] = emut
+            feature['description'] = emut.replace(':', '  ')
+            feature['referenceName'] = 'GRCh37'
+            feature['geneSymbol'] = gene
+            features.append(feature)
 
     if len(features) == 0:
         description_parts = re.split(' +|:|__', evidence['Biomarker'].strip())
