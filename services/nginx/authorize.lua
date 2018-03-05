@@ -99,6 +99,8 @@ local restrictions = {
   g2p = {
 
     ["^/$"]                             = { "GET" },
+    ["^/demo-ui.*$"]                    = { "GET" },
+    ["^/*.j*$"]                         = { "GET" },
     ["^/?[^/]*/?[^/]*/_search"]         = { "GET", "POST" },
     ["^/?[^/]*/?[^/]*/_msearch"]        = { "GET", "POST" },
     ["^/?[^/]*/?[^/]*/_validate/query"] = { "GET", "POST" },
@@ -119,7 +121,8 @@ local restrictions = {
     ["/static.*"]                       = { "GET" },
 
     ["/kibana"]                       = { "GET", "POST" },
-    ["/elastic"]                      = { "GET", "POST" }
+    ["/v1.*"]                      = { "GET", "POST" }
+
   }
 
 }
@@ -162,11 +165,11 @@ for path, methods in pairs(restrictions[role]) do
 
   if p and m then
     allowed = true
-    ngx.log(ngx.NOTICE, method.." "..uri.." matched: "..tostring(m).." "..tostring(path).." for "..role)
+    -- ngx.log(ngx.NOTICE, method.." "..uri.." matched: "..tostring(m).." "..tostring(path).." for "..role)
     break
   end
 
-  -- ngx.log(ngx.WARN, method.." "..uri.." NO matched: m:"..tostring(m).." path:"..tostring(path).." for "..role)
+  ngx.log(ngx.WARN, method.." "..uri.." NO matched: m:"..tostring(m).." path:"..tostring(path).." for "..role)
 end
 
 if not allowed then
