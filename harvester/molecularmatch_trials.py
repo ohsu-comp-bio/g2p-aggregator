@@ -9,10 +9,8 @@ import mutation_type as mut
 from warnings import warn
 import sys
 import mutation_type as mut
-from feature_enricher import enrich
 import time
 
-DEFAULT_GENES = ['*']
 TRIAL_IDS = []
 
 
@@ -27,9 +25,6 @@ def get_evidence(gene_ids=None):
     apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
     if not apiKey:
         raise ValueError('Please set MOLECULAR_MATCH_API_KEY in environment')
-
-    if not gene_ids:
-        gene_ids = DEFAULT_GENES
 
     count = 0
     start = int(os.getenv('MM_TRIALS_START', 0))
@@ -69,7 +64,7 @@ def get_evidence(gene_ids=None):
             for hit in assertions['rows']:
                 count += 1
                 yield hit
-            if assertions['total'] == 0:
+            if assertions['total'] == count:
                 start = -1
                 continue
             else:
@@ -150,8 +145,6 @@ def convert(evidence):
             if t['facet'] == 'MUTATION':
                 features.add(t['term'])
         features = list(features)
-        for feature in features:
-            feature_objs.append(enrich({'description': feature}))
 
         drugs = set([])
         for t in evidence_tags:
@@ -186,6 +179,8 @@ def convert(evidence):
                         .format(evidence['id'])]
                 }
             }]
+
+
             # add summary fields for Display
             association = el.evidence_label(evidence['phase'],
                                             association, na=False)

@@ -10,7 +10,7 @@ import sys
 def init_logging():
     # # turn on max debugging
     ch = logging.StreamHandler(sys.stdout)
-    ch.setLevel(logging.DEBUG)
+    ch.setLevel(logging.INFO)
     # formatter = logging.Formatter(
     #             '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     # ch.setFormatter(formatter)
