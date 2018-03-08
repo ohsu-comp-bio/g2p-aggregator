@@ -16,7 +16,7 @@ bin/elasticsearch-plugin install repository-s3
 #### configure
 By convention, name the s3 client the same as the repository
 ```
-
+bin/elasticsearch-keystore create s3.client.g2p-test-snapshots
 bin/elasticsearch-keystore add s3.client.g2p-test-snapshots.access_key XXX
 bin/elasticsearch-keystore add s3.client.g2p-test-snapshots.secret_key XXX
 dc restart  elastic
