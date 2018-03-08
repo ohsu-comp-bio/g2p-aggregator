@@ -5,10 +5,8 @@ import os
 import evidence_label as el
 import evidence_direction as ed
 import logging
-import mutation_type as mut
 from warnings import warn
 import sys
-import mutation_type as mut
 from feature_enricher import enrich
 import time
 
@@ -100,6 +98,16 @@ def get_evidence_from_file(filepath):
             line = fp.readline()
 
 
+def get_evidence_from_file(filepath):
+    """ read raw mm data from file """
+    with open(filepath) as fp:
+        line = fp.readline()
+        while line:
+            evidence = json.loads(line)
+            yield evidence["molecularmatch_trials"]
+            line = fp.readline()
+
+
 def convert(evidence):
     """
 
@@ -139,7 +147,6 @@ def convert(evidence):
         for t in evidence_tags:
             if t['facet'] == 'MUTATION':
                 features.add(t['term'])
-                feature_objs.append({'description': t['term']})
         features = list(features)
         for feature in features:
             feature_objs.append(enrich({'description': feature}))

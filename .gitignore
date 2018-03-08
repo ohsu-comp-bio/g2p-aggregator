@@ -20,7 +20,10 @@ util/elastic/backups
 data/*.json
 data/*.txt
 data/msk_impact_2017*
-data/*.tsv
+# data/*.tsv
+data/cgi_biomarkers_per_variant.tsv
+data/cgi_oncogenic_mutations.tsv
+data/oncokb_all_mutations.tsv
 harvester/data
 harvester/cosmic_lookup_table.tsv
 harvester/CosmicMutantExport.tsv.gz

@@ -7,7 +7,6 @@ import logging
 import cosmic_lookup_table
 import evidence_label as el
 import evidence_direction as ed
-import mutation_type as mut
 
 """ https://www.cancergenomeinterpreter.org/biomarkers """
 
@@ -35,7 +34,6 @@ def _get_evidence(gene_ids, path='../data'):
         'Evidence level',
         'Gene',
         'Metastatic Tumor Type',
-        'Primary Tumor acronym',
         'Primary Tumor type',
         'Source',
         'Targeting'
@@ -118,9 +116,7 @@ def convert(evidence):
         geneSymbol = genes[0]
         if len(genes) > idx:
             geneSymbol = genes[idx]
-        feature['biomarker_type'] = mut.norm_biomarker(
-                                    alteration_type,
-                                    evidence['individual_mutation'][idx])
+        # feature['biomarker_type'] = mut.norm_biomarker(alteration_type)
         feature['name'] = evidence['individual_mutation'][idx]
         description_parts = re.split(' +|:|__', evidence['individual_mutation'][idx].strip())
         feature['description'] = ' '.join(description_parts)

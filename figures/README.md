@@ -1,3 +1,134 @@
+# Figure Candidates
+
+## Harmonizations
+
+### harmonization percentages
+
+![harmonization_percentages.png](images/harmonization_percentages.png)
+*Percentage of association entites that were sucessfully harmonized.*
+
+```
+harmonizations = Harmonizations(es_host=args.host, index=args.index)
+harmonizations.harmonization_percentages_figure(path='./images/harmonization_percentages.png')
+```
+
+## Overlaps
+
+
+### gene overlaps
+
+![gene_overlaps.png](images/gene_overlaps.png)
+*Percentage of others association genes appear in source.*
+
+```
+overlaps = Overlaps(es_host=args.host, index=args.index)
+overlaps.gene_overlaps_figure(path='./images/gene_overlaps.png')
+```
+
+
+### feature overlaps
+
+![feature_overlaps.png](images/feature_overlaps.png)
+*Percentage of others association features appear in source.*
+
+```
+overlaps = Overlaps(es_host=args.host, index=args.index)
+overlaps.feature_overlaps_figure(path='./images/feature_overlaps.png')
+```
+
+### publication overlaps
+
+![publication_overlaps.png](images/publication_overlaps.png)
+*Percentage of others association evidence publications appear in source.*
+
+```
+overlaps = Overlaps(es_host=args.host, index=args.index)
+overlaps.publication_overlaps_figure(path='./images/publication_overlaps.png')
+```
+
+
+### phenotype overlaps
+
+![phenotype_overlaps](images/phenotype_overlaps.png)
+*Percentage of others association phenotype appear in source.*
+
+```
+overlaps = Overlaps(es_host=args.host, index=args.index)
+overlaps.phenotype_overlaps_figure(path='./images/phenotype_overlaps.png')
+```
+
+### environment overlaps
+
+![environment_overlaps](images/environment_overlaps.png)
+*Percentage of others association environment appear in source.*
+
+```
+overlaps = Overlaps(es_host=args.host, index=args.index)
+overlaps.environment_overlaps_figure(path='./images/environment_overlaps.png')
+```
+
+## Cohorts
+
+
+### phenotypes by source
+
+![g2p_phenotypes_by_source](images/g2p_phenotypes_by_source.png)
+*Breakdown of top twenty phenotypes in g2p knowledgebases.*
+
+```
+cohorts = Cohorts(es_host=args.host, index=args.index)
+cohorts.g2p_phenotypes_by_source_figure(path='./images/g2p_phenotypes_by_source.png')
+```
+
+### g2p phenotypes by chromosome
+
+![g2p_phenotypes_by_chromosome](images/g2p_phenotypes_by_chromosome.png)
+*Show the evidence phenotypes mapped to feature chromosome.*
+
+```
+cohorts = Cohorts(es_host=args.host, index=args.index)
+cohorts.g2p_phenotypes_by_chromosome_figure(path='./images/g2p_phenotypes_by_chromosome.png')
+```
+
+
+### genie samples by chromosome
+
+![genie_samples_by_chromosome](images/genie_samples_by_chromosome.png)
+*Show the evidence phenotypes mapped to tumor sample to feature chromosome.*
+
+```
+cohorts = Cohorts(es_host=args.host, index=args.index)
+cohorts.genie_samples_by_chromosome_figure(path='./images/genie_samples_by_chromosome.png')
+```
+
+
+
+### genie samples by oncotree
+
+![genie_samples_by_oncotree](images/genie_samples_by_oncotree.png)
+*Breakdown of top twenty genie clinical phenotypes in g2p knowledgebases.*
+
+```
+cohorts = Cohorts(es_host=args.host, index=args.index)
+cohorts.genie_samples_by_oncotree_figure(path='./images/genie_samples_by_oncotree.png')
+```
+
+### genie biomarkers
+
+![genie_biomarkers.png](images/genie_biomarkers.png)
+*Breakdown of top twenty genie clinical phenotypes by bio marker type.*
+
+```
+cohorts = Cohorts(es_host=args.host, index=args.index)
+cohorts.genie_biomarkers_figure(path='./images/genie_biomarkers.png')
+```
+
+
+# Raw counts
+
+[raw counts](html/raw_counts.html)
+
+
 ## Genotype to Phenotype (G2P)
   A number of groups – including those from the commercial, governmental, and academic sectors have created knowledgebases to interpret cancer genomic mutations in the context of evidence for pathogenicity, relevant treatment options, or genomically-guided clinical trials (e.g., NCI MATCH and ASCO TAPUR basket trials, and many individual targeted therapy trials). However, in practice, clinicians and researchers are currently unable to effectively utilize the accumulated knowledge derived from such efforts. Integration of the available knowledge is infeasible because each institution (often redundantly) curates their own knowledgebase with limited adherence to any interoperability standards, contributing to a persistent data sharing and interpretation bottleneck. G2P is an aggregate public clinical cancer knowledge base for storing and searching connections between genomic biomarkers (“genotypes”) and patient diagnosis, prognosis, and response to treatment (“phenotypes”). Key uses of G2P include (a) searching by somatic variant to find drugs known to lead to response or resistance in tumors with the variant; (b) searching by drug to identify different mutations in which it can lead to response; (c) searching clinical trials to find those associated with particular biomarkers or drugs. G2P combines biomarker-phenotype associations from 9 trusted and curated knowledge bases, including:
   

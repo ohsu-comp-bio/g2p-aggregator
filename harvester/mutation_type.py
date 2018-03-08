@@ -1,4 +1,4 @@
-
+# DEPRECATED
 
 def norm_biomarker(evidence, cgi_biomarker=None):
     """ Map alteration type to standardized biomarker type. """

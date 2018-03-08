@@ -169,7 +169,7 @@ for path, methods in pairs(restrictions[role]) do
     break
   end
 
-  -- ngx.log(ngx.WARN, method.." "..uri.." NO matched: m:"..tostring(m).." path:"..tostring(path).." for "..role)
+  ngx.log(ngx.WARN, method.." "..uri.." NO matched: m:"..tostring(m).." path:"..tostring(path).." for "..role)
 end
 
 if not allowed then

@@ -19,6 +19,7 @@ import pmkb
 import drug_normalizer
 import disease_normalizer
 import oncogenic_normalizer
+import biomarker_normalizer
 import sage
 import brca
 import jax_trials
@@ -206,6 +207,11 @@ def normalize(feature_association):
     elapsed = timeit.default_timer() - start_time
     if elapsed > 1:
         logging.info('reference_genome_normalizer {}'.format(elapsed))
+
+    start_time = timeit.default_timer()
+    biomarker_normalizer.normalize_feature_association(feature_association)
+    if elapsed > 1:
+        logging.info('biomarker_normalizer {}'.format(elapsed))
 
     start_time = timeit.default_timer()
     location_normalizer.normalize_feature_association(feature_association)

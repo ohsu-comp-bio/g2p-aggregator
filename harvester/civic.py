@@ -4,7 +4,6 @@ import requests
 import copy
 import evidence_label as el
 import evidence_direction as ed
-import mutation_type as mut
 import sys
 import logging
 
@@ -60,7 +59,7 @@ def convert(gene_data):
                 'variant_types' in variant and
                 len(variant['variant_types']) > 0
             ):
-                feature['biomarker_type'] = mut.norm_biomarker(variant['variant_types'][0]['display_name'])  # NOQA
+                feature['biomarker_type'] = variant['variant_types'][0]['display_name']
             for evidence_item in variant['evidence_items']:
                 association = {}
                 for part in variant['name'].split():
