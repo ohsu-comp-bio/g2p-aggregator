@@ -56,7 +56,7 @@ def convert(gene_data):
             feature['alt'] = str(variant['coordinates']['variant_bases'])
             feature['name'] = variant['name']
             feature['description'] = '{} {}'.format(variant['entrez_name'],
-                                                   variant['name'])            
+                                                   variant['name'])
             if (
                 'variant_types' in variant and
                 len(variant['variant_types']) > 0
