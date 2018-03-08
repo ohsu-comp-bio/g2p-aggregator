@@ -69,3 +69,12 @@ def test_uncategorized():
     soid = normalize(term)
     assert soid == None
 
+
+def test_get_so_data_0001587():
+    term = 'SO:0001587'
+    soid = get_soid_data(term)
+    assert soid['soid'] == term
+    assert soid['name'] == 'stop_gained'
+    assert soid['parent_soid'] == 'SO:0001060'
+    assert soid['parent_name'] == 'sequence_variant'
+    assert len(soid['hierarchy']) == 10
