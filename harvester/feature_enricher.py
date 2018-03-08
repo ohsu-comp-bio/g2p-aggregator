@@ -78,52 +78,29 @@ def enrich(feature):
     """
     given a feature, decorate it with genomic location
     """
-    apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
-    if not apiKey:
-        raise ValueError('Please set MOLECULAR_MATCH_API_KEY in environment')
+    try:
+        # return if already there
+        if feature.get('start', None):
+            return feature
 
-    url = "https://api.molecularmatch.com/v2/mutation/get"
-    headers = {'Authorization': 'Bearer {}'.format(apiKey)}
-    payload = {'name': feature['description']}
-    r = requests.get(url, params=payload, headers=headers)
-    mutation = r.json()
-    if 'name' in mutation:
-        feature['name'] = mutation['name']
-    else:
-        feature['name'] = feature['description']
-    if ('GRCh37_location' in mutation and
-            len(mutation['GRCh37_location']) > 0):
-        grch37_mutation = mutation['GRCh37_location'][0]
-        if 'ref' in grch37_mutation:
-            feature['ref'] = grch37_mutation['ref']
-        if 'alt' in grch37_mutation:
-            feature['alt'] = grch37_mutation['alt']
-        if 'chr' in grch37_mutation:
-            feature['chromosome'] = str(grch37_mutation['chr'])
-        if 'start' in grch37_mutation:
-            feature['start'] = grch37_mutation['start']
-        if 'stop' in grch37_mutation:
-            feature['end'] = grch37_mutation['stop']
+        # make sure it has a name and a description
+        if not feature.get('description', None):
+            feature['description'] = feature.get('name', None)
+        if not feature.get('name', None):
+            feature['name'] = feature.get('description', None)
 
-        feature['referenceName'] = 'GRCh37'
-        links = feature.get('links', [])
-        links.append(r.url)
-        feature['links'] = links
+        # we can't normalize things without a description
+        if not feature.get('description', None):
+            return feature
 
-    if 'biomarker_type' not in feature:
-        if ('mutation_type' in mutation and
-                len(mutation['mutation_type']) > 0):
-                feature['biomarker_type'] = mut.norm_biomarker(
-                                mutation['mutation_type'][0])
-
-    # there is a lot of info in mutation, just get synonyms and links
-    if ('wgsaMap' in mutation and 'Synonyms' in mutation['wgsaMap'][0]):
-        synonyms = feature.get('synonyms', [])
-        synonyms = synonyms + mutation['wgsaMap'][0]['Synonyms']
-        synonyms = list(set(synonyms))
-        feature['synonyms'] = synonyms
-
-    # if 'geneSymbol' in mutation and mutation['geneSymbol']:
-    #     feature['geneSymbol'] = mutation['geneSymbol']
+        # we can't normalize things without a description
+        description_parts = re.split(' +', feature['description'].strip())
+        description_length = len(description_parts)
+        if description_length == 1:
+            feature = _enrich_gene(feature)
+        else:
+            feature = _enrich_feature(feature)
+    except Exception as e:
+        logging.error(feature, exc_info=1)
 
     return feature
