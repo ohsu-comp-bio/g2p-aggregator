@@ -25,6 +25,9 @@ def _enrich_gene(feature):
         if 'end' in hit:
             feature['end'] = hit['end']
         feature['referenceName'] = 'GRCh37'
+        if 'provenance' not in feature:
+            feature['provenance'] = []
+        feature['provenance'].append(url)
     return feature
 
 
@@ -65,6 +68,9 @@ def _enrich_feature(feature):
         if 'end' in hg19:
             feature['end'] = hg19['end']
         feature['referenceName'] = 'GRCh37'
+        if 'provenance' not in feature:
+            feature['provenance'] = []
+        feature['provenance'].append(url)
 
         if 'biomarker_type' not in feature:
             if 'cadd' in hit and 'type' in hit['cadd']:
