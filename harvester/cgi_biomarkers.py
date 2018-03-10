@@ -116,7 +116,7 @@ def convert(evidence):
         geneSymbol = genes[0]
         if len(genes) > idx:
             geneSymbol = genes[idx]
-        # feature['biomarker_type'] = mut.norm_biomarker(alteration_type)
+        feature['biomarker_type'] = alteration_type
         feature['name'] = evidence['individual_mutation'][idx]
         description_parts = re.split(' +|:|__', evidence['individual_mutation'][idx].strip())
         feature['description'] = ' '.join(description_parts)

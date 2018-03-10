@@ -7,7 +7,6 @@ import evidence_direction as ed
 import logging
 from warnings import warn
 import sys
-from feature_enricher import enrich
 import time
 
 DEFAULT_GENES = ['*']
@@ -147,9 +146,8 @@ def convert(evidence):
         for t in evidence_tags:
             if t['facet'] == 'MUTATION':
                 features.add(t['term'])
+                feature_objs.append({'description': t['term']})
         features = list(features)
-        for feature in features:
-            feature_objs.append(enrich({'description': feature}))
 
         drugs = set([])
         for t in evidence_tags:
