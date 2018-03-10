@@ -70,6 +70,13 @@ def test_uncategorized():
     assert soid == None
 
 
+def test_CNA():
+    term = 'CNA'
+    soid = normalize(term)
+    print soid
+    assert soid == None
+
+
 def test_get_so_data_0001587():
     term = 'SO:0001587'
     soid = get_soid_data(term)
