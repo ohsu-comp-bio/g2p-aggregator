@@ -44,7 +44,9 @@ def allele_registry(hgvs):
     if r.status_code not in [200, 400, 404]:
         logging.info('unexpected allele_registry {} {}'.format(url,
                                                                r.status_code))
-    return r.json()
+    rsp = r.json()
+    rsp['provenance'] = url
+    return rsp
 
 
 def genomic_hgvs(feature, complement=False, description=False):
@@ -205,6 +207,9 @@ def _apply_allele_registry(feature, allele_registry):
         feature['synonyms'] = synonyms
     if len(links) > 0:
         feature['links'] = links
+    if 'provenance' not in feature:
+        feature['provenance'] = []
+    feature['provenance'].append(allele_registry['provenance'])
 
 
 def _fix_location_end(feature):
