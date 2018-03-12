@@ -7,6 +7,7 @@ import logging
 import cosmic_lookup_table
 import evidence_label as el
 import evidence_direction as ed
+import mutation_type as mut
 
 """ https://www.cancergenomeinterpreter.org/biomarkers """
 
@@ -129,7 +130,8 @@ def convert(evidence):
         features.append({
             'description': ' '.join(description_parts),
             'name': ' '.join(description_parts),
-            'geneSymbol': genes[0]
+            'geneSymbol': genes[0],
+            'biomarker_type': mut.norm_biomarker(evidence['Alteration type'], evidence['Biomarker'])
         })
 
     association = {}
