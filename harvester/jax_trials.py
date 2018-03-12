@@ -10,7 +10,6 @@ import json
 import logging
 import evidence_label as el
 import evidence_direction as ed
-import mutation_type as mut
 
 import cosmic_lookup_table
 
@@ -178,10 +177,7 @@ def convert(jax_evidence):
                 feature['name'] = ' '.join([gene_index[i], mut_index[i],
                                             biomarkers[i]])
                 if biomarkers[i]:
-                    feature['biomarker_type'] = mut.norm_biomarker(
-                        biomarkers[i])
-                else:
-                    feature['biomarker_type'] = mut.norm_biomarker('na')
+                    feature['biomarker_type'] = biomarkers[i]
 
                 # Look up variant and add position information.
                 if not LOOKUP_TABLE:
@@ -204,7 +200,7 @@ def convert(jax_evidence):
                     feature = {}
                     feature['geneSymbol'] = gene
                     feature['name'] = '-'.join(fusion)
-                    feature['biomarker_type'] = mut.norm_biomarker("fusion")
+                    feature['biomarker_type'] = 'fusion'
                     features.append(feature)
 
     association = {}

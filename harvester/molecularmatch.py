@@ -5,7 +5,6 @@ import os
 import evidence_label as el
 import evidence_direction as ed
 import logging
-import mutation_type as mut
 from warnings import warn
 
 resourceURLs = {
@@ -182,11 +181,9 @@ def convert(evidence):
                 elif ('Insertion' in mutation_type or 'Deletion' in mutation_type) and len(feature.get('alt', '')) < len(feature.get('ref', '')):  # NOQA
                     biomarker_types.append('deletion')
                 else:
-                    biomarker_types.append(mut.norm_biomarker(mutation_type))
+                    biomarker_types.append(mutation_type)
             biomarker_types = list(set(biomarker_types))
-            if len(biomarker_types) == 0:
-                feature['biomarker_type'] = mut.norm_biomarker('NA')
-            else:
+            if len(biomarker_types) != 0:
                 feature['biomarker_type'] = ','.join(biomarker_types)
 
         features.append(feature)

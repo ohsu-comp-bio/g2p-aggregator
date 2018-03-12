@@ -12,10 +12,16 @@ import cosmic_lookup_table
 
 import evidence_label as el
 import evidence_direction as ed
-import mutation_type as mut
 from feature_enricher import enrich
 
 LOOKUP_TABLE = None
+
+# OncoKB harvester now pulls from the below downloadable OncoKB files
+# and supplements with additional variant data pulled from their public
+# API. This is because pulling from the private API gives unpredictable
+# results and their is no endpoint in the public API that gives the
+# same drug-gene-variant association information as was being
+# pulled from the private API.
 clinv = Path('../data/oncokb_allActionableVariants.txt')
 biov = Path('../data/oncokb_allAnnotatedVariants.txt')
 
@@ -153,8 +159,7 @@ def convert(gene_data):
                     feature['description'] = var['name']
                     feature['name'] = var['name']
                     feature['entrez_id'] = gene_data['entrezGeneId']
-                    feature['biomarker_type'] = mut.norm_biomarker(
-                        variant['consequence']['term'])
+                    feature['biomarker_type'] = variant['consequence']['term']
                     feature = _enrich_feature(gene, feature)
                     features.append(feature)
 
@@ -163,8 +168,7 @@ def convert(gene_data):
         feature['name'] = variant['name']
         feature['description'] = variant['name']
         feature['entrez_id'] = gene_data['entrezGeneId']
-        feature['biomarker_type'] = mut.norm_biomarker(
-            variant['consequence']['term'])
+        feature['biomarker_type'] = variant['consequence']['term']
         feature = _enrich_feature(gene, feature)
         features.append(feature)
 
@@ -243,8 +247,7 @@ def convert(gene_data):
         feature['geneSymbol'] = gene
         feature['name'] = variant['name']
         feature['entrez_id'] = gene_data['entrezGeneId']
-        feature['biomarker_type'] = mut.norm_biomarker(
-            variant['consequence']['term'])
+        feature['biomarker_type'] = variant['consequence']['term']
 
         # Look up variant and add position information.
         if not LOOKUP_TABLE:

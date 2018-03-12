@@ -4,7 +4,6 @@ import requests
 import copy
 import evidence_label as el
 import evidence_direction as ed
-import mutation_type as mut
 import sys
 import logging
 
@@ -47,8 +46,7 @@ def convert(gene_data):
         feature['ref'] = brca['Ref']
         feature['alt'] = brca['Alt']
         feature['name'] = brca['Protein_Change']
-        feature['biomarker_type'] = mut.norm_biomarker(
-                                    brca['Mutation_type_BIC'])
+        feature['biomarker_type'] = brca['Mutation_type_BIC']
         if len(feature['name']) == 0:
             feature['name'] = brca['HGVS_cDNA']
 

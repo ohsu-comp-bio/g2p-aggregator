@@ -162,7 +162,7 @@ def convert(evidence):
             'description': ' '.join(description_parts),
             'name': ' '.join(description_parts),
             'geneSymbol': genes[0],
-            'biomarker_type' : mut.norm_biomarker(evidence['Alteration type'], evidence['Biomarker'])
+            'biomarker_type': mut.norm_biomarker(evidence['Alteration type'], evidence['Biomarker'])
         })
 
     association = {}

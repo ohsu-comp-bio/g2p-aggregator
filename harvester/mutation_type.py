@@ -1,4 +1,4 @@
-
+# DEPRECATED
 
 def norm_biomarker(evidence, cgi_biomarker=None):
     """ Map alteration type to standardized biomarker type. """
@@ -78,7 +78,7 @@ def norm_biomarker(evidence, cgi_biomarker=None):
                 # Copy number alteration, either amplification or deletion.
                 # This is only relevant in the case of CGI
                 if "amplification" in cgi_biomarker:
-                    return "amplification"
+                    return "amp"
                 elif "deletion" in cgi_biomarker:
-                    return "deletion"
+                    return "del"
     return ev
