@@ -120,11 +120,6 @@ def convert(evidence):
         if not LOOKUP_TABLE:
             LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
                 "./cosmic_lookup_table.tsv")
-        if len(indiv_mut) != len(gDNA):
-            print "WE HAVE A PROBLEM!!!"
-            print gDNA
-            print indiv_mut
-            sys.exit()
         for idx, emut in enumerate(indiv_mut):
             # get genomic locus from COSMIC; if mutation not in COSMIC,
             # get locus info from given gDNA instead
@@ -166,7 +161,8 @@ def convert(evidence):
         features.append({
             'description': ' '.join(description_parts),
             'name': ' '.join(description_parts),
-            'geneSymbol': genes[0]
+            'geneSymbol': genes[0],
+            'biomarker_type' : mut.norm_biomarker(evidence['Alteration type'], evidence['Biomarker'])
         })
 
     association = {}
