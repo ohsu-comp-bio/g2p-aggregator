@@ -233,16 +233,21 @@ def normalize_feature_association(feature_association):
     """ given the 'final' g2p feature_association,
     update it with genomic location """
     allele_registry = None
+    normalized_features = []
     for feature in feature_association['features']:
         try:
-            # ensure we have location
-            feature = enrich(feature)
-            # go get AR info
-            allele_registry = normalize(feature)
-            if allele_registry:
-                if '@id' in allele_registry:
-                    _apply_allele_registry(feature, allele_registry)
-            feature = _fix_location_end(feature)
+            # ensure we have location, enrich can create new features
+            enriched_features = enrich(feature, feature_association)
+            for enriched_feature in enriched_features:
+                # go get AR info
+                allele_registry = normalize(enriched_feature)
+                if allele_registry:
+                    if '@id' in allele_registry:
+                        _apply_allele_registry(enriched_feature,
+                                               allele_registry)
+                enriched_feature = _fix_location_end(enriched_feature)
+                normalized_features.append(enriched_feature)
+            feature_association['features'] = normalized_features
         except Exception as e:
             logging.exception(
                 'exception {} feature {} allele {}'.format(e, feature,
