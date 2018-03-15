@@ -142,6 +142,7 @@ def enrich(feature, feature_association):
             feature['provenance_rule'] = 'missing_description'
             return [feature]
 
+
         # apply rules
         description_parts = re.split(' +', feature['description'].strip())
         description_length = len(description_parts)
@@ -149,16 +150,19 @@ def enrich(feature, feature_association):
         source = feature_association['source'] if 'source' in feature_association else None
         exonMatch = re.match(r'.* Exon ([0-9]*) .*', feature['name'], re.M|re.I)
 
+
         enriched_features = []
-        if description_length == 1:
-            feature = _enrich_gene(feature, provenance_rule='gene_only')
-            enriched_features.append(feature)
-        elif len(description_parts[0].split('-')) == 2:
+        if len(description_parts[0].split('-')) == 2:
             fusion_donor, fusion_acceptor = description_parts[0].split('-')
             feature_fusion_donor = _enrich_gene(copy.deepcopy(feature), fusion_donor, provenance_rule='is_fusion_donor')  # NOQA
+            feature_fusion_donor['geneSymbol'] = fusion_donor
             enriched_features.append(feature_fusion_donor)
             feature_fusion_acceptor = _enrich_gene(copy.deepcopy(feature), fusion_acceptor, provenance_rule='is_fusion_acceptor')  # NOQA
+            feature_fusion_acceptor['geneSymbol'] = fusion_acceptor
             enriched_features.append(feature_fusion_acceptor)
+        elif description_length == 1:
+            feature = _enrich_gene(feature, provenance_rule='gene_only')
+            enriched_features.append(feature)
         elif ('oncokb' == source and
               'clinical' in feature_association['oncokb'] and
               exonMatch and
