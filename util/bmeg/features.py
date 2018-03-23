@@ -15,9 +15,120 @@ from google.protobuf import json_format
 import json
 from google.protobuf.json_format import MessageToJson
 
+# standardized ID generation
+from vmc import models, computed_id, vmc_serialize, get_vmc_sequence_id
+
+
 logger = logging.getLogger(__name__)
+
 # keep track of what we've already exported
 exported = []
+
+
+def get_accession(chromosome):
+    ''' return accession for chromosome
+        https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37.p13
+        https://www.ncbi.nlm.nih.gov/nuccore/NC_000019.09
+    '''
+    ac_map = {
+        '1': 'NC_000001.10',
+        '2': 'NC_000002.11',
+        '3': 'NC_000003.11',
+        '4': 'NC_000004.11',
+        '5': 'NC_000005.9',
+        '6': 'NC_000006.11',
+        '7': 'NC_000007.13',
+        '8': 'NC_000008.10',
+        '9': 'NC_000009.11',
+        '10': 'NC_000010.10',
+        '11': 'NC_000011.9',
+        '12': 'NC_000012.11',
+        '13': 'NC_000013.10',
+        '14': 'NC_000014.8',
+        '15': 'NC_000015.9',
+        '16': 'NC_000016.9',
+        '17': 'NC_000017.10',
+        '18': 'NC_000018.9',
+        '19': 'NC_000019.9',
+        '20': 'NC_000020.10',
+        '21': 'NC_000021.8',
+        '22': 'NC_000022.10',
+        'X': 'NC_000023.10',
+        '23': 'NC_000023.10',
+        'Y': 'NC_000024.9',
+    }
+    return ac_map.get(chromosome, None)
+
+
+def get_GRCh37_identifier():
+    return models.Identifier(namespace="NCBI",
+                             accession="NC_000019.9")
+
+
+def vmc_identifier(chromosome):
+    ''' return VMC identifier for chromosome '''
+    identifier = models.Identifier(namespace="NCBI",
+                                   accession=get_accession(chromosome))
+    return identifier
+
+
+def vmc_location(feature):
+    """
+    given a feature, create a VMC identifier
+    https://github.com/ga4gh/vmc-python
+    """
+    identifier = vmc_identifier(feature['chromosome'])
+    start = None
+    end = None
+    if 'start' in feature:
+        start = int(feature['start'])
+    if 'end' in feature:
+        end = int(feature['end'])
+
+    interval = models.Interval(start=start, end=end)
+
+    location = models.Location(sequence_id=get_vmc_sequence_id(identifier),
+                               interval=interval)
+    location.id = computed_id(location)
+
+    return location, identifier
+
+
+def vmc_allele(feature):
+    """
+    given a feature, create a VMC identifier
+    https://github.com/ga4gh/vmc-python
+    """
+    location, identifier = vmc_location(feature)
+
+    alt = feature.get('alt', None)
+    if alt == '-':
+        alt = None
+    allele = None
+    ref = feature.get('ref', None)
+    if ref == '-':
+        ref = None
+
+    if alt:
+        allele = models.Allele(location_id=location.id, state=a)
+    elif ref:
+        allele = models.Allele(location_id=location.id, state=ref)
+    if allele:
+        allele.id = computed_id(allele)
+
+    return allele, location, identifier
+
+
+def vmc_bundle(feature):
+
+    location = vmc_location(feature)
+    allele, location, identifier = vmc_allele(feature)
+    locations = {location.id: location}
+    identifiers = {location.sequence_id: [identifier]}
+    alleles = {allele.id: allele}
+
+    return models.Vmcbundle(locations=locations, alleles=alleles,
+                            identifiers=identifiers)
 
 
 def feature_gid(f):
@@ -115,7 +226,7 @@ if __name__ == '__main__':
             "geneSymbol": "TTL"
         }
     ]})
-    assert ({'features': ['ENSG00000114999']}, {'ENSG00000114999': {'id': 'ENSG00000114999', 'names': []}}) == ttl    # noqa
+    assert (({'features': ['geneENSG00000114999']}, {'geneENSG00000114999': {'id': 'geneENSG00000114999', 'names': []}})) == ttl    # noqa
     complex_rsp = normalize({'features': [
         COMPLEX_FEATURE,
     ]})
@@ -128,8 +239,16 @@ if __name__ == '__main__':
         },
         COMPLEX_FEATURE
     ]})
-    assert ({'features': ['GRCh37:4:55593607:55593615:AGGTTGTTG:-', 'ENSG00000114999']}, {}) == complex_ttl   # noqa
+    assert ({'features': ['geneENSG00000114999', 'GRCh37:4:55593607:55593615:AGGTTGTTG:-']}, {}) == complex_ttl, 'should be \n{}'.format(complex_ttl)   # noqa
 
     v = Variant()
     o = json_format.Parse(json.dumps(complex_rsp[1]['GRCh37:4:55593607:55593615:AGGTTGTTG:-']), v, ignore_unknown_fields=False)
     assert(MessageToJson(o))
+
+    location = vmc_location(COMPLEX_FEATURE)
+    print location
+    allele = vmc_allele(COMPLEX_FEATURE)
+    print allele
+    bundle = vmc_bundle(COMPLEX_FEATURE)
+    print bundle.as_dict()
+    print bundle.keys()
