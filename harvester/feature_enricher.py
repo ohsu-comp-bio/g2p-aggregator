@@ -174,19 +174,26 @@ def enrich(feature, feature_association):
                                        provenance_rule='is_oncokb_exon')
             enriched_features.append(feature)
 
-        elif 'amplification' in feature['description']:
+        elif ('deletion' in feature['description'].lower() or
+              'del ' in feature['description'].lower()):
+            feature = _enrich_gene(feature, description_parts[0],
+                                   provenance_rule='is_deletion')
+            enriched_features.append(feature)
+
+        elif ('amplification' in feature['description'].lower() or
+              'amp ' in feature['description'].lower()):
             feature = _enrich_gene(feature, description_parts[0],
                                    provenance_rule='is_amplification')
             enriched_features.append(feature)
-        elif 'loss' in feature['description']:
+        elif 'loss' in feature['description'].lower():
             feature = _enrich_gene(feature, description_parts[0],
                                    provenance_rule='is_loss')
             enriched_features.append(feature)
-        elif 'mutation' in feature['description']:
+        elif 'mutation' in feature['description'].lower():
             feature = _enrich_gene(feature, description_parts[0],
                                    provenance_rule='is_mutation')
             enriched_features.append(feature)
-        elif 'inact mut' in feature['description']:
+        elif 'inact mut' in feature['description'].lower():
             feature = _enrich_gene(feature, description_parts[0],
                                    provenance_rule='is_inact_mut')
             enriched_features.append(feature)
