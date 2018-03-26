@@ -1,6 +1,7 @@
 .env
 **/venv
 .cache
+*.pkl
 .idea/
 *.pyc
 *.swp
