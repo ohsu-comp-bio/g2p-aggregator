@@ -4,6 +4,7 @@
 *.pkl
 .idea/
 *.pyc
+.pytest_cache/
 *.swp
 *.ipynb_checkpoints
 esdata
