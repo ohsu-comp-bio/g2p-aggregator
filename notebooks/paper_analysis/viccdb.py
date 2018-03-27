@@ -2,6 +2,9 @@ from definitions import *
 import json
 from collections import defaultdict
 import pickle
+import pyupset as pyu
+import pandas as pd
+import matplotlib as mpl
 
 
 class ViccAssociation(dict):
@@ -113,3 +116,11 @@ class ViccDb:
 
     def __iter__(self):
         return iter(self.associations)
+
+    def plot_overlap(self, map_function, by='source'):
+        if by == 'source':
+            input_dict = self.associations_by_source
+        else:
+            raise NotImplementedError
+        d = {group: pd.DataFrame(set().update(map(map_function, input_dict[group]))) for group in input_dict}
+        pyu.plot(d, inters_size_bounds=(3, 10000000))

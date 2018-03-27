@@ -1,1 +1,4 @@
 pytest
+pyupset
+pandas
+matplotlib
