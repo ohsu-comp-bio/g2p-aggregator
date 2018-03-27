@@ -22,9 +22,6 @@ class ViccAssociation(dict):
             t = [self['raw']['variant']['id'], self['raw']['tumor']['id']] + [x['id'] for x in self['raw']['tissues']]
             k = 'pmkb:{}'.format('-'.join([str(x) for x in t]))  # There's no interpretation ID, made compound ID from components
         elif source == 'oncokb':
-            # The lines below are if biological variants are included. These are being omitted from analysis.
-            # pre = self['raw']['biological']
-            # t = [pre['variant']['name'], pre['gene'], pre['oncogenic']]
             pre = self['raw']['clinical']
             t = [pre['cancerType'], pre['drug'], pre['gene'], pre['variant']['name'], pre['level']]
             k = 'oncokb:{}'.format('-'.join(t))

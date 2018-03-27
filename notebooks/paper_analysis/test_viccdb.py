@@ -24,8 +24,8 @@ class TestViccDb(object):
         assert len(vdb) == count
 
     def test_association_hash(self, vdb):
-        c = Counter(map(lambda x: hash(x), vdb))
-        assert len(c) == sum(c.values())
+        c = Counter(map(lambda x: hash(x), vdb))  # Implicit test that all elements hash
+        assert len(c) == sum(c.values())          # Tests that all hashes are unique
 
 
 class TestOncokb(object):
