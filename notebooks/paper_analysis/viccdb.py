@@ -35,6 +35,9 @@ class ViccAssociation(dict):
             raise NotImplementedError("No hash routine defined for source '{}'".format(source))
         return hash(k)
 
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
 
 class ViccDb:
 
