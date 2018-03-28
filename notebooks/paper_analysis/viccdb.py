@@ -2,9 +2,42 @@ from definitions import *
 import json
 from collections import defaultdict
 import pickle
+import re
 import pyupset as pyu
 import pandas as pd
-import matplotlib as mpl
+
+
+class Publication:
+
+    pmid_re = re.compile(r'https?://.*pubmed/(\d+)$')
+
+    def __init__(self, publication_string):
+        pmid_match = Publication.pmid_re.match(publication_string)
+        self.pmid = None
+        self.publication_string = publication_string
+        if pmid_match:
+            self.pmid = int(pmid_match[1])
+
+    def __str__(self):
+        if self.pmid:
+            return str(self.pmid)
+        else:
+            return self.publication_string
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def __eq__(self, other):
+        return str(other) == str(self)
+
+    def __lt__(self, other):
+        return str(self) < str(other)
+
+    def __gt__(self, other):
+        return str(self) > str(other)
 
 
 class ViccAssociation(dict):
@@ -34,6 +67,18 @@ class ViccAssociation(dict):
         else:
             raise NotImplementedError("No hash routine defined for source '{}'".format(source))
         return hash(k)
+
+    @property
+    def publications(self):
+        evidence = self['association']['evidence']
+        all_pubs = list()
+        for e in evidence:
+            all_pubs += [Publication(p) for p in e['info']['publications'] if p]
+        return all_pubs
+
+    @property
+    def source(self):
+        return self['source']
 
     def __eq__(self, other):
         return hash(self) == hash(other)
@@ -82,10 +127,13 @@ class ViccDb:
 
     def _index_associations(self):
         associations_by_source = defaultdict(list)
+        hashed = defaultdict(list)
         for association in self.associations:
             source = association['source']
             associations_by_source[source].append(association)
+            hashed[hash(association)].append(association)
         self.associations_by_source = dict(associations_by_source)
+        self._hashed = hashed
 
     def select(self, filter_function):
         associations = filter(filter_function, self.associations)
@@ -117,10 +165,13 @@ class ViccDb:
     def __iter__(self):
         return iter(self.associations)
 
-    def plot_overlap(self, map_function, by='source'):
-        if by == 'source':
-            input_dict = self.associations_by_source
-        else:
-            raise NotImplementedError
-        d = {group: pd.DataFrame(set().update(map(map_function, input_dict[group]))) for group in input_dict}
-        pyu.plot(d, inters_size_bounds=(3, 10000000))
+    def __contains__(self, item):
+        return hash(item) in self._hashed
+
+    def __sub__(self, other):
+        for h, associations in other._hashed.items():
+            assert len(associations) == 1
+            assert len(self._hashed.get(h, [])) <= 1
+            # these assertions assume that hash uniquely identifies an association.
+            # Currently not true, but should be with harvester changes.
+        return ViccDb([x for x in self if x not in other])
