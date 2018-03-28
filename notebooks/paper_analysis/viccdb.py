@@ -3,8 +3,6 @@ import json
 from collections import defaultdict
 import pickle
 import re
-import pyupset as pyu
-import pandas as pd
 
 
 class Publication:
@@ -40,7 +38,7 @@ class Publication:
         return str(self) > str(other)
 
 
-class ViccAssociation(dict):
+class RawAssociation(dict):
 
     def __hash__(self):
         source = self['source']
@@ -114,7 +112,7 @@ class ViccDb:
             with path.open() as json_data:
                 associations = list()
                 for line in json_data:
-                    association = ViccAssociation(json.loads(line))
+                    association = RawAssociation(json.loads(line))
                     association['raw'] = association.pop(source)
                     associations.append(association)
                     self.associations.append(association)
