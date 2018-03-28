@@ -1,4 +1,4 @@
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-DATA_ROOT = PROJECT_ROOT.parents[1] / 'data' / 'local'
+DATA_ROOT = PROJECT_ROOT / 'data'

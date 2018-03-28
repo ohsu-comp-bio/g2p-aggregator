@@ -5,7 +5,7 @@ from viccdb import ViccDb
 
 @pytest.fixture(scope="module")
 def vdb():
-    return ViccDb(load_cache=True)
+    return ViccDb()
 
 
 @pytest.fixture(scope="module")
@@ -16,7 +16,7 @@ def civicdb(vdb):
 class TestViccDb(object):
 
     def test_len(self, vdb):
-        assert len(vdb) > 18500
+        assert len(vdb) > 13000
 
     def test_select(self, vdb, civicdb):
         assert len(civicdb) == len(vdb.select(lambda x: x['source'] == 'civic'))
@@ -35,7 +35,8 @@ class TestViccDb(object):
     def test_subtraction(self, vdb, civicdb):
         delta = vdb - civicdb
         assert len(delta) == len(vdb) - len(civicdb)
-        assert len(delta) > 10000
+        assert len(delta) > 5000
+
 
 class TestOncokb(object):
 
