@@ -24,14 +24,58 @@ class Element:
     def __gt__(self, other):
         return str(self) > str(other)
 
+    def __str__(self):
+        raise NotImplementedError
+
+
+class Disease(Element):
+
+    def __init__(self, id, source, term):
+        self.id = id
+        self.source = source
+        self.term = term
+
+    def __str__(self):
+        return str(self.term)
+
+
+class Drug(Element):
+
+    def __init__(self, id, source, term, **kwargs):
+        self.id = id
+        self.source = source
+        self.term = term
+
+    def __str__(self):
+        return str(self.term)
 
 class Gene(Element):
 
     def __init__(self, gene_name):
-        self.gene_symbol = str(gene_name)  # Assumes gene_name is gene_symbol
+        self.gene_name = gene_name  # Assumes gene_names are homogeneous
 
     def __str__(self):
-        return self.gene_symbol
+        return str(self.gene_name)
+
+    def __bool__(self):
+        return bool(self.gene_name)
+
+
+class Feature(Element):
+
+    CHROMOSOMES = [str(x) for x in range(1, 23)] + ['X', 'Y']
+    REFERENCE_BUILDS = ['GRCh37', 'GRCh38']
+
+    def __init__(self, chromosome, start, end, referenceName, **kwargs):
+        assert chromosome in Feature.CHROMOSOMES
+        self.chromosome = chromosome
+        self.start = start
+        self.end = end
+        assert referenceName in Feature.REFERENCE_BUILDS
+        self.referenceName = referenceName
+
+    def __str__(self):
+        return ':'.join([str(getattr(self, x)) for x in ['referenceName', 'chromosome', 'start', 'end']])
 
 
 class Publication(Element):
@@ -52,7 +96,61 @@ class Publication(Element):
             return self.publication_string
 
 
-class RawAssociation(dict):
+class ViccAssociation(dict):
+
+    def __hash__(self):
+        raise NotImplementedError
+
+    @property
+    def publications(self):
+        evidence = self['association']['evidence']
+        all_pubs = list()
+        for e in evidence:
+            all_pubs += [Publication(p) for p in e['info']['publications'] if p]
+        return all_pubs
+
+    @property
+    def genes(self):
+        return [Gene(g) for g in self['genes']]
+
+    @property
+    def source(self):
+        return self['source']
+
+    @property
+    def features(self):
+        out = list()
+        for f in self['features']:
+            try:
+                f2 = Feature(**f)
+            except:
+                continue
+            out.append(f2)
+        return out
+
+    @property
+    def disease(self):
+        try:
+            return Disease(**self['association']['phenotype']['type'])
+        except:
+            return None
+
+    @property
+    def drugs(self):
+        out = list()
+        for d in self['association'].get('environmentalContexts', []):
+            try:
+                d2 = Drug(**d)
+            except:
+                continue
+            out.append(d2)
+        return out
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
+
+class RawAssociation(ViccAssociation):
 
     def __hash__(self):
         source = self['source']
@@ -84,31 +182,6 @@ class RawAssociation(dict):
         else:
             raise NotImplementedError("No hash routine defined for source '{}'".format(source))
         return hash(k)
-
-    @property
-    def publications(self):
-        evidence = self['association']['evidence']
-        all_pubs = list()
-        for e in evidence:
-            all_pubs += [Publication(p) for p in e['info']['publications'] if p]
-        return all_pubs
-
-    @property
-    def genes(self):
-        return [ Gene(g) for g in self['genes'] ]
-
-
-    @property
-    def source(self):
-        return self['source']
-
-    def __eq__(self, other):
-        return hash(self) == hash(other)
-
-
-class ViccAssociation(RawAssociation):
-
-    pass
 
 
 class ViccDb:
@@ -142,7 +215,7 @@ class ViccDb:
             source = path.parts[-1].split('.')[0]
             with path.open() as json_data:
                 for line in json_data:
-                    association = RawAssociation(json.loads(line))
+                    association = RawAssociation(json.loads(line))  # TODO: Move to ViccAssociation after RawAssociation checks pass
                     association['raw'] = association.pop(source)
                     self.associations.append(association)
 
@@ -163,6 +236,9 @@ class ViccDb:
     def select(self, filter_function):
         associations = filter(filter_function, self.associations)
         return ViccDb(list(associations))
+
+    def by_source(self, source):
+        return ViccDb(self.associations_by_source[source])
 
     def report_groups(self, superset=None):
         if superset is None:
@@ -204,7 +280,7 @@ class ViccDb:
             # Currently not true, but should be with harvester changes.
         return ViccDb([x for x in self if x not in other])
 
-    def plot_element_by_source(self, element, filter_func=lambda x: True, min_bound=3, max_bound=1000000000):
+    def plot_element_by_source(self, element, filter_func=lambda x: True, min_bound=1, max_bound=1000000000):
         element_by_source = defaultdict(set)
         for association in self:
             element_by_source[association.source].update(getattr(association, element))
