@@ -152,7 +152,7 @@ def enrich(feature, feature_association):
 
 
         enriched_features = []
-        if len(description_parts[0].split('-')) == 2:
+        if len(description_parts[0].split('-')) == 2 and len(description_parts[0].split('-')[1]) > 1:
             fusion_donor, fusion_acceptor = description_parts[0].split('-')
             feature_fusion_donor = _enrich_gene(copy.deepcopy(feature), fusion_donor, provenance_rule='is_fusion_donor')  # NOQA
             feature_fusion_donor['geneSymbol'] = fusion_donor
