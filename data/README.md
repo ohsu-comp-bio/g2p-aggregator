@@ -14,14 +14,16 @@ This directory contains the 'raw' files from various sources necessary for g2p h
   * pre-harmonization download of molecularmatch trials
   * recreate  via `python harvester.py --silos file --harvesters molecularmatch_trials  --phases harvest`
 
-* [cgi_biomarkers_per_variant.tsv, cgi_oncogenic_mutations.tsv](https://www.cancergenomeinterpreter.org/biomarkers)
+* cgi
+  * [cgi_biomarkers_per_variant.tsv](https://www.cancergenomeinterpreter.org/biomarkers)
+  * [catalog_of_validated_oncogenic_mutations.tsv](https://www.cancergenomeinterpreter.org/mutations)
   * manual download
   * raw evidence
 
 * [allAnnotatedVariants.txt](http://oncokb.org/api/v1/utils/allAnnotatedVariants.txt), [allActionableVariants.txt](http://oncokb.org/api/v1/utils/allActionableVariants.txt)
   * download by clicking link, or going to [oncokb.org/#/dataAccess](http://oncokb.org/#/dataAccess)
   * used to run harvester on oncokb
-  * 'oncokb\_' prefix added to files for clarity 
+  * 'oncokb\_' prefix added to files for clarity
 
 * [data_mutations_extended_1.0.1.txt,data_clinical_1.0.1.txt](https://www.synapse.org/#!Synapse:syn7851250 )
   * manual registration and download
