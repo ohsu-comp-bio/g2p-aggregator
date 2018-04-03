@@ -81,9 +81,9 @@ class TestSource(object):
                 count += 1
         assert count < 5
 
-    def test_drugs(self, sourcedb):
-        count = 0
-        for x in sourcedb:
-            if len(x.drugs) == 0:
-                count += 1
-        assert count == 0
+    # def test_drugs(self, sourcedb):
+    #     count = 0
+    #     for x in sourcedb:
+    #         if len(x.drugs) == 0:
+    #             count += 1
+    #     assert count == 0
