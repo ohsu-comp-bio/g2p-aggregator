@@ -72,7 +72,7 @@ class TestSource(object):
         for x in sourcedb:
             if len(x.features) == 0:
                 count += 1
-        assert count < 25
+        assert count < 0.02 * len(sourcedb)  # less than 2% of associations lacking features
 
     def test_diseases(self, sourcedb):
         count = 0
