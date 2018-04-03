@@ -10,7 +10,7 @@ import pandas as pd
 class Element:
 
     def __repr__(self):
-        return str(self)
+        return "{}: {}".format(str(type(self)), str(self))
 
     def __hash__(self):
         return hash(str(self))
