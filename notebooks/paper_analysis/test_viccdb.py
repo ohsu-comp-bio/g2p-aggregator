@@ -1,19 +1,24 @@
 import pytest
 from collections import Counter
 from viccdb import ViccDb
+from os import environ
 
 
 CACHE_PRESENT = ViccDb.DEFAULT_CACHE.exists()
+PAPER_TESTING = bool(environ['VICC_PAPER_TESTING'])
+if PAPER_TESTING:
+    SOURCES = ['molecularmatch', 'civic', 'pmkb', 'oncokb', 'jax', 'cgi']
+else:
+    SOURCES = ['molecularmatch', 'civic', 'pmkb', 'brca', 'oncokb', 'jax', 'cgi']
 
 
 @pytest.fixture(scope="module")
 def vdb():
     vdb = ViccDb(load_cache=CACHE_PRESENT)
-    omit = vdb.select(lambda x: x['source'] == 'oncokb' and 'clinical' not in x['raw'])
-    return vdb - omit
+    return vdb
 
 
-@pytest.fixture(scope="module", params=['molecularmatch', 'brca', 'civic', 'pmkb', 'oncokb', 'jax', 'cgi'])
+@pytest.fixture(scope="module", params=SOURCES)
 def sourcedb(vdb, request):
     return ViccDb(vdb.by_source(request.param))
 
