@@ -49,7 +49,7 @@ class TestSource(object):
 
     def test_hash(self, sourcedb):
         c = Counter(map(lambda x: hash(x), sourcedb))   # Implicit test that all elements hash
-        assert len(c) <= sum(c.values()) + 5               # Tests that most hashes are unique (within 5 collisions)
+        assert len(c) == sum(c.values())             # Tests that hashes are unique
 
     def test_genes(self, sourcedb):
         count = 0
