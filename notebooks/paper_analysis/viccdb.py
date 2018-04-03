@@ -61,21 +61,75 @@ class Gene(Element):
         return bool(self.gene_name)
 
 
-class Feature(Element):
+class GenomicFeature(Element):
 
     CHROMOSOMES = [str(x) for x in range(1, 23)] + ['X', 'Y']
     REFERENCE_BUILDS = ['GRCh37', 'GRCh38']
 
-    def __init__(self, chromosome, start, end, referenceName, **kwargs):
-        assert chromosome in Feature.CHROMOSOMES
+    def __init__(self, chromosome, start, end, referenceName, sequence_ontology={}, **kwargs):
+        if chromosome.lower().startswith('chr'):
+            chromosome = chromosome[3:]
+        assert chromosome in GenomicFeature.CHROMOSOMES
         self.chromosome = chromosome
-        self.start = start
-        self.end = end
-        assert referenceName in Feature.REFERENCE_BUILDS
-        self.referenceName = referenceName
+        self.start = int(start)
+        self.end = int(end)
+        self.so = sequence_ontology
+        assert referenceName in GenomicFeature.REFERENCE_BUILDS
+        self.reference_name = referenceName
 
     def __str__(self):
-        return ':'.join([str(getattr(self, x)) for x in ['referenceName', 'chromosome', 'start', 'end']])
+        return ':'.join([str(getattr(self, x)) for x in ['reference_name', 'chromosome', 'start', 'end']])
+
+    def __eq__(self, other):
+        return all([
+            self.chromosome == other.chromosome,
+            self.start == other.start,
+            self.end == other.end,
+            self.reference_name == other.reference_name
+        ])
+
+    __hash__ = Element.__hash__
+
+    def __le__(self, other):
+        return all([
+            self.chromosome == other.chromosome,
+            self.start >= other.start,
+            self.end <= other.end,
+            self.reference_name == other.reference_name
+        ])
+
+    def __ge__(self, other):
+        return all([
+            self.chromosome == other.chromosome,
+            self.start <= other.start,
+            self.end >= other.end,
+            self.reference_name == other.reference_name
+        ])
+
+    def __lt__(self, other):
+        if not self.chromosome == other.chromosome:
+            return False
+        if not self.reference_name == other.reference_name:
+            return False
+        if self.start > other.start and self.end <= other.end:
+            return True
+        if self.start >= other.start and self.end < other.end:
+            return True
+        return False
+
+    def __gt__(self, other):
+        if not self.chromosome == other.chromosome:
+            return False
+        if not self.reference_name == other.reference_name:
+            return False
+        if self.start < other.start and self.end >= other.end:
+            return True
+        if self.start <= other.start and self.end > other.end:
+            return True
+        return False
+
+    def __contains__(self, item):
+        return self >= item
 
 
 class Publication(Element):
@@ -122,7 +176,7 @@ class ViccAssociation(dict):
         out = list()
         for f in self['features']:
             try:
-                f2 = Feature(**f)
+                f2 = GenomicFeature(**f)
             except:
                 continue
             out.append(f2)
