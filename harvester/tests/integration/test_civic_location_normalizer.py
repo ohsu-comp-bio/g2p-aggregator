@@ -36,3 +36,5 @@ def test_civic2():
     for f in fa['features']:
         print f['name'], f['provenance']
     assert len(fa['features']) == 1
+    assert fa['features'][0]['geneSymbol'] == "HLA-C"
+    assert fa['features'][0]['provenance_rule'] == "is_loss"

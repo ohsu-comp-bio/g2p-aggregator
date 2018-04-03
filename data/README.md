@@ -36,3 +36,7 @@ This directory contains the 'raw' files from various sources necessary for g2p h
 * [msk_impact_2017/*](http://www.cbioportal.org/study?id=msk_impact_2017#summary)
   * manual download  from 'Download Data' button at top of page
   * cohort for GENIE analysis notebook
+
+* non_alt_loci_set.json
+  * wget ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/json/non_alt_loci_set.json
+  * gene symbol validation
