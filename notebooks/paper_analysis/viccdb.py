@@ -286,6 +286,7 @@ class ViccDb:
             hashed[hash(association)].append(association)
         self.associations_by_source = dict(associations_by_source)
         self._hashed = hashed
+        self._element_by_source = dict()
 
     def select(self, filter_function):
         associations = filter(filter_function, self.associations)
@@ -336,15 +337,34 @@ class ViccDb:
         return ViccDb([x for x in self if x not in other])
 
     def plot_element_by_source(self, element, filter_func=lambda x: True, min_bound=1, max_bound=1000000000):
-        element_by_source = defaultdict(set)
-        for association in self:
-            element_by_source[association.source].update(getattr(association, element))
+        element_by_source = self.get_element_by_source(element)
 
         df_dict = dict()
         column_name = ['attribute']
         for source in element_by_source:
-            pubs = list(filter(filter_func, element_by_source[source]))
-            df_dict[source] = pd.DataFrame(pubs, columns=column_name)
+            filtered_elements = list(filter(filter_func, element_by_source[source]))
+            df_dict[source] = pd.DataFrame(filtered_elements, columns=column_name)
         x = pyu.plot(df_dict, unique_keys=column_name, inters_size_bounds=(min_bound, max_bound))
         x['input_data'] = element_by_source
         return x
+
+    def element_by_source_stats(self, element, filter_func=lambda x: True):
+        element_by_source = self.get_element_by_source(element)
+        for source, elements in element_by_source.items():
+            element_by_source[source] = list(filter(filter_func, elements))
+        return element_by_source
+
+    def get_element_by_source(self, element):
+        try:
+            e = self._element_by_source[element]
+        except KeyError:
+            element_by_source = defaultdict(set)
+            for association in self:
+                association_element = getattr(association, element)
+                if hasattr(association_element, '__iter__') and not isinstance(association_element, str):
+                    element_by_source[association.source].update(association_element)
+                else:
+                    element_by_source[association.source].add(association_element)
+            self._element_by_source[element] = dict(element_by_source)
+            e = self._element_by_source[element]
+        return e
