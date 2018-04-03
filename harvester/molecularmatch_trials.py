@@ -112,6 +112,9 @@ def convert(evidence):
     for t in evidence['tags']:
         if t.get("filterType", None) == "include" and \
            t.get("suppress", True) is False:
+            generatedByTerm = t.get('generatedByTerm', None)
+            if generatedByTerm == '':
+                del t['generatedByTerm']
             evidence_tags.append(t)
 
     has_drug = False

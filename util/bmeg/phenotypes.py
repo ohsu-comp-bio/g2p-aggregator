@@ -7,8 +7,6 @@ exported = []
 
 def phenotype_gid(p):
     """ given a phenotype, hash it"""
-    """
-    """
     a = []
     if 'type' in p:
         _type = p['type']
@@ -40,13 +38,17 @@ def normalize(hit):
     """
     phenotypes = {}
     # hash each phenotype
-    if 'phenotype' in hit['association']:
-        gid = phenotype_gid(hit['association']['phenotype'])
-        phenotypes[gid] = bmeg_phenotype(hit['association']['phenotype'], gid)
-        hit['association']['phenotypes'] = list(phenotypes.keys())
-        for k in phenotypes.keys():
-            if str(k) in exported:
-                del phenotypes[k]
-        exported.extend(phenotypes.keys())
-        del hit['association']['phenotype']
-    return (hit, phenotypes)
+    try:
+        if 'phenotype' in hit['association']:
+            gid = phenotype_gid(hit['association']['phenotype'])
+            phenotypes[gid] = bmeg_phenotype(hit['association']['phenotype'], gid)
+            hit['association']['phenotypes'] = list(phenotypes.keys())
+            for k in phenotypes.keys():
+                if str(k) in exported:
+                    del phenotypes[k]
+            exported.extend(phenotypes.keys())
+            del hit['association']['phenotype']
+        return (hit, phenotypes)
+    except Exception as e:
+        print hit
+        exit(1)
