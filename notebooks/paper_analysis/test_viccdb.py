@@ -3,9 +3,12 @@ from collections import Counter
 from viccdb import ViccDb
 
 
+CACHE_PRESENT = ViccDb.DEFAULT_CACHE.exists()
+
+
 @pytest.fixture(scope="module")
 def vdb():
-    vdb = ViccDb()
+    vdb = ViccDb(load_cache=CACHE_PRESENT)
     omit = vdb.select(lambda x: x['source'] == 'oncokb' and 'clinical' not in x['raw'])
     return vdb - omit
 
@@ -43,7 +46,8 @@ class TestOncokb(object):
     def test_types(self, vdb):
         okb = vdb.by_source('oncokb')
         for x in okb:
-            assert 'clinical' in x['raw'] # Only clinical results
+            assert 'clinical' in x['raw']  # Only clinical results
+
 
 class TestSource(object):
 

@@ -328,8 +328,9 @@ class ViccDb:
 
     def __sub__(self, other):
         for h, associations in other._hashed.items():
-            assert len(associations) == 1
-            assert len(self._hashed.get(h, [])) <= 1
+            error_msg = "Cannot perform set substraction, association hash not unique."
+            assert len(associations) == 1, error_msg
+            assert len(self._hashed.get(h, [])) <= 1, error_msg
             # these assertions assume that hash uniquely identifies an association.
             # Currently not true, but should be with harvester changes.
         return ViccDb([x for x in self if x not in other])
