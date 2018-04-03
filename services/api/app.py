@@ -102,15 +102,31 @@ def _location_lookup(params):
         args['features.referenceName'] = params.assemblyId
     if params.referenceName:
         args['features.chromosome'] = params.referenceName
-    if params.start:
+
+    if params.startMin and params.startMax:
+        args['features.start'] = '(>={} AND <={})'.format(params.startMin,
+                                                          params.startMax)
+    elif params.startMin:
+        args['features.start'] = '(>={})'.format(params.startMin)
+    elif params.startMax:
+        args['features.start'] = '(<={})'.format(params.startMax)
+    elif params.start:
         args['features.start'] = params.start
-    if params.end:
+
+    if params.endMin and params.endMax:
+        args['features.end'] = '(>={} AND <={})'.format(params.endMin,
+                                                        params.endMax)
+    elif params.endMin:
+        args['features.end'] = '(>={})'.format(params.endMin)
+    elif params.endMax:
+        args['features.end'] = '(<={})'.format(params.endMax)
+    elif params.end:
         args['features.end'] = params.end
+
     if params.referenceBases:
         args['features.ref'] = params.referenceBases
     if params.alternateBases:
         args['features.alt'] = params.alternateBases
-    print args
 
     q = Search(using=client)
     query = ' '.join(['+{}:{}'.format(k, args[k]) for k in args.keys()])
@@ -122,7 +138,7 @@ def _location_lookup(params):
         "exists": count > 0,
         "datasetAlleleResponses": [
             {
-                'externalUrl': '{}://{}/v1/g2p/associations/{}'.format(
+                'externalUrl': '{}://{}/api/v1/associations/{}'.format(
                     g2p_api.specification['schemes'][0],
                     g2p_api.specification['host'],
                     hit.meta.id),
@@ -157,7 +173,6 @@ def searchAssociations(**kwargs):
     s = Search(using=client, index='associations')
     s = s.query("query_string", query=q)
     # grab total before we apply size
-    total = s.count()
     size = int(kwargs.get('size', '10'))
     _from = int(kwargs.get('from', '1'))
     # set sort order
@@ -170,11 +185,15 @@ def searchAssociations(**kwargs):
             field = '{}.keyword'.format(field)
         log.debug('set sort to {}'.format(field))
         s = s.sort(field)
-    log.debug(s.to_dict())
+    s = s[_from:(_from+size)]
+    response = s.execute()
+    total = response.hits.total
+    log.debug('total {}'.format(total))
+    hits = [hit.to_dict() for hit in response]
     return {
         'hits': {
             'total': total,
-            'hits': [hit.to_dict() for hit in s[_from:(_from+size)]]
+            'hits': hits
         }
     }
 
@@ -192,8 +211,8 @@ def associationTerms(**kwargs):
     s = s.params(size=0)
     s = s.query("query_string", query=q)
     # ... just aggregations
-    s.aggs.bucket('terms', 'terms', field=field)
-    print s.to_dict()
+    size = int(kwargs.get('size', '10'))
+    s.aggs.bucket('terms', 'terms', field=field, size=size)
     aggs = s.execute().aggregations
     # map it to an array of objects
     return aggs.to_dict()
