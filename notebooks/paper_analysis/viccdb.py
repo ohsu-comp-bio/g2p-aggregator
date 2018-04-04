@@ -1,10 +1,11 @@
 from definitions import *
 import json
-from collections import defaultdict
+from collections import defaultdict, Counter
 import pickle
 import re
 import pyupset as pyu
 import pandas as pd
+from math import ceil
 
 
 class Element:
@@ -336,7 +337,7 @@ class ViccDb:
             # Currently not true, but should be with harvester changes.
         return ViccDb([x for x in self if x not in other])
 
-    def plot_element_by_source(self, element, filter_func=lambda x: True, min_bound=1, max_bound=1000000000):
+    def plot_element_by_source(self, element, filter_func=lambda x: bool(x), min_bound=1, max_bound=1000000000):
         element_by_source = self.get_element_by_source(element)
 
         df_dict = dict()
@@ -348,11 +349,38 @@ class ViccDb:
         x['input_data'] = element_by_source
         return x
 
-    def element_by_source_stats(self, element, filter_func=lambda x: True):
+    def element_by_source_stats(self, element, filter_func=lambda x: bool(x)):
         element_by_source = self.get_element_by_source(element)
         for source, elements in element_by_source.items():
-            element_by_source[source] = list(filter(filter_func, elements))
-        return element_by_source
+            element_by_source[source] = set(list(filter(filter_func, elements)))
+        ubiquitous_elements = set.intersection(*(element_by_source.values()))
+        total_elements = set.union(*(element_by_source.values()))
+        count = Counter()
+        for source in element_by_source:
+            count.update(element_by_source[source])
+        majority_size = ceil(len(element_by_source) / 2)
+        majority_elements = set([element for element in count if count[element] >= majority_size])
+        unique_elements = set([element for element in count if count[element] == 1])
+        out = {
+            'total': total_elements,
+            'ubiquitous': ubiquitous_elements,
+            'majority': majority_elements,
+            'majority_size': majority_size,
+            'unique_elements': unique_elements
+        }
+        a = len(unique_elements)
+        b = len(total_elements)
+        print("{} / {} ({:.2%}) of {} are represented in only 1 resource."
+              .format(a, b, a / b, element))
+
+        a = len(majority_elements)
+        print("{} / {} ({:.2%}) of {} are represented in the majority of ({}) resources."
+              .format(a, b, a / b, element, majority_size))
+
+        a = len(ubiquitous_elements)
+        print("{} / {} ({:.2%}) of {} are represented across all resources."
+              .format(a, b, a/b, element))
+        return out
 
     def get_element_by_source(self, element):
         try:
