@@ -89,6 +89,12 @@ class Gene(Element):
     def __eq__(self, other):
         return self.entrez_id == other.entrez_id
 
+    def __lt__(self, other):
+        return self.entrez_id < other.entrez_id
+
+    def __gt__(self, other):
+        return self.entrez_id > other.entrez_id
+
 
 class GenomicFeature(Element):
 
