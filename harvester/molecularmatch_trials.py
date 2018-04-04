@@ -158,7 +158,12 @@ def convert(evidence):
         conditions = set([])
         priority_phenotype = None
         for t in evidence_tags:
-            if (t['facet'] == 'CONDITION' and t['filterType'] == 'include' and 'generatedByTerm' not in t and not t['suppress']):  # noqa
+            if (t['facet'] == 'CONDITION' and t['filterType'] == 'include' and not t['suppress']):  # noqa
+                generatedByTerm = t.get('generatedByTerm', None)
+                if generatedByTerm == '':
+                    generatedByTerm = None
+                if generatedByTerm:
+                    continue
                 priority_phenotype = t['term']
         conditions = [priority_phenotype]
 
