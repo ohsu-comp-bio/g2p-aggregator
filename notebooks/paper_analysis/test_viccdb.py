@@ -46,9 +46,23 @@ class TestViccDb(object):
         assert len(delta) > 5000
 
     def test_search_features(self, vdb):
-        results = vdb.search_features(chromosome=7, start=140453136, end=140453136, reference_name='GRCh37')  # BRAF V600E
-        assert len(results) >= 500
+        hits = vdb.search_features(chromosome=7, start=140453136, end=140453136,
+                                      reference_name='GRCh37', name='V600E', gene_symbol='BRAF')
+        assert len(hits) >= 500
+        associations = [hit['association'] for hit in hits]
+        results = ViccDb(associations)
         assert len(results.sources) >= 5
+
+
+class TestGenomicFeatures(object):
+
+    def test_len(self, vdb):
+        for association in vdb:
+            for feature in association.features:
+                try:
+                    assert len(feature) >= 1
+                except ValueError:
+                    raise ValueError("Association {} has feature {} with invalid length".format(association, feature))
 
 
 class TestOncokb(object):

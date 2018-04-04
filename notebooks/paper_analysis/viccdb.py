@@ -167,6 +167,9 @@ class GenomicFeature(Element):
     def __contains__(self, item):
         return self.issuperfeature(item)
 
+    def __len__(self):
+        return self.end - self.start + 1
+
 
 class Publication(Element):
 
