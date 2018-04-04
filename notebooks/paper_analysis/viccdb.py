@@ -50,10 +50,30 @@ class Drug(Element):
     def __str__(self):
         return str(self.term)
 
+
 class Gene(Element):
 
-    def __init__(self, gene_name):
-        self.gene_name = gene_name  # Assumes gene_names are homogeneous
+    SYMBOL_TABLE = dict()
+    SYMBOL_ALIAS_TABLE = defaultdict(list)
+    with open(str(DATA_ROOT / 'non_alt_loci_set.json'), 'r') as f:
+        d = json.load(f)
+        for doc in d['response']['docs']:
+            SYMBOL_TABLE[doc['symbol']] = doc
+            for alias in doc.get('alias_symbol', []):
+                SYMBOL_ALIAS_TABLE[alias].append(doc['symbol'])
+            for prev in doc.get('prev_symbol', []):
+                SYMBOL_ALIAS_TABLE[prev].append(doc['symbol'])
+        SYMBOL_ALIAS_TABLE = dict(SYMBOL_ALIAS_TABLE)
+
+    def __init__(self, gene_symbol):
+        self.gene_name = gene_symbol
+        try:
+            doc = Gene.SYMBOL_TABLE[gene_symbol]
+        except KeyError:
+            aliases = Gene.SYMBOL_ALIAS_TABLE[gene_symbol]
+            if len(aliases) > 1:
+                raise KeyError("{} is an ambiguous gene symbol.".format(gene_symbol))
+
 
     def __str__(self):
         return str(self.gene_name)
@@ -167,7 +187,18 @@ class ViccAssociation(dict):
 
     @property
     def genes(self):
-        return [Gene(g) for g in self['genes']]
+        if getattr(self, '_genes', None):
+            return self._genes
+        out = list()
+        for g in self['genes']:
+            if not g:
+                continue
+            try:
+                out.append(Gene(g))
+            except KeyError:
+                continue
+        self._genes = out
+        return out
 
     @property
     def source(self):

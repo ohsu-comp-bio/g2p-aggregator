@@ -70,7 +70,7 @@ class TestSource(object):
         for x in sourcedb:
             if len(x.genes) == 0:
                 count += 1
-        assert count == 0
+        assert count < 0.01 * len(sourcedb)  # less than 1% of associations lacking genes
 
     def test_features(self, sourcedb):
         count = 0
