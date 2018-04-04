@@ -66,7 +66,7 @@ class Gene(Element):
         SYMBOL_ALIAS_TABLE = dict(SYMBOL_ALIAS_TABLE)
 
     def __init__(self, gene_symbol):
-        self.gene_name = gene_symbol
+        self.gene_symbol = gene_symbol
         try:
             doc = Gene.SYMBOL_TABLE[gene_symbol]
         except KeyError:
@@ -79,7 +79,7 @@ class Gene(Element):
 
 
     def __str__(self):
-        return str(self.entrez_id)
+        return str(self.gene_symbol)
 
     def __bool__(self):
         return bool(self.entrez_id)
