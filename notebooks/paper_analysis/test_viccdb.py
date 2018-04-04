@@ -122,6 +122,13 @@ class TestSource(object):
                 count += 1
         assert count < 5
 
+    def test_evidence_level(self, sourcedb):
+        count = 0
+        for x in sourcedb:
+            if not x.evidence_level:
+                count += 1
+        assert count == 0
+
     # def test_drugs(self, sourcedb):
     #     count = 0
     #     for x in sourcedb:

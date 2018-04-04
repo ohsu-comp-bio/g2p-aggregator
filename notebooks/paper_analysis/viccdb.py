@@ -207,6 +207,10 @@ class ViccAssociation(dict):
         return all_pubs
 
     @property
+    def evidence_level(self):
+        return self['association']['evidence_label']
+
+    @property
     def genes(self):
         if getattr(self, '_genes', None):
             return self._genes
