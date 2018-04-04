@@ -91,7 +91,7 @@ class GenomicFeature(Element):
 
     __hash__ = Element.__hash__
 
-    def __le__(self, other):
+    def issubfeature(self, other):
         return all([
             self.chromosome == other.chromosome,
             self.start >= other.start,
@@ -99,7 +99,7 @@ class GenomicFeature(Element):
             self.reference_name == other.reference_name
         ])
 
-    def __ge__(self, other):
+    def issuperfeature(self, other):
         return all([
             self.chromosome == other.chromosome,
             self.start <= other.start,
@@ -108,29 +108,29 @@ class GenomicFeature(Element):
         ])
 
     def __lt__(self, other):
-        if not self.chromosome == other.chromosome:
+        if self.reference_name != other.reference_name:
+            return self.reference_name < other.reference_name
+        elif self.chromosome != other.chromosome:
+            c = GenomicFeature.CHROMOSOMES
+            return c.index(self.chromosome) < c.index(other.chromosome)
+        elif self.start != other.start:
+            return self.start < other.start
+        elif self.end != other.end:
+            return self.end < other.end
+        else:
             return False
-        if not self.reference_name == other.reference_name:
-            return False
-        if self.start > other.start and self.end <= other.end:
-            return True
-        if self.start >= other.start and self.end < other.end:
-            return True
-        return False
 
     def __gt__(self, other):
-        if not self.chromosome == other.chromosome:
-            return False
-        if not self.reference_name == other.reference_name:
-            return False
-        if self.start < other.start and self.end >= other.end:
-            return True
-        if self.start <= other.start and self.end > other.end:
-            return True
-        return False
+        return not self < other and self != other
+
+    def __le__(self, other):
+        return not self > other
+
+    def __ge__(self, other):
+        return not self < other
 
     def __contains__(self, item):
-        return self >= item
+        return self.issuperfeature(item)
 
 
 class Publication(Element):
@@ -174,6 +174,8 @@ class ViccAssociation(dict):
 
     @property
     def features(self):
+        if getattr(self, '_features', None):
+            return self._features
         out = list()
         for f in self['features']:
             try:
@@ -181,7 +183,8 @@ class ViccAssociation(dict):
             except:
                 continue
             out.append(f2)
-        return out
+        self._features = sorted(out)
+        return sorted(out)
 
     @property
     def disease(self):
@@ -273,7 +276,6 @@ class ViccDb:
                     association = RawAssociation(json.loads(line))  # TODO: Move to ViccAssociation after RawAssociation checks pass
                     association['raw'] = association.pop(source)
                     self.associations.append(association)
-
 
     def _load_s3(self):
         raise NotImplementedError
