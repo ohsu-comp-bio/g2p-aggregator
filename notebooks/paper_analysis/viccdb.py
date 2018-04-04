@@ -73,13 +73,16 @@ class Gene(Element):
             aliases = Gene.SYMBOL_ALIAS_TABLE[gene_symbol]
             if len(aliases) > 1:
                 raise KeyError("{} is an ambiguous gene symbol.".format(gene_symbol))
+            doc = Gene.SYMBOL_TABLE[aliases[0]]
+        self.entrez_id = doc['entrez_id']
+        self._doc = doc
 
 
     def __str__(self):
-        return str(self.gene_name)
+        return str(self.entrez_id)
 
     def __bool__(self):
-        return bool(self.gene_name)
+        return bool(self.entrez_id)
 
 
 class GenomicFeature(Element):
