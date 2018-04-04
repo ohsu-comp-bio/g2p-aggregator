@@ -84,6 +84,12 @@ class Gene(Element):
     def __bool__(self):
         return bool(self.entrez_id)
 
+    def __hash__(self):
+        return int(self.entrez_id)
+
+    def __eq__(self, other):
+        return self.entrez_id == other.entrez_id
+
 
 class GenomicFeature(Element):
 
