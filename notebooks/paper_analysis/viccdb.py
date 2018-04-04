@@ -117,7 +117,7 @@ class GenomicFeature(Element):
         self.reference_name = referenceName
 
     def __str__(self):
-        return ':'.join([str(getattr(self, x)) for x in ['reference_name', 'chromosome', 'start', 'end']])
+        return ':'.join([str(getattr(self, x)) for x in ['reference_name', 'chromosome', 'start', 'end', 'name']])
 
     def __eq__(self, other):
         return all([
@@ -127,7 +127,8 @@ class GenomicFeature(Element):
             self.reference_name == other.reference_name
         ])
 
-    __hash__ = Element.__hash__
+    def __hash__(self):
+        return hash(':'.join([str(getattr(self, x)) for x in ['reference_name', 'chromosome', 'start', 'end', 'alt']]))
 
     def issubfeature(self, other):
         return all([

@@ -1,6 +1,6 @@
 import pytest
 from collections import Counter
-from viccdb import ViccDb
+from viccdb import ViccDb, GenomicFeature
 from os import environ
 
 
@@ -21,6 +21,21 @@ def vdb():
 @pytest.fixture(scope="module", params=SOURCES)
 def sourcedb(vdb, request):
     return ViccDb(vdb.by_source(request.param))
+
+
+@pytest.fixture(scope="module")
+def gfa():
+    return GenomicFeature(1,1,1,'GRCh37','Feature A','FAKE1',alt='G')
+
+
+@pytest.fixture(scope="module")
+def gfb():
+    return GenomicFeature(1, 1, 1, 'GRCh37', 'Feature A', 'FAKE1', alt='C')
+
+
+@pytest.fixture(scope="module")
+def gfa2():
+    return GenomicFeature(1, 1, 1, 'GRCh37', 'Feature A', 'FAKE1', alt='G', sequence_ontology={'soid': 141})
 
 
 class TestViccDb(object):
@@ -63,6 +78,13 @@ class TestGenomicFeatures(object):
                     assert len(feature) >= 1
                 except ValueError:
                     raise ValueError("Association {} has feature {} with invalid length".format(association, feature))
+
+    def test_equality(self, gfa, gfb):
+        assert gfa == gfb
+
+    def test_hash(self, gfa, gfb, gfa2):
+        assert hash(gfa) != hash(gfb)
+        assert hash(gfa) == hash(gfa2)
 
 
 class TestOncokb(object):
