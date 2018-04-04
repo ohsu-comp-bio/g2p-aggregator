@@ -77,7 +77,6 @@ class Gene(Element):
         self.entrez_id = doc['entrez_id']
         self._doc = doc
 
-
     def __str__(self):
         return str(self.gene_symbol)
 
