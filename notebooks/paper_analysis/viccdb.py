@@ -68,6 +68,7 @@ class GenomicFeature(Element):
     REFERENCE_BUILDS = ['GRCh37', 'GRCh38']
 
     def __init__(self, chromosome, start, end, referenceName, sequence_ontology={}, **kwargs):
+        chromosome = str(chromosome)
         if chromosome.lower().startswith('chr'):
             chromosome = chromosome[3:]
         assert chromosome in GenomicFeature.CHROMOSOMES
@@ -398,3 +399,14 @@ class ViccDb:
             self._element_by_source[element] = dict(element_by_source)
             e = self._element_by_source[element]
         return e
+
+    def search_features(self, chromosome=None, start=None, end=None, reference_name=None, genomic_feature=None):
+        if not isinstance(genomic_feature, GenomicFeature):
+            query = GenomicFeature(chromosome, start, end, reference_name)
+        else:
+            query = genomic_feature
+        return self.select(lambda x: any([(query in feature) for feature in x.features]))
+
+    @property
+    def sources(self):
+        return self.associations_by_source.keys()

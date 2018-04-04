@@ -45,6 +45,11 @@ class TestViccDb(object):
         assert len(delta) == len(vdb) - len(civicdb)
         assert len(delta) > 5000
 
+    def test_search_features(self, vdb):
+        results = vdb.search_features(chromosome=7, start=140453136, end=140453136, reference_name='GRCh37')
+        assert len(results) >= 3
+        assert len(results.sources) >= 3
+
 
 class TestOncokb(object):
 
