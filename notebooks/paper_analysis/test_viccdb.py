@@ -46,9 +46,9 @@ class TestViccDb(object):
         assert len(delta) > 5000
 
     def test_search_features(self, vdb):
-        results = vdb.search_features(chromosome=7, start=140453136, end=140453136, reference_name='GRCh37')
-        assert len(results) >= 3
-        assert len(results.sources) >= 3
+        results = vdb.search_features(chromosome=7, start=140453136, end=140453136, reference_name='GRCh37')  # BRAF V600E
+        assert len(results) >= 500
+        assert len(results.sources) >= 5
 
 
 class TestOncokb(object):
