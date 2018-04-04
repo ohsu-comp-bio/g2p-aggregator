@@ -101,7 +101,7 @@ class GenomicFeature(Element):
     CHROMOSOMES = [str(x) for x in range(1, 23)] + ['X', 'Y']
     REFERENCE_BUILDS = ['GRCh37', 'GRCh38']
 
-    def __init__(self, chromosome, start, end, referenceName, sequence_ontology={}, **kwargs):
+    def __init__(self, chromosome, start, end, referenceName, name, geneSymbol, sequence_ontology={}, alt=None, **kwargs):
         chromosome = str(chromosome)
         if chromosome.lower().startswith('chr'):
             chromosome = chromosome[3:]
@@ -110,6 +110,9 @@ class GenomicFeature(Element):
         self.start = int(start)
         self.end = int(end)
         self.so = sequence_ontology
+        self.alt = alt
+        self.name = name
+        self.gene_symbol = geneSymbol
         assert referenceName in GenomicFeature.REFERENCE_BUILDS
         self.reference_name = referenceName
 
@@ -448,12 +451,54 @@ class ViccDb:
             e = self._element_by_source[element]
         return e
 
-    def search_features(self, chromosome=None, start=None, end=None, reference_name=None, genomic_feature=None):
+    MATCH_RANKING = ['exact', 'positional', 'focal', 'regional']
+
+    def search_features(self, chromosome=None, start=None, end=None, reference_name=None,
+                        name=None, alt=None, gene_symbol=None, genomic_feature=None):
         if not isinstance(genomic_feature, GenomicFeature):
-            query = GenomicFeature(chromosome, start, end, reference_name)
+            query = GenomicFeature(chromosome, start, end, reference_name, name, gene_symbol, alt=alt)
         else:
             query = genomic_feature
-        return self.select(lambda x: any([(query in feature) for feature in x.features]))
+        hits = list()
+        for association in self:
+            features = association.features
+            matches = [x for x in features if (x.issuperfeature(query) or x.issubfeature(query))]
+            if not matches:
+                continue
+            match_details = list()
+            for feature in matches:
+                match = {'feature': feature}
+                if query == feature:
+                    if query.alt and feature.alt and query.alt == feature.alt:
+                        match['type'] = 'exact'
+                    else:
+                        match['type'] = 'positional'
+                    match['p'] = 1
+                else:
+                    if query.issubfeature(feature):
+                        p = len(query) / len(feature)
+                    else:
+                        p = len(feature) / len(query)
+                    assert p < 1
+                    match['p'] = p
+                    if p >= 0.1:
+                        match['type'] = 'focal'
+                    else:
+                        match['type'] = 'regional'
+                match_details.append(match)
+            if len(match_details) == 1:
+                best_match = match_details[0]
+            else:
+                s1 = sorted(match_details, key=lambda x: x['p'], reverse=True)
+                s2 = sorted(s1, key=lambda x: ViccDb.MATCH_RANKING.index(x['type']))
+                best_match = s2[0]
+            hit = {
+                'association': association,
+                'matches': match_details,
+                'best_match': best_match
+            }
+            hits.append(hit)
+        return hits
 
     @property
     def sources(self):
