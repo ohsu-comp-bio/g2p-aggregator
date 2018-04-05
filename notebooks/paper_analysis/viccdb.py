@@ -6,6 +6,7 @@ import re
 import pyupset as pyu
 import pandas as pd
 from math import ceil
+import hashlib
 
 
 class Element:
@@ -128,7 +129,7 @@ class GenomicFeature(Element):
         ])
 
     def __hash__(self):
-        return hash(':'.join([str(getattr(self, x)) for x in ['reference_name', 'chromosome', 'start', 'end', 'alt']]))
+        return hash(tuple([str(getattr(self, x)) for x in ['reference_name', 'chromosome', 'start', 'end', 'alt']]))
 
     def issubfeature(self, other):
         return all([
@@ -196,6 +197,9 @@ class Publication(Element):
 class ViccAssociation(dict):
 
     def __hash__(self):
+        return self._stable_hash()
+
+    def _stable_hash(self):
         raise NotImplementedError
 
     @property
@@ -267,7 +271,7 @@ class ViccAssociation(dict):
 
 class RawAssociation(ViccAssociation):
 
-    def __hash__(self):
+    def _stable_hash(self):
         source = self['source']
         if source == 'civic':
             assert len(self['association']['evidence']) == 1  # we currently import 1 evidence per association.
@@ -296,7 +300,10 @@ class RawAssociation(ViccAssociation):
             k = 'cgi:{}'.format('-'.join(t))
         else:
             raise NotImplementedError("No hash routine defined for source '{}'".format(source))
-        return hash(k)
+        b = k.encode()
+        m = hashlib.sha256()
+        m.update(b)
+        return int(m.hexdigest(), 16)
 
 
 class ViccDb:
