@@ -25,7 +25,7 @@ def sourcedb(vdb, request):
 
 @pytest.fixture(scope="module")
 def gfa():
-    return GenomicFeature(1,1,1,'GRCh37','Feature A','FAKE1',alt='G')
+    return GenomicFeature(1, 1, 1, 'GRCh37', 'Feature A', 'FAKE1', alt='G')
 
 
 @pytest.fixture(scope="module")
