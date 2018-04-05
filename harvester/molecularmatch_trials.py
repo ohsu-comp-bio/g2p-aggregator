@@ -165,7 +165,7 @@ def convert(evidence):
                 if generatedByTerm:
                     continue
                 priority_phenotype = t['term']
-        conditions = [priority_phenotype]
+        conditions = [priority_phenotype or generatedByTerm]
 
         # TODO - only one phenotype per association
         for condition in conditions:
