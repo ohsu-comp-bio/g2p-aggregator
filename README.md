@@ -160,6 +160,12 @@ docker-compose -f docker-compose.yml -f cloud-setup/docker-compose-nginx.yml up 
 ```
 This will do the same setup, but will also include an nginx proxy to map http and https ports.  
 
+Our demo site is hosted on aws and includes the API server and nginx proxy 
+```
+docker-compose -f docker-compose-aws.yml up -d
+```
+
+
 As a convenience, there is a juypter image for notebook analysis:
 ```
 docker-compose -f docker-compose.yml -f docker-compose-jupyter.yml up -d
