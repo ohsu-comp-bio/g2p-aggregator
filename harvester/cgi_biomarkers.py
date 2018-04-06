@@ -124,7 +124,6 @@ def convert(evidence):
             # get genomic locus from COSMIC; if mutation not in COSMIC,
             # get locus info from given gDNA instead
             feature = {}
-            print emut
             if len(emut) > 0:
                 gene, prot = emut.split(':')
                 matches = LOOKUP_TABLE.get_entries(gene, prot)
