@@ -1,6 +1,7 @@
 .env
 **/venv
 .cache
+.idea/
 *.pyc
 *.swp
 *.ipynb_checkpoints

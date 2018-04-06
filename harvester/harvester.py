@@ -46,71 +46,8 @@ DUPLICATES = []
 # cache responses
 requests_cache.install_cache('harvester', allowable_codes=(200, 400, 404))
 
-
-argparser = argparse.ArgumentParser()
-
-argparser.add_argument('--harvesters',  nargs='+',
-                       help='''harvest from these sources. default:
-                               [cgi_biomarkers,jax,civic,oncokb,
-                               pmkb]''',
-                       default=['cgi_biomarkers', 'jax', 'civic',
-                                'oncokb', 'pmkb', 'brca', 'jax_trials',
-                                'molecularmatch_trials'])
-
-
-argparser.add_argument('--silos',  nargs='+',
-                       help='''save to these silos. default:[elastic]''',
-                       default=['elastic'],
-                       choices=['elastic', 'kafka', 'file'])
-
-
-argparser.add_argument('--delete_index', '-d',
-                       help='''delete all from index''',
-                       default=False, action="store_true")
-
-argparser.add_argument('--delete_source', '-ds',
-                       help='delete all content for any harvester',
-                       default=False, action="store_true")
-
-argparser.add_argument('--genes',   nargs='+',
-                       help='array of hugo ids, no value will harvest all',
-                       default=None)
-
-
-argparser.add_argument('--phases',   nargs='+',
-                       help='array of harvest phases to run '
-                            '[harvest,convert,enrich,all]. default is all',
-                       default=['all'],
-                       choices=['all', 'harvest'])
-
-
-elastic_silo.populate_args(argparser)
-kafka_silo.populate_args(argparser)
-file_silo.populate_args(argparser)
-
-
-args = argparser.parse_args()
-for h in args.harvesters:
-    assert h in sys.modules, "harvester is not a module: %r" % h
-
-path = 'logging.yml'
-with open(path) as f:
-    config = yaml.load(f)
-logging.config.dictConfig(config)
-
-
-logging.info("harvesters: %r" % args.harvesters)
-logging.info("silos: %r" % args.silos)
-logging.info("elastic_search: %r" % args.elastic_search)
-logging.info("elastic_index: %r" % args.elastic_index)
-logging.info("delete_index: %r" % args.delete_index)
-logging.info("file_output_dir: %r" % args.file_output_dir)
-logging.info("phases: %r" % args.phases)
-
-if not args.genes:
-    logging.info("genes: all")
-else:
-    logging.info("genes: %r" % args.genes)
+args = None
+silos = None
 
 
 def is_duplicate(feature_association):
@@ -142,9 +79,6 @@ def _make_silos(args):
         if s == 'file':
             silos.append(FileSilo(args))
     return silos
-
-
-silos = _make_silos(args)
 
 
 # cgi, jax, civic, oncokb
@@ -185,7 +119,6 @@ def harvest_only(genes):
 def normalize(feature_association):
     """ standard representation of drugs,disease etc. """
     start_time = timeit.default_timer()
-
     drug_normalizer.normalize_feature_association(feature_association)
     elapsed = timeit.default_timer() - start_time
     if elapsed > 1:
@@ -202,6 +135,19 @@ def normalize(feature_association):
         logging.info('disease_normalizer {} {}'.format(elapsed, disease))
 
     start_time = timeit.default_timer()
+    # functionality for oncogenic_normalizer already mostly in harvesters
+    oncogenic_normalizer.normalize_feature_association(feature_association)
+    elapsed = timeit.default_timer() - start_time
+    if elapsed > 1:
+        logging.info('oncogenic_normalizer {}'.format(elapsed))
+
+    start_time = timeit.default_timer()
+    location_normalizer.normalize_feature_association(feature_association)
+    elapsed = timeit.default_timer() - start_time
+    if elapsed > 1:
+        logging.info('location_normalizer {}'.format(elapsed))
+
+    start_time = timeit.default_timer()
     reference_genome_normalizer \
         .normalize_feature_association(feature_association)
     elapsed = timeit.default_timer() - start_time
@@ -213,21 +159,77 @@ def normalize(feature_association):
     if elapsed > 1:
         logging.info('biomarker_normalizer {}'.format(elapsed))
 
-    start_time = timeit.default_timer()
-    location_normalizer.normalize_feature_association(feature_association)
-    elapsed = timeit.default_timer() - start_time
-    if elapsed > 1:
-        logging.info('location_normalizer {}'.format(elapsed))
-
-    start_time = timeit.default_timer()
-    # functionality for oncogenic_normalizer already mostly in harvesters
-    oncogenic_normalizer.normalize_feature_association(feature_association)
-    elapsed = timeit.default_timer() - start_time
-    if elapsed > 1:
-        logging.info('oncogenic_normalizer {}'.format(elapsed))
-
 
 def main():
+    global args
+    global silos
+    argparser = argparse.ArgumentParser()
+
+    argparser.add_argument('--harvesters',  nargs='+',
+                           help='''harvest from these sources. default:
+                                   [cgi_biomarkers,jax,civic,oncokb,
+                                   pmkb]''',
+                           default=['cgi_biomarkers', 'jax', 'civic',
+                                    'oncokb', 'pmkb', 'brca', 'jax_trials',
+                                    'molecularmatch_trials'])
+
+
+    argparser.add_argument('--silos',  nargs='+',
+                           help='''save to these silos. default:[elastic]''',
+                           default=['elastic'],
+                           choices=['elastic', 'kafka', 'file'])
+
+
+    argparser.add_argument('--delete_index', '-d',
+                           help='''delete all from index''',
+                           default=False, action="store_true")
+
+    argparser.add_argument('--delete_source', '-ds',
+                           help='delete all content for any harvester',
+                           default=False, action="store_true")
+
+    argparser.add_argument('--genes',   nargs='+',
+                           help='array of hugo ids, no value will harvest all',
+                           default=None)
+
+
+    argparser.add_argument('--phases',   nargs='+',
+                           help='array of harvest phases to run '
+                                '[harvest,convert,enrich,all]. default is all',
+                           default=['all'],
+                           choices=['all', 'harvest'])
+
+    elastic_silo.populate_args(argparser)
+    kafka_silo.populate_args(argparser)
+    file_silo.populate_args(argparser)
+
+    args = argparser.parse_args()
+    for h in args.harvesters:
+        assert h in sys.modules, "harvester is not a module: %r" % h
+
+    path = 'logging.yml'
+    with open(path) as f:
+        config = yaml.load(f)
+    logging.config.dictConfig(config)
+
+
+    logging.info("harvesters: %r" % args.harvesters)
+    logging.info("silos: %r" % args.silos)
+    logging.info("elastic_search: %r" % args.elastic_search)
+    logging.info("elastic_index: %r" % args.elastic_index)
+    logging.info("delete_index: %r" % args.delete_index)
+    logging.info("file_output_dir: %r" % args.file_output_dir)
+    logging.info("phases: %r" % args.phases)
+
+
+
+    silos = _make_silos(args)
+
+    if not args.genes:
+        logging.info("genes: all")
+    else:
+        logging.info("genes: %r" % args.genes)
+
     if args.delete_index:
         for silo in silos:
             silo.delete_all()

@@ -5,6 +5,7 @@ import os
 import evidence_label as el
 import evidence_direction as ed
 import logging
+import mutation_type as mut
 from warnings import warn
 
 resourceURLs = {
@@ -153,6 +154,8 @@ def convert(evidence):
 
         feature['geneSymbol'] = gene
         feature['name'] = mutation
+        feature['description'] = '{} {}'.format(gene, mutation)
+
 
         # Add variant-level information.
         # TODO: only looks at first location, not all locations.
@@ -185,7 +188,6 @@ def convert(evidence):
             biomarker_types = list(set(biomarker_types))
             if len(biomarker_types) != 0:
                 feature['biomarker_type'] = ','.join(biomarker_types)
-
         features.append(feature)
 
     # if len(mutations['mutation_type']) == 1:
@@ -256,10 +258,13 @@ def convert(evidence):
             for feature_tuple in minimal_features:
                 feature = {}
                 feature['geneSymbol'] = feature_tuple[0]
+                feature['description'] = feature['geneSymbol']
+
                 if not feature['geneSymbol'].isupper() and len(genes) > 0:
                     feature['geneSymbol'] = genes[0]
                 try:
                     feature['name'] = feature_tuple[1]
+
                 except IndexError:
                     pass
                 features.append(feature)

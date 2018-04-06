@@ -50,3 +50,9 @@ def test_molecular_match_CNA():
     print '"{}"={}'.format('Copy Number Variant',
                            norm_biomarker('Copy Number Variant'))
     assert 'copy number variant' == norm_biomarker('Copy Number Variant')
+
+
+def test_CNA():
+    print '"{}"={}'.format('CNA',
+                           norm_biomarker('CNA'))
+    assert 'copy number variant' == norm_biomarker('Copy Number Variant')

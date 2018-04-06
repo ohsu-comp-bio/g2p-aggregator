@@ -29,6 +29,7 @@ def parse_genomic_locus(locus):
             raise SyntaxError('missed a case!')
     return locii_return_set
 
+
 def normalize_cgi_oncogenic(asso, gene_set):
     # add the asso to the set before edits are made
     # grab only oncogenic mutations from cgi table that match gene and tumor
@@ -45,11 +46,12 @@ def normalize_cgi_oncogenic(asso, gene_set):
                     f = deepcopy(feature)
                     # Look up position info
                     for locus in parse_genomic_locus(match['gdna']):
-                        f['name'] = gene + match['gdna']
+                        f['name'] = '{} {}'.format(gene, match['protein'])
                         f['chromosome'] = locus[0]
-                        f['start'] = locus[1]
+                        f['start'] = int(locus[1])
                         f['ref'] = locus[2]
                         f['alt'] = locus[3]
+                        f['referenceName'] = 'GRCh37'
                         # f['cgiValidatedOncogenicMutations'] = match
                         features.append(f)
     asso['features'] = features

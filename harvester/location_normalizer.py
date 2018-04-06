@@ -2,11 +2,13 @@ import requests
 import re
 import logging
 import json
+import copy
 
 import hgvs.location
 import hgvs.posedit
 import hgvs.edit
 from hgvs.sequencevariant import SequenceVariant
+from feature_enricher import enrich
 
 
 def _complement(bases):
@@ -43,7 +45,8 @@ def allele_registry(hgvs):
     if r.status_code not in [200, 400, 404]:
         logging.info('unexpected allele_registry {} {}'.format(url,
                                                                r.status_code))
-    return r.json()
+    rsp = r.json()
+    return rsp, url
 
 
 def genomic_hgvs(feature, complement=False, description=False):
@@ -125,7 +128,8 @@ def genomic_hgvs(feature, complement=False, description=False):
     else:
         if 'dup' in feature_description:
             ref_alt = _get_ref_alt(feature_description)
-            posedit.edit = ref_alt + alt
+            if ref_alt:
+                posedit.edit = ref_alt + alt
 
     # Make the variant
     var = SequenceVariant(ac=ac, type='g', posedit=posedit)
@@ -139,16 +143,17 @@ def genomic_hgvs(feature, complement=False, description=False):
 def normalize(feature):
     if 'referenceName' not in feature or \
        'chromosome' not in feature or 'ref' not in feature:
-            return None
+            return None, None
     if feature['chromosome'] == 'None' or feature['chromosome'] is None:
-        return None
+        return None, None
     if feature['ref'] == 'None' or feature['ref'] is None:
-        return None
+        return None, None
 
     hgvs = genomic_hgvs(feature)
     allele = None
+    provenance = None
     if hgvs:
-        allele = allele_registry(hgvs)
+        (allele, provenance) = allele_registry(hgvs)
         if ('errorType' in allele and
                 allele['errorType'] == 'IncorrectReferenceAllele'):
             message = allele['message']
@@ -158,7 +163,7 @@ def normalize(feature):
             if complement_ref == actualAllele:
                 # print 'reverse strand re-try'
                 hgvs = genomic_hgvs(feature, complement=True)
-                allele = allele_registry(hgvs)
+                (allele, provenance) = allele_registry(hgvs)
             # else:
             #     print 'complement_ref {} m[0] {}'.format(complement_ref,
             #                                              actualAllele)
@@ -167,15 +172,15 @@ def normalize(feature):
                 allele['errorType'] == 'IncorrectHgvsPosition'):
             # print 'position error re-try'
             hgvs = genomic_hgvs(feature, description=True)
-            allele = allele_registry(hgvs)
+            (allele, provenance) = allele_registry(hgvs)
 
         if allele:
             allele['hgvs_g'] = hgvs
 
-    return allele
+    return allele, provenance
 
 
-def _enrich(feature, allele_registry):
+def _apply_allele_registry(feature, allele_registry, provenance):
     # there is a lot of info in registry, just get synonyms and links
     links = feature.get('links', [])
     synonyms = feature.get('synonyms', [])
@@ -203,6 +208,9 @@ def _enrich(feature, allele_registry):
         feature['synonyms'] = synonyms
     if len(links) > 0:
         feature['links'] = links
+    if 'provenance' not in feature:
+        feature['provenance'] = []
+    feature['provenance'].append(provenance)
 
 
 def _fix_location_end(feature):
@@ -226,12 +234,22 @@ def normalize_feature_association(feature_association):
     """ given the 'final' g2p feature_association,
     update it with genomic location """
     allele_registry = None
+    normalized_features = []
     for feature in feature_association['features']:
         try:
-            allele_registry = normalize(feature)
-            if allele_registry:
-                if '@id' in allele_registry:
-                    _enrich(feature, allele_registry)
+            # ensure we have location, enrich can create new features
+            enriched_features = enrich(copy.deepcopy(feature), feature_association)
+            for enriched_feature in enriched_features:
+                # go get AR info
+                (allele_registry, provenance) = normalize(enriched_feature)
+                if allele_registry:
+                    if '@id' in allele_registry:
+                        _apply_allele_registry(enriched_feature,
+                                               allele_registry,
+                                               provenance)
+                enriched_feature = _fix_location_end(enriched_feature)
+                normalized_features.append(enriched_feature)
+            feature_association['features'] = normalized_features
         except Exception as e:
             logging.exception(
                 'exception {} feature {} allele {}'.format(e, feature,

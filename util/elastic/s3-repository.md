@@ -7,7 +7,7 @@ see cloud-setup for aws elastic host
 ```
 $ dc exec elastic bash
 ...
-bin/elasticsearch-plugin install repository-s3
+dc exec elastic bin/elasticsearch-plugin install repository-s3
 ```
 ##### restart elastic afterwards
 
@@ -16,9 +16,8 @@ bin/elasticsearch-plugin install repository-s3
 #### configure
 By convention, name the s3 client the same as the repository
 ```
-
-bin/elasticsearch-keystore add s3.client.g2p-test-snapshots.access_key XXX
-bin/elasticsearch-keystore add s3.client.g2p-test-snapshots.secret_key XXX
+dc exec elastic bin/elasticsearch-keystore add s3.client.g2p-test-snapshots.access_key
+dc exec elastic bin/elasticsearch-keystore add s3.client.g2p-test-snapshots.secret_key
 dc restart  elastic
 
 ```
@@ -40,20 +39,21 @@ curl -XPUT $ES'/_snapshot/g2p-test?pretty' -H 'Content-Type: application/json' -
 #### verify
 ```
 $ curl -s $ES/_cat/repositories?v
-id            type
-g2p-test-snapshots   s3
-$ export REPOSITORY=s3_repository
+id       type
+g2p-test   s3
+$ export REPOSITORY=g2p-test
 ```
 
 
 #### list contents
 
 ```
-$curl -s $ES'/_snapshot/'$REPOSITORY'/_all' | jq .snapshots[].snapshot
+$ curl -s $ES'/_snapshot/'$REPOSITORY'/_all' | jq .snapshots[].snapshot
 "snapshot_20171119t1738"
 "snapshot_20171128t0102"
 "snapshot_20171128t0658"
 "snapshot_20171201t1405"
+export SNAPSHOT=snapshot_20171201t1405
 ```
 
 

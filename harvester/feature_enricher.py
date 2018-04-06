@@ -4,11 +4,41 @@ import os
 import mutation_type as mut
 import logging
 import re
+import copy
 
 
-def _enrich_gene(feature):
+def _enrich_ensemble(feature, transcript_id, exon, provenance_rule):
+    """ get coordinates from ensembl
+        curl -s 'http://grch37.rest.ensembl.org/lookup/id/ENST00000275493?expand=1'
+        | jq '{start:.start, end:.end, chromosome:.seq_region_name, strand:.strand}'
+    """  # NOQA
+    headers = {'Content-type': 'application/json'}
+    url = 'http://grch37.rest.ensembl.org/lookup/id/{}?expand=1' \
+        .format(transcript_id)
+    r = requests.get(url, timeout=60, headers=headers)
+    transcript = r.json()
+
+    if 'Exon' in transcript:
+        exon_ = transcript['Exon'][exon-1]
+        feature['chromosome'] = str(exon_['seq_region_name'])
+        feature['start'] = int(exon_['start'])
+        feature['end'] = int(exon_['end'])
+        feature['referenceName'] = 'GRCh37'
+        if 'provenance' not in feature:
+            feature['provenance'] = []
+        feature['provenance'].append(url)
+        feature['provenance_rule'] = provenance_rule
+    return feature
+
+
+def _enrich_gene(feature,
+                 gene=None,
+                 provenance_rule='default'):
     """ description contains a gene, get its location """
-    url = "http://mygene.info/v3/query?q={}&fields=genomic_pos_hg19".format(feature['description'])
+    if not gene:
+        gene = feature['description']
+    parms = 'fields=genomic_pos_hg19'
+    url = "http://mygene.info/v3/query?q={}&{}".format(gene, parms)
     r = requests.get(url, timeout=60)
     hit = None
     hits = r.json()
@@ -17,6 +47,13 @@ def _enrich_gene(feature):
             if 'genomic_pos_hg19' in a_hit:
                 hit = a_hit['genomic_pos_hg19']
                 break
+
+    if isinstance(hit, list):
+        alternatives = hit
+        for alternative in alternatives:
+            if 'PATCH' in alternative['chr']:
+                continue
+            hit = alternative
     if hit:
         if 'chr' in hit:
             feature['chromosome'] = str(hit['chr'])
@@ -25,10 +62,15 @@ def _enrich_gene(feature):
         if 'end' in hit:
             feature['end'] = hit['end']
         feature['referenceName'] = 'GRCh37'
+        if 'provenance' not in feature:
+            feature['provenance'] = []
+        feature['provenance'].append(url)
+        feature['provenance_rule'] = provenance_rule
     return feature
 
 
-def _enrich_feature(feature):
+def _enrich_feature(feature,
+                    provenance_rule='default'):
     """ description contains a gene + variant, get its location """
     #  curl -s http://myvariant.info/v1/query?q=FLT3%20N676D |
     # jq '.hits[0] |
@@ -65,6 +107,10 @@ def _enrich_feature(feature):
         if 'end' in hg19:
             feature['end'] = hg19['end']
         feature['referenceName'] = 'GRCh37'
+        if 'provenance' not in feature:
+            feature['provenance'] = []
+        feature['provenance'].append(url)
+        feature['provenance_rule'] = provenance_rule
 
         if 'biomarker_type' not in feature:
             if 'cadd' in hit and 'type' in hit['cadd']:
@@ -74,56 +120,88 @@ def _enrich_feature(feature):
     return feature
 
 
-def enrich(feature):
+def enrich(feature, feature_association):
     """
     given a feature, decorate it with genomic location
     """
-    apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
-    if not apiKey:
-        raise ValueError('Please set MOLECULAR_MATCH_API_KEY in environment')
+    enriched_features = [feature]
+    try:
+        # return if already there
+        if feature.get('start', None):
+            feature['provenance_rule'] = 'from_source'
+            return [feature]
 
-    url = "https://api.molecularmatch.com/v2/mutation/get"
-    headers = {'Authorization': 'Bearer {}'.format(apiKey)}
-    payload = {'name': feature['description']}
-    r = requests.get(url, params=payload, headers=headers)
-    mutation = r.json()
-    if 'name' in mutation:
-        feature['name'] = mutation['name']
-    else:
-        feature['name'] = feature['description']
-    if ('GRCh37_location' in mutation and
-            len(mutation['GRCh37_location']) > 0):
-        grch37_mutation = mutation['GRCh37_location'][0]
-        if 'ref' in grch37_mutation:
-            feature['ref'] = grch37_mutation['ref']
-        if 'alt' in grch37_mutation:
-            feature['alt'] = grch37_mutation['alt']
-        if 'chr' in grch37_mutation:
-            feature['chromosome'] = str(grch37_mutation['chr'])
-        if 'start' in grch37_mutation:
-            feature['start'] = grch37_mutation['start']
-        if 'stop' in grch37_mutation:
-            feature['end'] = grch37_mutation['stop']
+        # make sure it has a name and a description
+        if not feature.get('description', None):
+            feature['description'] = feature.get('name', None)
+        if not feature.get('name', None):
+            feature['name'] = feature.get('description', None)
 
-        feature['referenceName'] = 'GRCh37'
-        links = feature.get('links', [])
-        links.append(r.url)
-        feature['links'] = links
+        # we can't normalize things without a description
+        if not feature.get('description', None):
+            feature['provenance_rule'] = 'missing_description'
+            return [feature]
 
-    if 'biomarker_type' not in feature:
-        if ('mutation_type' in mutation and
-                len(mutation['mutation_type']) > 0):
-                feature['biomarker_type'] = mut.norm_biomarker(
-                                mutation['mutation_type'][0])
 
-    # there is a lot of info in mutation, just get synonyms and links
-    if ('wgsaMap' in mutation and 'Synonyms' in mutation['wgsaMap'][0]):
-        synonyms = feature.get('synonyms', [])
-        synonyms = synonyms + mutation['wgsaMap'][0]['Synonyms']
-        synonyms = list(set(synonyms))
-        feature['synonyms'] = synonyms
+        # apply rules
+        description_parts = re.split(' +', feature['description'].strip())
+        description_length = len(description_parts)
+        source = None
+        source = feature_association['source'] if 'source' in feature_association else None
+        exonMatch = re.match(r'.* Exon ([0-9]*) .*', feature['name'], re.M|re.I)
 
-    # if 'geneSymbol' in mutation and mutation['geneSymbol']:
-    #     feature['geneSymbol'] = mutation['geneSymbol']
 
-    return feature
+        enriched_features = []
+        if len(description_parts[0].split('-')) == 2:
+            fusion_donor, fusion_acceptor = description_parts[0].split('-')
+            feature_fusion_donor = _enrich_gene(copy.deepcopy(feature), fusion_donor, provenance_rule='is_fusion_donor')  # NOQA
+            feature_fusion_donor['geneSymbol'] = fusion_donor
+            enriched_features.append(feature_fusion_donor)
+            feature_fusion_acceptor = _enrich_gene(copy.deepcopy(feature), fusion_acceptor, provenance_rule='is_fusion_acceptor')  # NOQA
+            feature_fusion_acceptor['geneSymbol'] = fusion_acceptor
+            enriched_features.append(feature_fusion_acceptor)
+        elif description_length == 1:
+            feature = _enrich_gene(feature, provenance_rule='gene_only')
+            enriched_features.append(feature)
+        elif ('oncokb' == source and
+              'clinical' in feature_association['oncokb'] and
+              exonMatch and
+              'Isoform' in feature_association['oncokb']['clinical']):
+            isoform = feature_association['oncokb']['clinical']['Isoform']
+            feature = _enrich_ensemble(feature,
+                                       transcript_id=isoform,
+                                       exon=int(exonMatch.group(1)),
+                                       provenance_rule='is_oncokb_exon')
+            enriched_features.append(feature)
+
+        elif ('deletion' in feature['description'].lower() or
+              'del ' in feature['description'].lower()):
+            feature = _enrich_gene(feature, description_parts[0],
+                                   provenance_rule='is_deletion')
+            enriched_features.append(feature)
+
+        elif ('amplification' in feature['description'].lower() or
+              'amp ' in feature['description'].lower()):
+            feature = _enrich_gene(feature, description_parts[0],
+                                   provenance_rule='is_amplification')
+            enriched_features.append(feature)
+        elif 'loss' in feature['description'].lower():
+            feature = _enrich_gene(feature, description_parts[0],
+                                   provenance_rule='is_loss')
+            enriched_features.append(feature)
+        elif 'mutation' in feature['description'].lower():
+            feature = _enrich_gene(feature, description_parts[0],
+                                   provenance_rule='is_mutation')
+            enriched_features.append(feature)
+        elif 'inact mut' in feature['description'].lower():
+            feature = _enrich_gene(feature, description_parts[0],
+                                   provenance_rule='is_inact_mut')
+            enriched_features.append(feature)
+        else:
+            feature = _enrich_feature(feature,
+                                      provenance_rule='default_feature')
+            enriched_features.append(feature)
+    except Exception as e:
+        logging.error(feature, exc_info=1)
+
+    return enriched_features
