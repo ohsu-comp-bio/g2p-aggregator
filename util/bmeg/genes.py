@@ -46,12 +46,12 @@ def normalize(hit):
             if not gene_name.id:
                 logger.warning('no ensembl for {} {}'.format(gene,
                                                              gene_name.__dict__))  # noqa
-                _genes['{}'.format(gene)] = gene_name.__dict__
+                # _genes['{}'.format(gene)] = gene_name.__dict__
             else:
                 _genes['{}'.format(gene_name.id)] = gene_name.__dict__
         else:
             logger.error('no genename for {}'.format(gene))
-            _genes['{}'.format(gene)] = {}
+            # _genes['{}'.format(gene)] = {}
 
     hit['genes'] = list([k for k in _genes.keys()])
     for k in _genes.keys():
