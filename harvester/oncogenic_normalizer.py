@@ -4,6 +4,8 @@ import re
 import pandas
 from copy import deepcopy
 
+CGI_TABLE = None
+
 
 def parse_genomic_locus(locus):
     locii_return_set = []
@@ -25,18 +27,24 @@ def parse_genomic_locus(locus):
         elif 'dup' in gl:
             s = re.match('([0-9]*)[0-9_]*([A-Z]*)[a-z]*([A-Z]*)', parts[1].strip('g.'))
             locii_return_set.append([parts[0].strip('chr'), s.group(1), s.group(3), ''])
+        # interval
+        elif '_' in gl:
+            s = re.match('([0-9]*)_([0-9]*)', parts[1].strip('g.'))
+            locii_return_set.append([parts[0].strip('chr'), s.group(1), None, None, s.group(2) ])
+
         else:
-            raise SyntaxError('missed a case!')
+            raise SyntaxError('missed a case! {}'.format(gl))
     return locii_return_set
 
 
 def normalize_cgi_oncogenic(asso, gene_set):
+    global CGI_TABLE
     # add the asso to the set before edits are made
     # grab only oncogenic mutations from cgi table that match gene and tumor
-    CGI_TABLE = None
     features = deepcopy(asso['features'])
     if not CGI_TABLE:
-        CGI_TABLE = CGI_Oncogenic('../data/cgi_oncogenic_mutations.tsv')
+        # https://www.cancergenomeinterpreter.org/mutations
+        CGI_TABLE = CGI_Oncogenic('../data/catalog_of_validated_oncogenic_mutations.tsv')
     tt = asso['cgi']['Primary Tumor type']
     for gene in gene_set:
         for match in CGI_TABLE.get_muts(gene, tt):

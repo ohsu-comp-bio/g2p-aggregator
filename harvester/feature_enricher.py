@@ -5,6 +5,7 @@ import mutation_type as mut
 import logging
 import re
 import copy
+import gene_enricher
 
 
 def _enrich_ensemble(feature, transcript_id, exon, provenance_rule):
@@ -51,11 +52,13 @@ def _enrich_gene(feature,
     if isinstance(hit, list):
         alternatives = hit
         for alternative in alternatives:
-            if 'PATCH' in alternative['chr']:
-                continue
-            hit = alternative
+            if alternative['chr'] in ['20', '21', '22', '23', '1', '3', '2',
+                                      '5', '4', '7', '6', '9', '8', 'Y', 'X',
+                                      '11', '10', '13', '12', '15', '14', '17',
+                                      '16', '19', '18']:
+                hit = alternative
     if hit:
-        if 'chr' in hit:
+        if 'chr' in hit and 'chromosome' not in feature:
             feature['chromosome'] = str(hit['chr'])
         if 'start' in hit:
             feature['start'] = hit['start']
@@ -150,9 +153,19 @@ def enrich(feature, feature_association):
         source = feature_association['source'] if 'source' in feature_association else None
         exonMatch = re.match(r'.* Exon ([0-9]*) .*', feature['name'], re.M|re.I)
 
+        def _is_gene(symbols):
+            """ return true if all symbols exist"""
+            for symbol in symbols:
+                if not gene_enricher.get_gene(symbol):
+                    return False
+            return True
 
         enriched_features = []
-        if len(description_parts[0].split('-')) == 2:
+        if (
+            not _is_gene([description_parts[0]]) and
+            len(description_parts[0].split('-')) == 2 and
+            _is_gene(description_parts[0].split('-'))
+           ):
             fusion_donor, fusion_acceptor = description_parts[0].split('-')
             feature_fusion_donor = _enrich_gene(copy.deepcopy(feature), fusion_donor, provenance_rule='is_fusion_donor')  # NOQA
             feature_fusion_donor['geneSymbol'] = fusion_donor
