@@ -52,11 +52,13 @@ def _enrich_gene(feature,
     if isinstance(hit, list):
         alternatives = hit
         for alternative in alternatives:
-            if 'PATCH' in alternative['chr']:
-                continue
-            hit = alternative
+            if alternative['chr'] in ['20', '21', '22', '23', '1', '3', '2',
+                                      '5', '4', '7', '6', '9', '8', 'Y', 'X',
+                                      '11', '10', '13', '12', '15', '14', '17',
+                                      '16', '19', '18']:
+                hit = alternative
     if hit:
-        if 'chr' in hit:
+        if 'chr' in hit and 'chromosome' not in feature:
             feature['chromosome'] = str(hit['chr'])
         if 'start' in hit:
             feature['start'] = hit['start']
