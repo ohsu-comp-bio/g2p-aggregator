@@ -72,8 +72,9 @@ class Gene(Element):
             doc = Gene.SYMBOL_TABLE[gene_symbol]
         except KeyError:
             aliases = Gene.SYMBOL_ALIAS_TABLE[gene_symbol]
-            if len(aliases) > 1:
-                raise KeyError("{} is an ambiguous gene symbol.".format(gene_symbol))
+            # if len(aliases) > 1:
+            #     raise KeyError("{} is an ambiguous gene symbol.".format(gene_symbol))
+            assert len(aliases) <= 1
             doc = Gene.SYMBOL_TABLE[aliases[0]]
         self.entrez_id = doc['entrez_id']
         self._doc = doc
