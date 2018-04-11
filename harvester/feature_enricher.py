@@ -156,7 +156,7 @@ def enrich(feature, feature_association):
         def _is_gene(symbols):
             """ return true if all symbols exist"""
             for symbol in symbols:
-                if not gene_enricher.get_gene(symbol):
+                if not gene_enricher.get_genes(symbol):
                     return False
             return True
 
