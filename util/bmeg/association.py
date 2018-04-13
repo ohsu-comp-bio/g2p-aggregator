@@ -18,10 +18,11 @@ def association_gid(hit):
     a = []
     empty_count = 0
     gid_name = 'association:'
-    for p in ['source', 'phenotypes', 'features',
-              'environmentalContexts', 'evidence']:
+    for p in ['source', 'phenotypes', 'evidence', 'environmentalContexts']:
         a.append(str(association.get(p, '')))
-    m = hashlib.md5()
+    for p in ['features']:
+        a.append(str(hit.get(p, '')))
+    m = hashlib.sha1()
     m.update(':'.join(a))
     return 'association:{}:{}'.format(hit['source'], m.hexdigest())
 
