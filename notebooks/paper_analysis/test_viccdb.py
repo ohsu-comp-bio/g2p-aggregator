@@ -1,7 +1,8 @@
 import pytest
 from collections import Counter
-from viccdb import ViccDb, GenomicFeature
+from viccdb import ViccDb, GenomicFeature, Disease
 from os import environ
+import networkx
 
 
 CACHE_PRESENT = ViccDb.DEFAULT_CACHE.exists()
@@ -85,6 +86,13 @@ class TestGenomicFeatures(object):
     def test_hash(self, gfa, gfb, gfa2):
         assert hash(gfa) != hash(gfb)
         assert hash(gfa) == hash(gfa2)
+
+
+class TestDisease(object):
+
+    def test_ontology(self):
+        graph = Disease.DISEASE_ONTOLOGY
+        assert networkx.is_directed_acyclic_graph(graph)
 
 
 class TestOncokb(object):
