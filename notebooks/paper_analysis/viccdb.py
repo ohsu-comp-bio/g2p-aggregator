@@ -7,6 +7,9 @@ import pyupset as pyu
 import pandas as pd
 from math import ceil
 import hashlib
+from warnings import warn
+import obonet
+import networkx
 
 
 class Element:
@@ -37,8 +40,15 @@ class Disease(Element):
         self.source = source
         self.term = term
 
+    @property
+    def name(self):
+        return self.term
+
     def __str__(self):
         return str(self.term)
+
+    _DISEASE_ONTOLOGY_URL = 'https://raw.githubusercontent.com/DiseaseOntology/HumanDiseaseOntology/master/src/ontology/HumanDO.obo'
+    DISEASE_ONTOLOGY = obonet.read_obo(_DISEASE_ONTOLOGY_URL)
 
 
 class Drug(Element):
