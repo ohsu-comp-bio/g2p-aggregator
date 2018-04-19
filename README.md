@@ -3,7 +3,7 @@
 
 ## What is it?  Why use it?
 
-![image](https://user-images.githubusercontent.com/47808/36181526-0920bd12-10da-11e8-8edf-538a7b2b8f3e.png)
+![image](vicc_fig_2.png)
 
 * For researchers, who need to investigate genotype phenotype associations, smmart-g2p is a search tool that aggregates evidence from several knowledge bases unlike ad-hoc searches, the product allows the researcher to focus on the evidence, not on the search. [more](docs/smmart.pdf)
 
