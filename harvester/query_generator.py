@@ -8,31 +8,19 @@ import argparse
 import logging
 import logging.config
 import yaml
+import re
 
-import jax
-import civic
-import oncokb
 import smmart
-import cgi_biomarkers
-import molecularmatch
-import molecularmatch_trials
-import pmkb
+
 import drug_normalizer
 import disease_normalizer
 import oncogenic_normalizer
 import biomarker_normalizer
-import sage
-import brca
-import jax_trials
 
 import drug_normalizer
 import disease_normalizer
 import reference_genome_normalizer
 
-from elastic_silo import ElasticSilo
-import elastic_silo
-from kafka_silo import KafkaSilo
-import kafka_silo
 from file_silo import FileSilo
 import file_silo
 
@@ -51,32 +39,10 @@ args = None
 silos = None
 
 
-def is_duplicate(feature_association):
-    """ return true if already harvested """
-    is_dup = False
-    m = hashlib.md5()
-    try:
-        m.update(json.dumps(feature_association, sort_keys=True))
-        hexdigest = m.hexdigest()
-        if hexdigest in DUPLICATES:
-            is_dup = True
-            logging.info('is duplicate {}'.format(
-                feature_association['association']['evidence']))
-        else:
-            DUPLICATES.append(hexdigest)
-    except Exception as e:
-        logging.warn('duplicate {}'.format(e))
-    return is_dup
-
-
 def _make_silos(args):
     """ construct silos """
     silos = []
     for s in args.silos:
-        if s == 'elastic':
-            silos.append(ElasticSilo(args))
-        if s == 'kafka':
-            silos.append(KafkaSilo(args))
         if s == 'file':
             silos.append(FileSilo(args))
     return silos
@@ -87,11 +53,6 @@ def harvest(genes):
     """ get evidence from all sources """
     for h in args.harvesters:
         harvester = sys.modules[h]
-        if args.delete_source:
-            for silo in silos:
-                if h == 'cgi_biomarkers':
-                    h = 'cgi'
-                silo.delete_source(h)
 
         for feature_association in harvester.harvest_and_convert(genes):
             logging.info(
@@ -102,19 +63,6 @@ def harvest(genes):
                 )
             )
             yield feature_association
-
-
-def harvest_only(genes):
-    """ get evidence from all sources """
-    for h in args.harvesters:
-        harvester = sys.modules[h]
-        if args.delete_source:
-            for silo in silos:
-                if h == 'cgi_biomarkers':
-                    h = 'cgi'
-                silo.delete_source(h)
-        for evidence in harvester.harvest(genes):
-            yield {'source': h, h: evidence}
 
 
 def normalize(feature_association):
@@ -167,41 +115,14 @@ def main():
     argparser = argparse.ArgumentParser()
 
     argparser.add_argument('--harvesters',  nargs='+',
-                           help='''harvest from these sources. default:
-                                   [cgi_biomarkers,jax,civic,oncokb,
-                                   pmkb, smmart]''',
-                           default=['cgi_biomarkers', 'jax', 'civic',
-                                    'oncokb', 'pmkb', 'brca', 'jax_trials',
-                                    'molecularmatch_trials, smmart'])
-
+                           help='harvest from these sources. default:[smmart]',
+                           default=['smmart'])
 
     argparser.add_argument('--silos',  nargs='+',
-                           help='''save to these silos. default:[elastic]''',
-                           default=['elastic'],
-                           choices=['elastic', 'kafka', 'file'])
+                           help='''save to these silos. default:[file]''',
+                           default=['file'],
+                           choices=['file'])
 
-
-    argparser.add_argument('--delete_index', '-d',
-                           help='''delete all from index''',
-                           default=False, action="store_true")
-
-    argparser.add_argument('--delete_source', '-ds',
-                           help='delete all content for any harvester',
-                           default=False, action="store_true")
-
-    argparser.add_argument('--genes',   nargs='+',
-                           help='array of hugo ids, no value will harvest all',
-                           default=None)
-
-
-    argparser.add_argument('--phases',   nargs='+',
-                           help='array of harvest phases to run '
-                                '[harvest,convert,enrich,all]. default is all',
-                           default=['all'],
-                           choices=['all', 'harvest'])
-
-    elastic_silo.populate_args(argparser)
-    kafka_silo.populate_args(argparser)
     file_silo.populate_args(argparser)
 
     args = argparser.parse_args()
@@ -213,41 +134,83 @@ def main():
         config = yaml.load(f)
     logging.config.dictConfig(config)
 
-
     logging.info("harvesters: %r" % args.harvesters)
     logging.info("silos: %r" % args.silos)
-    logging.info("elastic_search: %r" % args.elastic_search)
-    logging.info("elastic_index: %r" % args.elastic_index)
-    logging.info("delete_index: %r" % args.delete_index)
     logging.info("file_output_dir: %r" % args.file_output_dir)
-    logging.info("phases: %r" % args.phases)
-
-
 
     silos = _make_silos(args)
 
-    if not args.genes:
-        logging.info("genes: all")
-    else:
-        logging.info("genes: %r" % args.genes)
+    feature_associations = [fa for fa in harvest([])]
 
-    if args.delete_index:
-        for silo in silos:
-            silo.delete_all()
+    def make_queries(feature_associations):
+        # +features.protein_effects:()
+        protein_effects = []
+        genes = []
+        genomic_locations = []
+        genomic_starts = []
+        protein_domains = []
+        pathways = []
+        for fa in feature_associations:
+            fa['tags'] = []
+            fa['dev_tags'] = []
+            normalize(fa)
 
-    def _check_dup(harvest):
-        for feature_association in harvest:
-            feature_association['tags'] = []
-            feature_association['dev_tags'] = []
-            normalize(feature_association)
-            if not is_duplicate(feature_association):
-                yield feature_association
+            for f in fa['features']:
+                if 'protein_effects' in f:
+                    for pe in f['protein_effects']:
+                        protein_effects.append(pe.split(':')[1])
 
-    if 'all' in args.phases:
-        silos[0].save_bulk(_check_dup(harvest(args.genes)))
-    else:
-        silos[0].save_bulk(harvest_only(args.genes))
+                if 'synonyms' in f:
+                    for s in f['synonyms']:
+                        is_HG37 = re.compile('NC_.*\.10:g')
+                        if is_HG37.match(s):
+                            genomic_locations.append(s)
 
+                if 'start' in f:
+                    genomic_starts.append({'chromosome': f['chromosome'], 'range': [str(f['start']-i) for i in range(-2,3)]})
+
+                for protein_domain in f.get('protein_domains', []):
+                    protein_domains.append(protein_domain['name'])
+
+                for pathway in f.get('pathways', []):
+                    pathways.append(pathway)
+
+
+            for g in fa['genes']:
+                genes.append(g)
+
+        protein_effects = list(set(protein_effects))
+        genes = list(set(genes))
+        genomic_locations = list(set(genomic_locations))
+        protein_domains = list(set(protein_domains))
+        pathways = list(set(pathways))
+
+        yield '+features.protein_effects:({})'.format(' OR '.join(protein_effects))
+        yield '+genes:({})'.format(' OR '.join(genes))
+        yield '+features.synonyms.keyword:({})'.format(' OR '.join(['"{}"'.format(g) for g in genomic_locations]))
+        yield '+features.protein_domains.name.keyword:({})'.format(' OR '.join(["'{}'".format(d) for d in protein_domains]))
+        yield '+features.pathways.keyword:({})'.format(' OR '.join(['"{}"'.format(d) for d in pathways]))
+
+        chromosome_starts = []
+        for genomic_start in genomic_starts:
+            chromosome_starts.append('(features.chromosome:{} AND features.start:({}))'.format(genomic_start['chromosome'], ' OR '.join(genomic_start['range'])))
+        yield ' OR '.join(chromosome_starts)
+
+    def save_bulk(queries):
+        q = {
+            "query": {
+                "query_string": {
+                  "analyze_wildcard": True,
+                  "default_field": "*",
+                  "query": None
+                  }
+                }
+            }
+        for query in queries:
+            q['query']['query_string']['query'] = query
+            print json.dumps(q)
+
+    save_bulk(make_queries(feature_associations))
 
 if __name__ == '__main__':
     main()

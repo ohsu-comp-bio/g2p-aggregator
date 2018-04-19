@@ -105,21 +105,13 @@
     "_source": {
       "title": "summary",
       "hits": 0,
-<<<<<<< HEAD
-      "description": "",
-      "panelsJSON": "[{\"col\":4,\"id\":\"73006320-02b9-11e7-a957-1f0b0fd823ac\",\"panelIndex\":4,\"row\":6,\"size_x\":5,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"2ea26c30-374f-11e7-8e1a-655afa16233d\",\"panelIndex\":9,\"row\":6,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"6ef46d40-1640-11e7-98fa-897995ad9d1f\",\"panelIndex\":18,\"row\":9,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"86a30c80-1640-11e7-98fa-897995ad9d1f\",\"panelIndex\":21,\"row\":9,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":9,\"id\":\"ff4f01a0-6354-11e7-8d14-0bdca529e90b\",\"panelIndex\":23,\"row\":6,\"size_x\":4,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"e9b229d0-c97a-11e7-be62-a1463829ba18\",\"panelIndex\":26,\"row\":1,\"size_x\":12,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"source.keyword\",\"genes.keyword\",\"feature_names.keyword\",\"association.phenotype.description.keyword\",\"association.drug_labels.keyword\",\"association.evidence_label.keyword\",\"association.evidence.info.publications.keyword\"],\"id\":\"79bc3540-633a-11e7-927c-a1b307009ae8\",\"panelIndex\":27,\"row\":14,\"size_x\":12,\"size_y\":5,\"sort\":[\"association.evidence.info.publications.keyword\",\"asc\"],\"type\":\"search\"}]",
-=======
       "description": "includes summary heatmap",
       "panelsJSON": "[{\"col\":5,\"id\":\"73006320-02b9-11e7-a957-1f0b0fd823ac\",\"panelIndex\":4,\"row\":7,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":2,\"id\":\"2ea26c30-374f-11e7-8e1a-655afa16233d\",\"panelIndex\":9,\"row\":7,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":7,\"id\":\"6ef46d40-1640-11e7-98fa-897995ad9d1f\",\"panelIndex\":18,\"row\":10,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":1,\"id\":\"86a30c80-1640-11e7-98fa-897995ad9d1f\",\"panelIndex\":21,\"row\":10,\"size_x\":6,\"size_y\":5,\"type\":\"visualization\"},{\"col\":9,\"id\":\"ff4f01a0-6354-11e7-8d14-0bdca529e90b\",\"panelIndex\":23,\"row\":7,\"size_x\":3,\"size_y\":3,\"type\":\"visualization\"},{\"col\":1,\"id\":\"e9b229d0-c97a-11e7-be62-a1463829ba18\",\"panelIndex\":26,\"row\":1,\"size_x\":12,\"size_y\":6,\"type\":\"visualization\"},{\"col\":1,\"columns\":[\"source.keyword\",\"genes.keyword\",\"feature_names.keyword\",\"association.phenotype.description.keyword\",\"association.drug_labels.keyword\",\"association.evidence_label.keyword\",\"association.evidence.info.publications.keyword\"],\"id\":\"79bc3540-633a-11e7-927c-a1b307009ae8\",\"panelIndex\":27,\"row\":15,\"size_x\":12,\"size_y\":5,\"sort\":[\"association.evidence.info.publications.keyword\",\"asc\"],\"type\":\"search\"}]",
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       "optionsJSON": "{\"darkTheme\":false}",
       "uiStateJSON": "{\"P-1\":{\"vis\":{\"defaultColors\":{\"0% - 13%\":\"rgb(247,252,245)\",\"13% - 25%\":\"rgb(229,245,224)\",\"25% - 38%\":\"rgb(199,233,192)\",\"38% - 50%\":\"rgb(161,217,155)\",\"50% - 63%\":\"rgb(116,196,118)\",\"63% - 75%\":\"rgb(65,171,93)\",\"75% - 88%\":\"rgb(35,139,69)\",\"88% - 100%\":\"rgb(0,109,44)\"}}},\"P-18\":{\"vis\":{\"defaultColors\":{\"1 - 430\":\"rgb(255,245,240)\",\"430 - 858\":\"rgb(254,224,210)\",\"858 - 1,287\":\"rgb(252,187,161)\",\"1,287 - 1,715\":\"rgb(252,146,114)\",\"1,715 - 2,143\":\"rgb(251,106,74)\",\"2,143 - 2,572\":\"rgb(239,59,44)\",\"2,572 - 3,000\":\"rgb(203,24,29)\",\"3,000 - 3,428\":\"rgb(165,15,21)\"},\"legendOpen\":false}},\"P-2\":{\"vis\":{\"defaultColors\":{\"1 - 40\":\"rgb(255,245,240)\",\"118 - 157\":\"rgb(252,146,114)\",\"157 - 196\":\"rgb(251,106,74)\",\"196 - 235\":\"rgb(239,59,44)\",\"235 - 274\":\"rgb(203,24,29)\",\"274 - 313\":\"rgb(165,15,21)\",\"40 - 79\":\"rgb(254,224,210)\",\"79 - 118\":\"rgb(252,187,161)\"}}},\"P-21\":{\"vis\":{\"defaultColors\":{\"0% - 13%\":\"rgb(247,252,245)\",\"13% - 25%\":\"rgb(229,245,224)\",\"25% - 38%\":\"rgb(199,233,192)\",\"38% - 50%\":\"rgb(161,217,155)\",\"50% - 63%\":\"rgb(116,196,118)\",\"63% - 75%\":\"rgb(65,171,93)\",\"75% - 88%\":\"rgb(35,139,69)\",\"88% - 100%\":\"rgb(0,109,44)\"},\"legendOpen\":false}},\"P-23\":{\"vis\":{\"legendOpen\":true}},\"P-26\":{\"vis\":{\"defaultColors\":{\"0 - 400\":\"rgb(247,252,245)\",\"400 - 800\":\"rgb(199,233,192)\",\"800 - 1,200\":\"rgb(116,196,118)\",\"1,200 - 1,600\":\"rgb(35,139,69)\"}}},\"P-4\":{\"vis\":{\"legendOpen\":true}},\"P-9\":{\"vis\":{\"defaultColors\":{\"0 - 65000\":\"rgb(0,104,55)\"}}}}",
       "version": 1,
       "timeRestore": false,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"filter\":[{\"meta\":{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"negate\":true,\"type\":\"phrase\",\"key\":\"source.keyword\",\"value\":\"molecularmatch_trials\",\"params\":{\"query\":\"molecularmatch_trials\",\"type\":\"phrase\"},\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"source.keyword\":{\"query\":\"molecularmatch_trials\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"negate\":true,\"type\":\"phrase\",\"key\":\"source.keyword\",\"value\":\"jax_trials\",\"params\":{\"query\":\"jax_trials\",\"type\":\"phrase\"},\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"source.keyword\":{\"query\":\"jax_trials\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"*\"}}"
-=======
         "searchSourceJSON": "{\"filter\":[{\"meta\":{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"negate\":true,\"type\":\"phrase\",\"key\":\"source.keyword\",\"value\":\"molecularmatch_trials\",\"params\":{\"query\":\"molecularmatch_trials\",\"type\":\"phrase\"},\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"source.keyword\":{\"query\":\"molecularmatch_trials\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}},{\"meta\":{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"negate\":true,\"type\":\"phrase\",\"key\":\"source.keyword\",\"value\":\"jax_trials\",\"params\":{\"query\":\"jax_trials\",\"type\":\"phrase\"},\"disabled\":false,\"alias\":null},\"query\":{\"match\":{\"source.keyword\":{\"query\":\"jax_trials\",\"type\":\"phrase\"}}},\"$state\":{\"store\":\"appState\"}}],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"*\"}}"
       }
     },
@@ -141,7 +133,6 @@
       "timeRestore": false,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":\"oncogenic\",\"disabled\":true,\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"key\":\"query\",\"negate\":false,\"type\":\"query_string\",\"value\":\"-association.environmentalContexts:*\"},\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"-association.environmentalContexts:*\"}}},{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":\"features\",\"disabled\":true,\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"key\":\"query\",\"negate\":false,\"type\":\"query_string\",\"value\":\"features.start:*\"},\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"features.start:*\"}}},{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":\"paper\",\"disabled\":false,\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"key\":\"query\",\"negate\":false,\"type\":\"query_string\",\"value\":\"-source.keyword:*trials AND -source.keyword:sage\"},\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"-source.keyword:*trials AND -source.keyword:sage\"}}}],\"highlightAll\":true,\"version\":true,\"query\":{\"language\":\"lucene\",\"query\":\"*\"}}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -170,11 +161,7 @@
       ],
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"highlightAll\":true,\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[],\"version\":true}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"highlightAll\":true,\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"version\":true}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -191,11 +178,7 @@
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -212,11 +195,7 @@
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -233,11 +212,7 @@
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -245,18 +220,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "86a30c80-1640-11e7-98fa-897995ad9d1f",
-    "_type": "visualization",
-    "_source": {
-      "title": "gene-environment",
-      "visState": "{\"title\":\"gene-environment\",\"type\":\"heatmap\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"enableHover\":false,\"legendPosition\":\"right\",\"times\":[],\"colorsNumber\":8,\"colorSchema\":\"Greens\",\"setColorRange\":false,\"colorsRange\":[],\"invertColors\":false,\"percentageMode\":true,\"valueAxes\":[{\"show\":false,\"id\":\"ValueAxis-1\",\"type\":\"value\",\"scale\":{\"type\":\"square root\",\"defaultYExtents\":true},\"labels\":{\"show\":false,\"rotate\":0,\"color\":\"#555\"}}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"association.drug_labels.keyword\",\"size\":25,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"drug\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"genes.keyword\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"gene\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0% - 13%\":\"rgb(247,252,245)\",\"13% - 25%\":\"rgb(229,245,224)\",\"25% - 38%\":\"rgb(199,233,192)\",\"38% - 50%\":\"rgb(161,217,155)\",\"50% - 63%\":\"rgb(116,196,118)\",\"63% - 75%\":\"rgb(65,171,93)\",\"75% - 88%\":\"rgb(35,139,69)\",\"88% - 100%\":\"rgb(0,109,44)\"}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"NOT association.drug_labels:NA\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "47f9a610-6046-11e7-801f-5d1966907e10",
     "_type": "visualization",
     "_source": {
@@ -267,7 +230,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -275,18 +237,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "47f9a610-6046-11e7-801f-5d1966907e10",
-    "_type": "visualization",
-    "_source": {
-      "title": "associations",
-      "visState": "{\"title\":\"associations\",\"type\":\"table\",\"params\":{\"perPage\":20,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"-\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"source.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"source\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"genes.keyword\",\"size\":99999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"gene\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"feature_names.keyword\",\"size\":99999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"feature_names\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.phenotype.description.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"phenotype.description\"}},{\"id\":\"6\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.evidence_label.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"evidence_label\"}},{\"id\":\"7\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.drug_labels.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"drug_labels\"}},{\"id\":\"8\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.description.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"description\"}},{\"id\":\"9\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.publication_url.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"publication_url\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": null,\n        \"direction\": null\n      }\n    }\n  }\n}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "934d2000-4715-11e7-a962-bfb3ec618d3a",
     "_type": "visualization",
     "_source": {
@@ -297,7 +247,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -305,18 +254,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "934d2000-4715-11e7-a962-bfb3ec618d3a",
-    "_type": "visualization",
-    "_source": {
-      "title": "drug_label",
-      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"drug\",\"field\":\"association.drug_labels.keyword\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":500},\"schema\":\"bucket\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"perPage\":100,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"title\":\"drug_label\",\"type\":\"table\"}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"desc\"}}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "d2742700-99b4-11e7-9eb1-47f20cafc194",
     "_type": "visualization",
     "_source": {
@@ -327,7 +264,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"NOT _exists_:features.biomarker_type\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -344,11 +280,7 @@
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -365,11 +297,7 @@
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"-molecularmatch\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"-molecularmatch\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -386,11 +314,7 @@
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -407,11 +331,7 @@
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -419,28 +339,16 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "d2742700-99b4-11e7-9eb1-47f20cafc194",
-    "_type": "visualization",
-    "_source": {
-      "title": "unharmonized-feature-missing-biomarker_type",
-      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"}],\"listeners\":{},\"params\":{\"fontSize\":60,\"handleNoResults\":true},\"title\":\"unharmonized-feature-missing-biomarker_type\",\"type\":\"metric\"}",
-=======
     "_id": "ff4f01a0-6354-11e7-8d14-0bdca529e90b",
     "_type": "visualization",
     "_source": {
       "title": "AMP/ASCO/CAP Guidelines",
       "visState": "{\"title\":\"AMP/ASCO/CAP Guidelines\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"association.evidence_label.keyword\",\"size\":99,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"evidence_label\"}}],\"listeners\":{}}",
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       "uiStateJSON": "{}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"NOT _exists_:features.biomarker_type\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -457,11 +365,7 @@
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -469,18 +373,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "63c887c0-70b4-11e7-bf9c-c306d4cb8531",
-    "_type": "visualization",
-    "_source": {
-      "title": "gene-environment-class",
-      "visState": "{\"title\":\"gene-environment-class\",\"type\":\"heatmap\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"enableHover\":false,\"legendPosition\":\"right\",\"times\":[],\"colorsNumber\":8,\"colorSchema\":\"Greens\",\"setColorRange\":false,\"colorsRange\":[],\"invertColors\":false,\"percentageMode\":true,\"valueAxes\":[{\"show\":false,\"id\":\"ValueAxis-1\",\"type\":\"value\",\"scale\":{\"type\":\"square root\",\"defaultYExtents\":true},\"labels\":{\"show\":false,\"rotate\":0,\"color\":\"#555\"}}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"association.environmentalContexts.taxonomy.class.keyword\",\"size\":25,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"drug\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"genes.keyword\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"gene\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0% - 13%\":\"rgb(247,252,245)\",\"13% - 25%\":\"rgb(229,245,224)\",\"25% - 38%\":\"rgb(199,233,192)\",\"38% - 50%\":\"rgb(161,217,155)\",\"50% - 63%\":\"rgb(116,196,118)\",\"63% - 75%\":\"rgb(65,171,93)\",\"75% - 88%\":\"rgb(35,139,69)\",\"88% - 100%\":\"rgb(0,109,44)\"}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"NOT association.drug_labels:NA\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "4e3ed050-99b1-11e7-826d-6704cb1b1e4d",
     "_type": "visualization",
     "_source": {
@@ -491,7 +383,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"\\\"no-doid\\\"\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -508,11 +399,7 @@
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"\\\"no-pubchem\\\"\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"\\\"no-pubchem\\\"\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -520,18 +407,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "6ef46d40-1640-11e7-98fa-897995ad9d1f",
-    "_type": "visualization",
-    "_source": {
-      "title": "gene-phenotype",
-      "visState": "{\"title\":\"gene-phenotype\",\"type\":\"heatmap\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"enableHover\":false,\"legendPosition\":\"right\",\"times\":[],\"colorsNumber\":8,\"colorSchema\":\"Reds\",\"setColorRange\":false,\"colorsRange\":[{\"from\":0,\"to\":null}],\"invertColors\":false,\"percentageMode\":false,\"valueAxes\":[{\"show\":false,\"id\":\"ValueAxis-1\",\"type\":\"value\",\"scale\":{\"type\":\"square root\",\"defaultYExtents\":true},\"labels\":{\"show\":false,\"rotate\":0,\"color\":\"#555\"}}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"association.phenotype.description.keyword\",\"size\":25,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"disease\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"genes.keyword\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"gene\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\n  \"vis\": {\n    \"defaultColors\": {\n      \"1 - 40\": \"rgb(255,245,240)\",\n      \"40 - 79\": \"rgb(254,224,210)\",\n      \"79 - 118\": \"rgb(252,187,161)\",\n      \"118 - 157\": \"rgb(252,146,114)\",\n      \"157 - 196\": \"rgb(251,106,74)\",\n      \"196 - 235\": \"rgb(239,59,44)\",\n      \"235 - 274\": \"rgb(203,24,29)\",\n      \"274 - 313\": \"rgb(165,15,21)\"\n    }\n  }\n}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "63c887c0-70b4-11e7-bf9c-c306d4cb8531",
     "_type": "visualization",
     "_source": {
@@ -542,7 +417,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"NOT association.drug_labels:NA\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -550,18 +424,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "4e3ed050-99b1-11e7-826d-6704cb1b1e4d",
-    "_type": "visualization",
-    "_source": {
-      "title": "unharmonized-phenotypes",
-      "visState": "{\"title\":\"unharmonized-phenotypes\",\"type\":\"table\",\"params\":{\"perPage\":12,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":true,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"source.keyword\",\"size\":999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"source\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.phenotype.description.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"phenotype\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":2,\"direction\":\"desc\"}}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"\\\"no-doid\\\"\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "2731e9d0-717e-11e7-8306-477812eaf810",
     "_type": "visualization",
     "_source": {
@@ -572,7 +434,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -580,28 +441,16 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "ff4f01a0-6354-11e7-8d14-0bdca529e90b",
-    "_type": "visualization",
-    "_source": {
-      "title": "AMP/ASCO/CAP Guidelines",
-      "visState": "{\"title\":\"AMP/ASCO/CAP Guidelines\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"association.evidence_label.keyword\",\"size\":99,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"evidence_label\"}}],\"listeners\":{}}",
-=======
     "_id": "9deea220-716f-11e7-91a1-33d2b0ea24e0",
     "_type": "visualization",
     "_source": {
       "title": "drug_class",
       "visState": "{\"title\":\"drug_class\",\"type\":\"tagcloud\",\"params\":{\"scale\":\"linear\",\"orientation\":\"single\",\"minFontSize\":16,\"maxFontSize\":53},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"association.environmentalContexts.taxonomy.class.keyword\",\"size\":25,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       "uiStateJSON": "{}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -609,18 +458,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "191ed910-c3d2-11e7-abc7-fdd530489193",
-    "_type": "visualization",
-    "_source": {
-      "title": "evidence-detail",
-      "visState": "{\"title\":\"evidence-detail\",\"type\":\"table\",\"params\":{\"perPage\":50,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"count\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"source.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"source\"}},{\"id\":\"7\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.evidence_label.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"label\"}},{\"id\":\"9\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"features.geneSymbol.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"geneSymbol\"}},{\"id\":\"14\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"features.biomarker_type.keyword\",\"size\":999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"biomarker_type\"}},{\"id\":\"10\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"features.referenceName.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"referenceName\"}},{\"id\":\"11\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"features.chromosome.keyword\",\"size\":99999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"chromosome\"}},{\"id\":\"12\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"features.start\",\"size\":999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"start\"}},{\"id\":\"13\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"features.end\",\"size\":999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"end\"}},{\"id\":\"16\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"features.ref.keyword\",\"size\":999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"ref\"}},{\"id\":\"17\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"features.alt.keyword\",\"size\":999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"alt\"}},{\"id\":\"15\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.phenotype.type.term.keyword\",\"size\":99999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"phenotype\"}},{\"id\":\"18\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.environmentalContexts.term.keyword\",\"size\":999999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"environment\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"asc\"}}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "d9dac070-716f-11e7-91a1-33d2b0ea24e0",
     "_type": "visualization",
     "_source": {
@@ -631,7 +468,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -639,18 +475,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "d9dac070-716f-11e7-91a1-33d2b0ea24e0",
-    "_type": "visualization",
-    "_source": {
-      "title": "phenotype_family",
-      "visState": "{\"title\":\"phenotype_family\",\"type\":\"tagcloud\",\"params\":{\"maxFontSize\":49,\"minFontSize\":16,\"orientation\":\"single\",\"scale\":\"linear\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"association.phenotype.family.keyword\",\"size\":25,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "191ed910-c3d2-11e7-abc7-fdd530489193",
     "_type": "visualization",
     "_source": {
@@ -661,7 +485,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -678,11 +501,7 @@
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -690,18 +509,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "2731e9d0-717e-11e7-8306-477812eaf810",
-    "_type": "visualization",
-    "_source": {
-      "title": "usan_stem",
-      "visState": "{\"title\":\"usan_stem\",\"type\":\"tagcloud\",\"params\":{\"scale\":\"linear\",\"orientation\":\"single\",\"minFontSize\":16,\"maxFontSize\":53},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"association.environmentalContexts.usan_stem.keyword\",\"size\":25,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "af9ba320-c9ac-11e7-ab1a-49791af62ba6",
     "_type": "visualization",
     "_source": {
@@ -712,7 +519,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -720,18 +526,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "9deea220-716f-11e7-91a1-33d2b0ea24e0",
-    "_type": "visualization",
-    "_source": {
-      "title": "drug_class",
-      "visState": "{\"title\":\"drug_class\",\"type\":\"tagcloud\",\"params\":{\"scale\":\"linear\",\"orientation\":\"single\",\"minFontSize\":16,\"maxFontSize\":53},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"association.environmentalContexts.taxonomy.class.keyword\",\"size\":25,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "178c74c0-37a2-11e7-b483-1bea20c8fff8",
     "_type": "visualization",
     "_source": {
@@ -742,7 +536,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -750,18 +543,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "af9ba320-c9ac-11e7-ab1a-49791af62ba6",
-    "_type": "visualization",
-    "_source": {
-      "title": "normalization-variants",
-      "visState": "{\"title\":\"normalization-variants\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"square root\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"source.keyword\",\"size\":99,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"source\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"group\",\"params\":{\"filters\":[{\"input\":{\"query\":{\"query_string\":{\"query\":\"_exists_:features.start\",\"analyze_wildcard\":true}}},\"label\":\"genomic location\"},{\"input\":{\"query\":{\"query_string\":{\"query\":\"NOT _exists_:features.start\",\"analyze_wildcard\":true}}},\"label\":\"no genomic location\"}]}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"spy\":{\"mode\":{\"fill\":false,\"name\":null}},\"vis\":{\"colors\":{\"All\":\"#7EB26D\",\"no disease ontology hit\":\"#EA6460\"}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "a04a0bc0-c9aa-11e7-932e-0bbd45632064",
     "_type": "visualization",
     "_source": {
@@ -772,7 +553,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"NOT _exists_:association.oncogenic.keyword\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -780,18 +560,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "a04a0bc0-c9aa-11e7-932e-0bbd45632064",
-    "_type": "visualization",
-    "_source": {
-      "title": "evidence_labels-barchart",
-      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"source\",\"field\":\"source.keyword\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":99},\"schema\":\"segment\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"filters\":[{\"input\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"association.evidence_label.keyword:\\\"A\\\"\"}}},\"label\":\"A\"},{\"input\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"association.evidence_label.keyword:\\\"B\\\"\"}}},\"label\":\"B\"},{\"input\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"association.evidence_label.keyword:\\\"C\\\"\"}}},\"label\":\"C\"},{\"input\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"association.evidence_label.keyword:\\\"D\\\"\"}}},\"label\":\"D\"},{\"input\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"association.evidence_label.keyword:\\\"NA\\\"\"}}},\"label\":\"NA\"},{\"input\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"NA\"}}}}]},\"schema\":\"group\",\"type\":\"filters\"}],\"listeners\":{},\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"legendPosition\":\"bottom\",\"mode\":\"stacked\",\"scale\":\"linear\",\"setYExtents\":false,\"times\":[]},\"title\":\"evidence_labels-barchart\",\"type\":\"histogram\"}",
-      "uiStateJSON": "{\"spy\":{\"mode\":{\"fill\":false,\"name\":\"table\"}},\"vis\":{\"colors\":{\"All\":\"#7EB26D\",\"no disease ontology hit\":\"#EA6460\"},\"legendOpen\":true}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"NOT _exists_:association.oncogenic.keyword\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "cb6c0090-af8a-11e7-ac5b-af272375aea5",
     "_type": "visualization",
     "_source": {
@@ -802,7 +570,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -810,18 +577,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "66c3e660-c9a9-11e7-8172-b705a4f59909",
-    "_type": "visualization",
-    "_source": {
-      "title": "normalization-drug-detail",
-      "visState": "{\"title\":\"normalization-drug-detail\",\"type\":\"table\",\"params\":{\"perPage\":100,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"source.keyword\",\"size\":99,\"order\":\"desc\",\"orderBy\":\"1\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"bucket\",\"params\":{\"filters\":[{\"input\":{\"query\":{\"query_string\":{\"query\":\"\\\"no-pubchem\\\"\",\"analyze_wildcard\":true}}},\"label\":\"\"}]}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.environmentalContexts.description.keyword\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":0,\"direction\":null}}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "e3874690-c9b0-11e7-aa37-ab5000be2b66",
     "_type": "visualization",
     "_source": {
@@ -832,7 +587,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -840,18 +594,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "178c74c0-37a2-11e7-b483-1bea20c8fff8",
-    "_type": "visualization",
-    "_source": {
-      "title": "evidence-lables",
-      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"count\"},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"7\",\"params\":{\"customLabel\":\"evidence_label\",\"field\":\"association.evidence_label.keyword\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":9999},\"schema\":\"bucket\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"5\",\"params\":{\"customLabel\":\"source\",\"field\":\"source.keyword\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":9999},\"schema\":\"bucket\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"perPage\":50,\"showMeticsAtAllLevels\":true,\"showPartialRows\":false,\"showTotal\":true,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"title\":\"evidence-lables\",\"type\":\"table\"}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":0,\"direction\":\"desc\"}}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "66c3e660-c9a9-11e7-8172-b705a4f59909",
     "_type": "visualization",
     "_source": {
@@ -862,7 +604,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -870,28 +611,16 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "cb6c0090-af8a-11e7-ac5b-af272375aea5",
-    "_type": "visualization",
-    "_source": {
-      "title": "normalization-counts",
-      "visState": "{\"title\":\"normalization-counts\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"square root\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"source.keyword\",\"size\":99,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"source\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"group\",\"params\":{\"filters\":[{\"input\":{\"query\":{\"query_string\":{\"query\":\"\\\"no-doid\\\"\",\"analyze_wildcard\":true}}},\"label\":\"no disease ontology\"},{\"input\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}},\"label\":\"All\"},{\"input\":{\"query\":{\"query_string\":{\"query\":\"\\\"no-pubchem\\\"\",\"analyze_wildcard\":true}}},\"label\":\"no pubchem\"}]}}],\"listeners\":{}}",
-=======
     "_id": "961313c0-c9ac-11e7-aa37-ab5000be2b66",
     "_type": "visualization",
     "_source": {
       "title": "normalization-variants",
       "visState": "{\"title\":\"normalization-variants\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"square root\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"source.keyword\",\"size\":99,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"source\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"group\",\"params\":{\"filters\":[{\"input\":{\"query\":{\"query_string\":{\"query\":\"\\\"no-doid\\\"\",\"analyze_wildcard\":true}}},\"label\":\"no disease ontology\"},{\"input\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}},\"label\":\"All\"},{\"input\":{\"query\":{\"query_string\":{\"query\":\"\\\"no-pubchem\\\"\",\"analyze_wildcard\":true}}},\"label\":\"no pubchem\"}]}}],\"listeners\":{}}",
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       "uiStateJSON": "{\"spy\":{\"mode\":{\"name\":null,\"fill\":false}},\"vis\":{\"colors\":{\"no disease ontology hit\":\"#EA6460\",\"All\":\"#7EB26D\"}}}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -899,18 +628,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "e3874690-c9b0-11e7-aa37-ab5000be2b66",
-    "_type": "visualization",
-    "_source": {
-      "title": "normalization-chromosome-by-source",
-      "visState": "{\"title\":\"normalization-chromosome-by-source\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"square root\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"source.keyword\",\"size\":99,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"source\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"features.chromosome.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"spy\":{\"mode\":{\"name\":null,\"fill\":false}},\"vis\":{\"colors\":{\"no disease ontology hit\":\"#EA6460\",\"All\":\"#7EB26D\"}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "f93b29f0-471c-11e7-a962-bfb3ec618d3a",
     "_type": "visualization",
     "_source": {
@@ -921,7 +638,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -929,18 +645,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "961313c0-c9ac-11e7-aa37-ab5000be2b66",
-    "_type": "visualization",
-    "_source": {
-      "title": "normalization-variants",
-      "visState": "{\"title\":\"normalization-variants\",\"type\":\"histogram\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"scale\":\"square root\",\"mode\":\"stacked\",\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"source.keyword\",\"size\":99,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"source\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"group\",\"params\":{\"filters\":[{\"input\":{\"query\":{\"query_string\":{\"query\":\"\\\"no-doid\\\"\",\"analyze_wildcard\":true}}},\"label\":\"no disease ontology\"},{\"input\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}}},\"label\":\"All\"},{\"input\":{\"query\":{\"query_string\":{\"query\":\"\\\"no-pubchem\\\"\",\"analyze_wildcard\":true}}},\"label\":\"no pubchem\"}]}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"spy\":{\"mode\":{\"name\":null,\"fill\":false}},\"vis\":{\"colors\":{\"no disease ontology hit\":\"#EA6460\",\"All\":\"#7EB26D\"}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "fb7522d0-3762-11e7-883d-3f2783200bf0",
     "_type": "visualization",
     "_source": {
@@ -951,7 +655,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -959,28 +662,16 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "fb7522d0-3762-11e7-883d-3f2783200bf0",
-    "_type": "visualization",
-    "_source": {
-      "title": "gene-cloud",
-      "visState": "{\"title\":\"gene-cloud\",\"type\":\"tagcloud\",\"params\":{\"scale\":\"linear\",\"orientation\":\"single\",\"minFontSize\":18,\"maxFontSize\":72},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"genes.keyword\",\"size\":50,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-=======
     "_id": "45f385f0-c97a-11e7-be62-a1463829ba18",
     "_type": "visualization",
     "_source": {
       "title": "oncogenicity-donut",
       "visState": "{\"title\":\"oncogenicity-donut\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"association.oncogenic.keyword\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       "uiStateJSON": "{}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -988,18 +679,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "f93b29f0-471c-11e7-a962-bfb3ec618d3a",
-    "_type": "visualization",
-    "_source": {
-      "title": "disease_label",
-      "visState": "{\"title\":\"disease_label\",\"type\":\"table\",\"params\":{\"perPage\":100,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.phenotype.description.keyword\",\"size\":500,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"disease\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"desc\"}}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "0f58e3f0-aa0d-11e7-80f4-79d7936ca1a9",
     "_type": "visualization",
     "_source": {
@@ -1010,7 +689,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1018,18 +696,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "0f58e3f0-aa0d-11e7-80f4-79d7936ca1a9",
-    "_type": "visualization",
-    "_source": {
-      "title": "bar",
-      "visState": "{\"title\":\"bar\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"genes.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "e9b229d0-c97a-11e7-be62-a1463829ba18",
     "_type": "visualization",
     "_source": {
@@ -1040,7 +706,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1048,18 +713,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "e9b229d0-c97a-11e7-be62-a1463829ba18",
-    "_type": "visualization",
-    "_source": {
-      "title": "summary: phenotype-environment",
-      "visState": "{\"title\":\"summary: phenotype-environment\",\"type\":\"heatmap\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"colorSchema\":\"Greens\",\"colorsNumber\":4,\"colorsRange\":[],\"enableHover\":false,\"invertColors\":false,\"legendPosition\":\"right\",\"percentageMode\":false,\"setColorRange\":false,\"times\":[],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"color\":\"#555\",\"rotate\":0,\"show\":false},\"scale\":{\"defaultYExtents\":false,\"type\":\"linear\"},\"show\":false,\"type\":\"value\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"association.environmentalContexts.usan_stem.keyword\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"usan\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"association.phenotype.family.keyword\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"phenotype_family\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 1500\":\"rgb(247,252,245)\",\"1500 - 3000\":\"rgb(199,233,192)\",\"3000 - 4500\":\"rgb(116,196,118)\",\"4500 - 6000\":\"rgb(35,139,69)\"},\"legendOpen\":false}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "feedb450-aa0c-11e7-80f4-79d7936ca1a9",
     "_type": "visualization",
     "_source": {
@@ -1070,7 +723,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1078,18 +730,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "feedb450-aa0c-11e7-80f4-79d7936ca1a9",
-    "_type": "visualization",
-    "_source": {
-      "title": "foo",
-      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"field\":\"source.keyword\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":99},\"schema\":\"bucket\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"title\":\"foo\",\"type\":\"table\"}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "c0795fb0-37a9-11e7-b483-1bea20c8fff8",
     "_type": "visualization",
     "_source": {
@@ -1100,7 +740,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1108,34 +747,20 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "45f385f0-c97a-11e7-be62-a1463829ba18",
-    "_type": "visualization",
-    "_source": {
-      "title": "oncogenicity-donut",
-      "visState": "{\"title\":\"oncogenicity-donut\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"association.oncogenic.keyword\",\"size\":20,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-=======
     "_id": "1647aae0-c97d-11e7-be62-a1463829ba18",
     "_type": "visualization",
     "_source": {
       "title": "overview",
       "visState": "{\"title\":\"overview\",\"type\":\"markdown\",\"params\":{\"markdown\":\"### Overview\"},\"aggs\":[],\"listeners\":{}}",
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       "uiStateJSON": "{}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
       "savedObjectVersion": 2
-<<<<<<< HEAD
-=======
     }
   },
   {
@@ -1153,24 +778,19 @@
     },
     "_meta": {
       "savedObjectVersion": 2
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
     }
   },
   {
-    "_id": "c0795fb0-37a9-11e7-b483-1bea20c8fff8",
+    "_id": "5927e800-99b4-11e7-9eb1-47f20cafc194",
     "_type": "visualization",
     "_source": {
-      "title": "navigation",
-      "visState": "{\"title\":\"navigation\",\"type\":\"markdown\",\"params\":{\"markdown\":\"###  [Heatmap](/#/dashboard/9e921030-37aa-11e7-b744-3f569d1a1d0c?embed=true) [Tagclouds](/#/dashboard/1a661050-374f-11e7-8e1a-655afa16233d?embed=true)\"},\"aggs\":[],\"listeners\":{}}",
+      "title": "unharmonized-feature-missing-genomic_location",
+      "visState": "{\"title\":\"unharmonized-feature-missing-genomic_location\",\"type\":\"metric\",\"params\":{\"fontSize\":60,\"handleNoResults\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"listeners\":{}}",
       "uiStateJSON": "{}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"NOT _exists_:features.start\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1178,18 +798,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "1647aae0-c97d-11e7-be62-a1463829ba18",
-    "_type": "visualization",
-    "_source": {
-      "title": "overview",
-      "visState": "{\"title\":\"overview\",\"type\":\"markdown\",\"params\":{\"markdown\":\"### Overview\"},\"aggs\":[],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "07c049b0-9d7b-11e7-b9f4-97ec13350146",
     "_type": "visualization",
     "_source": {
@@ -1200,7 +808,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"NOT _exists_:features.start\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1234,11 +841,7 @@
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"NOT _exists_:features.biomarker_type\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1246,18 +849,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "5927e800-99b4-11e7-9eb1-47f20cafc194",
-    "_type": "visualization",
-    "_source": {
-      "title": "unharmonized-feature-missing-genomic_location",
-      "visState": "{\"title\":\"unharmonized-feature-missing-genomic_location\",\"type\":\"metric\",\"params\":{\"fontSize\":60,\"handleNoResults\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"NOT _exists_:features.start\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "9cb35570-ce55-11e7-9657-dde8137bb70f",
     "_type": "visualization",
     "_source": {
@@ -1268,7 +859,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"match_all\":{}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1276,18 +866,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "1bdf36b0-9d74-11e7-9edf-a70a6494b945",
-    "_type": "visualization",
-    "_source": {
-      "title": "oncogenicity",
-      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"source\",\"field\":\"source.keyword\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":58},\"schema\":\"bucket\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"oncogenic\",\"field\":\"association.oncogenic.keyword\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":999},\"schema\":\"bucket\",\"type\":\"terms\"}],\"listeners\":{},\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"title\":\"oncogenicity\",\"type\":\"table\"}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":2,\"direction\":\"desc\"}}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "2ea26c30-374f-11e7-8e1a-655afa16233d",
     "_type": "visualization",
     "_source": {
@@ -1298,7 +876,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1306,30 +883,17 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "07c049b0-9d7b-11e7-b9f4-97ec13350146",
-    "_type": "visualization",
-    "_source": {
-      "title": "unharmonized-features",
-      "visState": "{\"title\":\"unharmonized-features\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":true,\"showTotal\":true,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"source.keyword\",\"size\":999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"source\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"features.geneSymbol.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"gene\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"feature_names.keyword\",\"size\":999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"feature.name\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":1,\"direction\":\"asc\"}}}}",
-=======
     "_id": "73006320-02b9-11e7-a957-1f0b0fd823ac",
     "_type": "visualization",
     "_source": {
       "title": "source",
       "visState": "{\"title\":\"source\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"source.keyword\",\"size\":999,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
       "uiStateJSON": "{}",
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       "description": "",
       "savedSearchId": "79bc3540-633a-11e7-927c-a1b307009ae8",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"NOT _exists_:features.start\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1337,18 +901,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "8e95e490-c9ae-11e7-aa37-ab5000be2b66",
-    "_type": "visualization",
-    "_source": {
-      "title": "normalization-disease",
-      "visState": "{\"title\":\"normalization-disease\",\"type\":\"table\",\"params\":{\"perPage\":100,\"showPartialRows\":false,\"showMeticsAtAllLevels\":true,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":true,\"totalFunc\":\"count\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"association.phenotype.description.keyword\",\"size\":9999,\"order\":\"desc\",\"orderBy\":\"1\",\"customLabel\":\"phenotype\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"filters\",\"schema\":\"bucket\",\"params\":{\"filters\":[{\"input\":{\"query\":{\"query_string\":{\"query\":\"_exists_:association.phenotype.type.id\",\"analyze_wildcard\":true}}},\"label\":\"has_doid\"}]}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":3,\"direction\":\"desc\"}}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "86a30c80-1640-11e7-98fa-897995ad9d1f",
     "_type": "visualization",
     "_source": {
@@ -1359,7 +911,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"NOT association.drug_labels:NA\"}}},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1367,18 +918,6 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "9cb35570-ce55-11e7-9657-dde8137bb70f",
-    "_type": "visualization",
-    "_source": {
-      "title": "test2",
-      "visState": "{\"title\":\"test2\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMeticsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"count\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}],\"listeners\":{}}",
-      "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"match_all\":{}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
     "_id": "6ef46d40-1640-11e7-98fa-897995ad9d1f",
     "_type": "visualization",
     "_source": {
@@ -1389,7 +928,6 @@
       "version": 1,
       "kibanaSavedObjectMeta": {
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {
@@ -1397,47 +935,16 @@
     }
   },
   {
-<<<<<<< HEAD
-    "_id": "73006320-02b9-11e7-a957-1f0b0fd823ac",
-    "_type": "visualization",
-    "_source": {
-      "title": "source",
-      "visState": "{\"title\":\"source\",\"type\":\"pie\",\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"source.keyword\",\"size\":999,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-=======
     "_id": "fddf8be0-18ea-11e8-ba16-9318f268e4a6",
     "_type": "visualization",
     "_source": {
       "title": "paper-feature-misses",
       "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"field\":\"source.keyword\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":999},\"schema\":\"bucket\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"field\":\"feature_names.keyword\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":9999},\"schema\":\"bucket\",\"type\":\"terms\"}],\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\"},\"title\":\"paper-feature-misses\",\"type\":\"table\"}",
       "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
-      "description": "",
-      "savedSearchId": "79bc3540-633a-11e7-927c-a1b307009ae8",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{}"
-      }
-    },
-    "_meta": {
-      "savedObjectVersion": 2
-    }
-  },
-  {
-    "_id": "2ea26c30-374f-11e7-8e1a-655afa16233d",
-    "_type": "visualization",
-    "_source": {
-      "title": "count",
-      "visState": "{\"title\":\"count\",\"type\":\"metric\",\"params\":{\"addLegend\":false,\"addTooltip\":true,\"gauge\":{\"autoExtend\":false,\"backStyle\":\"Full\",\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":65000}],\"gaugeColorMode\":\"None\",\"gaugeStyle\":\"Full\",\"gaugeType\":\"Arc\",\"invertColors\":false,\"labels\":{\"color\":\"black\",\"show\":true},\"orientation\":\"vertical\",\"percentageMode\":false,\"scale\":{\"color\":\"#333\",\"labels\":false,\"show\":true,\"width\":2},\"style\":{\"bgColor\":false,\"fontSize\":\"29\",\"labelColor\":false,\"subText\":\"\"},\"type\":\"meter\",\"useRange\":false,\"verticalSplit\":false,\"extendRange\":true},\"handleNoResults\":true,\"type\":\"gauge\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}}]}",
-      "uiStateJSON": "{\"vis\":{\"defaultColors\":{\"0 - 65000\":\"rgb(0,104,55)\"}}}",
       "description": "",
       "version": 1,
       "kibanaSavedObjectMeta": {
-<<<<<<< HEAD
-        "searchSourceJSON": "{\"index\":\"772bd0e0-dba0-11e7-8c58-7def43a592ae\",\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[]}"
-=======
         "searchSourceJSON": "{\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"filter\":[{\"$state\":{\"store\":\"globalState\"},\"meta\":{\"alias\":\"features\",\"disabled\":true,\"index\":\"03713bc0-e0e3-11e7-ae4a-b5f95b22004b\",\"key\":\"query\",\"negate\":true,\"type\":\"query_string\",\"value\":\"features.start:*\"},\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"features.start:*\"}}}],\"query\":{\"language\":\"lucene\",\"query\":\"-source.keyword:*_trials AND -source.keyword:sage AND -features.start:*\"}}"
->>>>>>> 8d8bc7928d0b8d6ec1b4a2c9fdb022a5bb7fcd10
       }
     },
     "_meta": {

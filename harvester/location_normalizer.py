@@ -180,6 +180,52 @@ def normalize(feature):
     return allele, provenance
 
 
+def _enrich_pathways(feature):
+    """ get domains from pathwaycommons
+        curl 'http://www.pathwaycommons.org/pc2/search.json?q=P60484&organism=homo%20sapiens' | jq '.searchHit[].pathway'
+    """  # NOQA
+    headers = {'Content-type': 'application/json'}
+    pathways = []
+    for swissprot in feature.get('swissprots',[]):
+        url = 'http://www.pathwaycommons.org/pc2/search.json?q={}&organism=homo%20sapiens' \
+            .format(swissprot)
+        r = requests.get(url, timeout=60, headers=headers)
+        hits = r.json()
+        for hit in hits.get('searchHit', []):
+            for pathway in hit.get('pathway', []):
+                pathways.append(pathway)
+    # make uniq
+    feature['pathways'] = list(set(pathways))
+
+
+def _enrich_protein_domains(feature):
+    """ get domains from ensembl
+        curl https://grch37.rest.ensembl.org/vep/human/hgvs/ENSP00000361021.3:p.Arg15Lys?domains=1&protein=1&uniprot=1
+         -H 'Content-type:application/json' | jq '.[]|.transcript_consequences[]|.domains
+    """  # NOQA
+    headers = {'Content-type': 'application/json'}
+    protein_domains = []
+    swissprots = []
+    for protein_effect in feature['protein_effects']:
+        if not protein_effect.startswith('ENSP'):
+            continue
+        url = 'https://grch37.rest.ensembl.org/vep/human/hgvs/{}?domains=1&protein=1&uniprot=1' \
+            .format(protein_effect)
+        r = requests.get(url, timeout=60, headers=headers)
+        veps = r.json()
+        if 'error' in veps:
+            print veps, url
+            continue
+        for vep in veps:
+            for transcript_consequence in vep.get('transcript_consequences', []):
+                for domain in transcript_consequence.get('domains', []):
+                    protein_domains.append(domain)
+                for swissprot in transcript_consequence.get('swissprot', []):
+                    swissprots.append(swissprot)
+    # make uniq
+    feature['protein_domains'] = map(dict, set(tuple(sorted(d.items())) for d in protein_domains))
+    feature['swissprots'] = list(set(swissprots))
+
 def _apply_allele_registry(feature, allele_registry, provenance):
     # there is a lot of info in registry, just get synonyms and links
     links = feature.get('links', [])
@@ -202,12 +248,25 @@ def _apply_allele_registry(feature, allele_registry, provenance):
             synonyms = synonyms + genomicAllele['hgvs']
             links.append(genomicAllele['referenceSequence'])
 
+    proteinEffects = []
+    if 'transcriptAlleles' in allele_registry:
+        transcriptAlleles = allele_registry['transcriptAlleles']
+        for transcriptAllele in transcriptAlleles:
+            if 'proteinEffect' in transcriptAllele and 'hgvsWellDefined' in transcriptAllele['proteinEffect']:
+                proteinEffects.append(transcriptAllele['proteinEffect']['hgvsWellDefined'])
+
     synonyms = list(set(synonyms))
     links = list(set(links))
+    proteinEffects = list(set(proteinEffects))
     if len(synonyms) > 0:
         feature['synonyms'] = synonyms
     if len(links) > 0:
         feature['links'] = links
+    if len(proteinEffects) > 0:
+        feature['protein_effects'] = proteinEffects
+        _enrich_protein_domains(feature)
+        _enrich_pathways(feature)
+
     if 'provenance' not in feature:
         feature['provenance'] = []
     feature['provenance'].append(provenance)

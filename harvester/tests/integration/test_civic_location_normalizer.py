@@ -22,8 +22,8 @@ def test_civic():
 
     fa = convert(gene_data).next()
     normalize_feature_association(fa)
-    for f in fa['features']:
-        print f['name'], f['provenance']
+    # for f in fa['features']:
+    #     print f['name'], f['provenance']
     assert len(fa['features']) == 1
 
 
@@ -33,8 +33,19 @@ def test_civic2():
 
     fa = convert(gene_data).next()
     normalize_feature_association(fa)
-    for f in fa['features']:
-        print f['name'], f['provenance']
+    # for f in fa['features']:
+    #     print f['name'], f['provenance']
     assert len(fa['features']) == 1
     assert fa['features'][0]['geneSymbol'] == "HLA-C"
     assert fa['features'][0]['provenance_rule'] == "is_loss"
+
+
+def test_civic_protein_effects():
+    evidence = json.loads(CIVIC)
+    gene_data = {'gene': 'KRAS', 'civic': {'variants': [evidence]}}
+
+    fa = convert(gene_data).next()
+    normalize_feature_association(fa)
+    for f in fa['features']:
+        # print f['name'], f['protein_effects']
+        assert len(f['protein_effects']) > 1
