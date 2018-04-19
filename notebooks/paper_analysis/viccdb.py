@@ -320,7 +320,7 @@ class RawAssociation(ViccAssociation):
         b = k.encode()
         m = hashlib.sha256()
         m.update(b)
-        return int(m.hexdigest(), 16)
+        return int(m.hexdigest(), 16) % 10**16  # Last 16 digits of sha256 hash are sufficient
 
 
 class ViccDb:
