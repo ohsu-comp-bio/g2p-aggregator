@@ -84,7 +84,7 @@ class Gene(Element):
             aliases = Gene.SYMBOL_ALIAS_TABLE[gene_symbol]
             # if len(aliases) > 1:
             #     raise KeyError("{} is an ambiguous gene symbol.".format(gene_symbol))
-            assert len(aliases) <= 1
+            assert len(aliases) <= 1, 'Ambiguous gene symbol {}'.format(gene_symbol)
             doc = Gene.SYMBOL_TABLE[aliases[0]]
         self.entrez_id = doc['entrez_id']
         self._doc = doc
@@ -236,6 +236,9 @@ class ViccAssociation(dict):
             try:
                 out.append(Gene(g))
             except KeyError:
+                continue
+            except AssertionError:
+                warn('Ambiguous gene symbol {} in assertion {}'.format(g, self))
                 continue
         self._genes = out
         return out
