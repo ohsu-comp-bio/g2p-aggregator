@@ -207,6 +207,9 @@ class Publication(Element):
 
 class ViccAssociation(dict):
 
+    def __str__(self):
+        return str(hash(self))
+
     def __hash__(self):
         return self._stable_hash()
 
