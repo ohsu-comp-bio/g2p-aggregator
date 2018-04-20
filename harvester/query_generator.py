@@ -150,6 +150,7 @@ def main():
         genomic_starts = []
         protein_domains = []
         pathways = []
+        biomarker_types = []
         for fa in feature_associations:
             fa['tags'] = []
             fa['dev_tags'] = []
@@ -175,6 +176,9 @@ def main():
                 for pathway in f.get('pathways', []):
                     pathways.append(pathway)
 
+                if 'sequence_ontology' in f:
+                    biomarker_types.append( (f['geneSymbol'], f['sequence_ontology']['name'] ))
+
 
             for g in fa['genes']:
                 genes.append(g)
@@ -184,17 +188,26 @@ def main():
         genomic_locations = list(set(genomic_locations))
         protein_domains = list(set(protein_domains))
         pathways = list(set(pathways))
+        biomarker_types = list(set(biomarker_types))
 
         yield '+features.protein_effects:({})'.format(' OR '.join(protein_effects))
         yield '+genes:({})'.format(' OR '.join(genes))
         yield '+features.synonyms.keyword:({})'.format(' OR '.join(['"{}"'.format(g) for g in genomic_locations]))
         yield '+features.protein_domains.name.keyword:({})'.format(' OR '.join(["'{}'".format(d) for d in protein_domains]))
         yield '+features.pathways.keyword:({})'.format(' OR '.join(['"{}"'.format(d) for d in pathways]))
+        yield '+features.sequence_ontology.name.keyword:({})'.format(' OR '.join(['"{}"'.format(d) for d in biomarker_types]))
+
+
 
         chromosome_starts = []
         for genomic_start in genomic_starts:
             chromosome_starts.append('(features.chromosome:{} AND features.start:({}))'.format(genomic_start['chromosome'], ' OR '.join(genomic_start['range'])))
         yield ' OR '.join(chromosome_starts)
+
+        biomarker_queries = []
+        for t in biomarker_types:
+            biomarker_queries.append('(features.geneSymbol:{} AND features.sequence_ontology.name:{})'.format(t[0],t[1]))
+        yield ' OR '.join(biomarker_queries)
 
     def save_bulk(queries):
         q = {
