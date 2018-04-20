@@ -73,8 +73,7 @@ def test_uncategorized():
 def test_CNA():
     term = 'CNA'
     soid = normalize(term)
-    print soid
-    assert soid == None
+    assert soid == {'hierarchy': [u'SO:0000110', u'SO:0002072', u'SO:0001059', u'SO:0000248'], 'soid': u'SO:0001019', 'parent_name': u'sequence_feature', 'name': u'copy_number_variation', 'parent_soid': u'SO:0000110'}
 
 
 def test_get_so_data_0001587():
@@ -85,3 +84,9 @@ def test_get_so_data_0001587():
     assert soid['parent_soid'] == 'SO:0001060'
     assert soid['parent_name'] == 'sequence_variant'
     assert len(soid['hierarchy']) == 10
+
+
+def test_Missense_Variant():
+    term = "Missense Variant"
+    soid = normalize(term)
+    assert soid == {'hierarchy': [u'SO:0001060', u'SO:0001537', u'SO:0001878', u'SO:0001564', u'SO:0001576', u'SO:0001791', u'SO:0001580', u'SO:0001818', u'SO:0001650', u'SO:0001992'], 'soid': u'SO:0001583', 'parent_name': u'sequence_variant', 'name': u'missense_variant', 'parent_soid': u'SO:0001060'}
