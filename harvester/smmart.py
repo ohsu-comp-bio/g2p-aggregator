@@ -34,7 +34,8 @@ def convert(row):
     feature = {}
     feature['chromosome'] = row['Chromosome']
     feature['start'] = long(row['Start_position'])
-    feature['end'] = long(row['End_position'])
+    if row['End_position']:
+        feature['end'] = long(row['End_position'])
     feature['ref'] = row['Reference_Allele']
     feature['alt'] = row['Tumor_Seq_Allele2']
     feature['referenceName'] = 'GRCh37'
