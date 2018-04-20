@@ -179,11 +179,14 @@ def _variant(feature, gid):
         v['reference_name'] = feature['chromosome']
     if 'referenceName' in feature:
         v['reference_genome'] = feature['referenceName']
-    if 'ref' in feature:
+    if 'ref' in feature and feature['ref']:
         v['reference_bases'] = feature['ref']
+    else:
+        v['reference_bases'] = '-'
     if 'alt' in feature and feature['alt']:
         v['alternate_bases'] = [feature['alt']]
-
+    else:
+        v['alternate_bases'] = ['-']
     return v
 
 
@@ -226,7 +229,7 @@ if __name__ == '__main__':
             "geneSymbol": "TTL"
         }
     ]})
-    assert (({'features': ['geneENSG00000114999']}, {'geneENSG00000114999': {'id': 'geneENSG00000114999', 'names': []}})) == ttl    # noqa
+    assert (({'features': ['geneENSG00000114999']}, {'geneENSG00000114999': {'alternate_bases': '-', 'reference_bases': '-', 'id': 'geneENSG00000114999', 'names': []}})) == ttl    # noqa
     complex_rsp = normalize({'features': [
         COMPLEX_FEATURE,
     ]})
