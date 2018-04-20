@@ -30,3 +30,18 @@ biostream/biostream/g2p/Gene.json
 biostream/biostream/g2p/Phenotype.json
 biostream/biostream/g2p/Variant.json
 ```
+
+
+
+## vmc
+
+```
+Resolved this by following instructions at https://github.com/biocommons/biocommons.seqrepo/blob/master/doc/mirror.rst#fetching-using-rsync-manually
+
+I rsync'd the entire repo, set instance name to master
+
+export SEQREPO_INSTANCE_NAME=master
+export SEQREPO_ROOT_DIR=/Users/walsbr/vmc-python/tests/_data/seqrepo
+
+At that point both conversions worked.
+```
