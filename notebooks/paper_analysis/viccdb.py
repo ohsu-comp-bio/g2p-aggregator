@@ -285,6 +285,10 @@ class ViccAssociation(dict):
     def __eq__(self, other):
         return hash(self) == hash(other)
 
+    @property
+    def description(self):
+        return self['association'].get('description', None)
+
 
 class RawAssociation(ViccAssociation):
 
