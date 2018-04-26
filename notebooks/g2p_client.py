@@ -15,10 +15,26 @@ import json
 from pandas.io.json import json_normalize
 import copy
 
-import location_normalizer
-
-
 import pandas as pd
+import math
+
+
+def location_query(features):
+    """
+    normalize features, return queries
+    """
+    import os
+    import sys
+    cwd = os.getcwd()
+    sys.path.insert(0, os.path.join(os.getcwd(), '../harvester'))  # NOQA
+    os.chdir('../harvester')
+    # print os.getcwd(), 'should be in harvester'
+    import location_query_generator  # NOQA
+    # print features
+    response = location_query_generator.generate(features)
+    os.chdir(cwd)
+    # print os.getcwd(), 'should be in notebooks'
+    return response
 
 
 class G2PDatabase(object):
@@ -194,6 +210,44 @@ class G2PDatabase(object):
                  'phenotype_evidence_count':b.phenotype_id.buckets[0].doc_count} for b in aggs.phenotype_descriptions.buckets]
 
 
+
+    def raw_dataframe(self, query_string=None, size=1000, verbose=False):
+            '''
+            Get a data frame with relevant information for analysis.
+            By default this excludes trials and limited to evidence with fully normalized features, environment and phenotype
+            :query_string -- ES query string, defaults to only features with genomic location, no trials
+            :size -- number of documents to fetch per scan
+            :verbose -- print the query
+            '''
+            fields = ['source', 'association.evidence_label', 'genes', 'association.phenotype.type.id',
+                      'association.phenotype.type.term', 'association.environmentalContexts.id',
+                      'association.environmentalContexts.term', 'association.evidence.info.publications',
+                      'features'
+                     ]
+            # if not query_string:
+            #     query_string = ('-source:*trials '
+            #                     '+features.start:* '
+            #                     '+association.phenotype.type:* '
+            #                     '+association.environmentalContexts.id:* '
+            #     )
+            s = Search(using=self.client, index=self.index)
+            s = s.params(size=size)
+            s = s.query("query_string", query=query_string).source(includes=fields)
+            if verbose:
+                print json.dumps(s.to_dict(),indent=2, separators=(',', ': '))
+
+            def hit_with_id(hit):
+                '''include the unique id with the source data'''
+                h = hit.to_dict()
+                h['evidence.id'] = hit.meta.id
+                return h
+
+            # create df with the first level of json formatted by pandas
+            # return json_normalize([hit_with_id(hit) for hit in s.scan()])
+            return [hit_with_id(hit) for hit in s.scan()]
+
+
+
     def associations_dataframe(self, query_string=None, size=1000, verbose=False):
             '''
             Get a data frame with relevant information for analysis.
@@ -232,6 +286,8 @@ class G2PDatabase(object):
             def environment_centric(df):
                 """iterate through df. denormalize, create new row for each environment (drug) """
                 for index, row  in df.iterrows():
+                    if not isinstance(row['association.environmentalContexts'], list):
+                        continue
                     for environmentalContext in row['association.environmentalContexts']:
                         ec = copy.deepcopy(environmentalContext)
                         for n in ['id', 'term']:
@@ -281,17 +337,20 @@ class G2PDatabase(object):
             denormalization_msg['original'] = len(df)
             df = pd.DataFrame(environment_centric(df))
             denormalization_msg['environment_centric'] = len(df)
-            del df['association.environmentalContexts']
+            if 'association.environmentalContexts' in df:
+                del df['association.environmentalContexts']
             df = pd.DataFrame(feature_centric(df))
             denormalization_msg['feature_centric'] = len(df)
-            del df['features']
-            del df['genes']
+            if 'features' in df:
+                del df['features']
+            if 'genes' in df:
+                del df['genes']
             df = pd.DataFrame(evidence_centric(df))
             denormalization_msg['evidence_centric'] = len(df)
             if verbose:
                 print json.dumps(denormalization_msg,indent=2, separators=(',', ': '))
-
-            del df['association.evidence']
+            if 'association.evidence' in df:
+                del df['association.evidence']
             return df
 
 
@@ -395,6 +454,7 @@ class G2PDatabase(object):
         df = pd.DataFrame([agg for agg in aggs])
         df.fillna(0, inplace=True)
         return df
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

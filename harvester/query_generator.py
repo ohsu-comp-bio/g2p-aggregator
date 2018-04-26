@@ -141,6 +141,13 @@ def main():
     silos = _make_silos(args)
 
     feature_associations = [fa for fa in harvest([])]
+    # print [f for f in fa['features'] for fa in feature_associations]
+    l = []
+    for fa in feature_associations:
+        for f in  fa['features']:
+            l.append(f)
+    print l
+    print
 
     def make_queries(feature_associations):
         # +features.protein_effects:()
@@ -195,7 +202,6 @@ def main():
         yield '+features.synonyms.keyword:({})'.format(' OR '.join(['"{}"'.format(g) for g in genomic_locations]))
         yield '+features.protein_domains.name.keyword:({})'.format(' OR '.join(["'{}'".format(d) for d in protein_domains]))
         yield '+features.pathways.keyword:({})'.format(' OR '.join(['"{}"'.format(d) for d in pathways]))
-        yield '+features.sequence_ontology.name.keyword:({})'.format(' OR '.join(['"{}"'.format(d) for d in biomarker_types]))
 
 
 
@@ -222,6 +228,7 @@ def main():
         for query in queries:
             q['query']['query_string']['query'] = query
             print json.dumps(q)
+            print
 
     save_bulk(make_queries(feature_associations))
 

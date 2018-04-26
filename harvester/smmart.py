@@ -40,9 +40,12 @@ def convert(row):
     feature['alt'] = row['Tumor_Seq_Allele2']
     feature['referenceName'] = 'GRCh37'
     feature['geneSymbol'] = row['Hugo_Symbol']
-    feature['description'] = row['Description']
     feature['name'] = '{} {}'.format(row['Hugo_Symbol'],
                                      row['Protein_Change'])
+    if row.get('Description', None):
+        feature['description'] = row.get('Description')
+    else:
+        feature['description'] = ''
     feature['biomarker_type'] = row['Variant_Classification']
     genes = [row['Hugo_Symbol']]
     features = [feature]

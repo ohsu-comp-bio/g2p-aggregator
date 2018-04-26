@@ -41,6 +41,7 @@ def allele_registry(hgvs):
     """
     url = 'http://reg.genome.network/allele?hgvs={}' \
         .format(requests.utils.quote(hgvs))
+    print url
     r = requests.get(url, headers={'Accept': 'application/json'})
     if r.status_code not in [200, 400, 404]:
         logging.info('unexpected allele_registry {} {}'.format(url,
@@ -189,6 +190,7 @@ def _enrich_pathways(feature):
     for swissprot in feature.get('swissprots',[]):
         url = 'http://www.pathwaycommons.org/pc2/search.json?q={}&organism=homo%20sapiens' \
             .format(swissprot)
+        print url
         r = requests.get(url, timeout=60, headers=headers)
         hits = r.json()
         for hit in hits.get('searchHit', []):
@@ -211,6 +213,7 @@ def _enrich_protein_domains(feature):
             continue
         url = 'https://grch37.rest.ensembl.org/vep/human/hgvs/{}?domains=1&protein=1&uniprot=1' \
             .format(protein_effect)
+        print url
         r = requests.get(url, timeout=60, headers=headers)
         veps = r.json()
         if 'error' in veps:
@@ -222,9 +225,14 @@ def _enrich_protein_domains(feature):
                     protein_domains.append(domain)
                 for swissprot in transcript_consequence.get('swissprot', []):
                     swissprots.append(swissprot)
+                if 'biomarker_type' not in feature and 'consequence_terms' in transcript_consequence:
+                    feature['biomarker_type'] = transcript_consequence['consequence_terms'][0]
+
     # make uniq
     feature['protein_domains'] = map(dict, set(tuple(sorted(d.items())) for d in protein_domains))
     feature['swissprots'] = list(set(swissprots))
+
+
 
 def _apply_allele_registry(feature, allele_registry, provenance):
     # there is a lot of info in registry, just get synonyms and links
@@ -254,6 +262,8 @@ def _apply_allele_registry(feature, allele_registry, provenance):
         for transcriptAllele in transcriptAlleles:
             if 'proteinEffect' in transcriptAllele and 'hgvsWellDefined' in transcriptAllele['proteinEffect']:
                 proteinEffects.append(transcriptAllele['proteinEffect']['hgvsWellDefined'])
+            if 'geneSymbol' not in feature and 'geneSymbol' in transcriptAllele:
+                feature['geneSymbol'] = transcriptAllele['geneSymbol']
 
     synonyms = list(set(synonyms))
     links = list(set(links))
