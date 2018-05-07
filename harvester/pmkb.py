@@ -12,7 +12,11 @@ def harvest(genes=None):
         for line in ins:
             interpretations = json.loads(line)['interpretations']
             for interpretation in interpretations:
-                yield interpretation
+                if not genes:
+                    yield interpretation
+                else:
+                    if interpretation['gene']['name'] in genes:
+                        yield interpretation
 
 
 def convert(interpretation):
@@ -77,8 +81,13 @@ def convert(interpretation):
     desc = []
     for tumor in tumors:
         desc.append(tumor['name'])
+    association['phenotypes'] = desc
+    if len(desc) > 0:
+        t = desc[0]
+    else:
+        t = ''
     association['phenotype'] = {
-         'description': desc
+         'description': t
     }
     association['drug_labels'] = 'NA'
     association['evidence'] = [{
@@ -93,6 +102,7 @@ def convert(interpretation):
         # add summary fields for Display
    #     if len(interpretation['citations']) > 0:
    #          association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])  # NOQA
+    association['publication_url'] = ''
     feature_association = {'genes': [genes],
                            'features': features,
                            'feature_names': ['{} {}'.format(f["geneSymbol"], f["name"]) for f in features],

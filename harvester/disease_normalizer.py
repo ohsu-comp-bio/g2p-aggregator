@@ -55,7 +55,7 @@ def normalize_bioontology(name):
 def normalize_ebi(name):
     """ call ebi & retrieve """
     if name in NOFINDS:
-        logging.info('{} in disease_normalizer.NOFINDS'.format(name))
+        # logging.info('{} in disease_normalizer.NOFINDS'.format(name))
         return []
     name = urllib.quote_plus(project_lookup(name))
     url = 'https://www.ebi.ac.uk/ols/api/search?q={}&groupField=iri&exact=on&start=0&ontology=doid'.format(name)  # NOQA
@@ -189,11 +189,30 @@ def normalize(name):
         return []
 
 
+def normalize_multi(phenotypes):
+    diseases = []
+    for pheno in phenotypes:
+        disease = normalize(pheno)
+        phenotype = {
+            'id': disease[0]['ontology_term'],
+            'term': disease[0]['label'],
+            'source': disease[0]['source'],
+            'description': disease[0]['label']
+        }
+        if 'family' in disease[0]:
+            phenotype['family'] = disease[0]['family']
+        diseases.append(phenotype)
+    return diseases
+
+
 def normalize_feature_association(feature_association):
     """ given the 'final' g2p feature_association,
     update it with normalized diseases """
     # nothing to read?, return
     association = feature_association['association']
+    if 'phenotypes' in association:
+        diseases = normalize_multi(association['phenotypes'])
+        association['phenotypes_info'] = diseases
     if 'phenotype' not in association:
         return
     diseases = normalize(association['phenotype']['description'])
