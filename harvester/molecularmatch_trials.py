@@ -8,7 +8,6 @@ import logging
 from warnings import warn
 import sys
 import time
-import gene_enricher
 
 DEFAULT_GENES = ['*']
 TRIAL_IDS = []
@@ -140,8 +139,7 @@ def convert(evidence):
         genes = set([])
         for t in evidence_tags:
             if t['facet'] == 'GENE':
-                if gene_enricher.get_genes(t['term']):
-                    genes.add(t['term'])
+                genes.add(t['term'])
         genes = list(genes)
 
         features = set([])
