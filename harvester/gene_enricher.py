@@ -35,20 +35,23 @@ for doc in data['response']['docs']:
 data = None
 
 
-def get_genes(identifier):
+def get_gene(identifier):
     """ return gene for identifier """
     for store in [GENES, ALIASES]:
         genes = store.get(identifier, None)
-        if genes:
+        if genes and len(genes) == 1:
             return genes
-    return None
-
+        else:
+            raise ValueError('gene reference does not exist or refers to multiple genes')
 
 def normalize_feature_association(feature_association):
     """ add gene_identifiers array to feature_association """
     gene_identifiers = []
     for gene_symbol in feature_association['genes']:
-        genes = get_genes(gene_symbol)
-        if (genes):
-            gene_identifiers.extend(genes)
+        try:
+            gene = get_gene(gene_symbol)
+        except:
+            gene = None
+        if (gene):
+            gene_identifiers.extend(gene)
     feature_association['gene_identifiers'] = gene_identifiers
