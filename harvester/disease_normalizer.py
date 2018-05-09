@@ -97,9 +97,13 @@ def normalize_ebi(name):
         NOFINDS.append(name)
         return []
     doc = response['docs'][0]
+    if doc['obo_id'][:2] != 'DO':
+        logging.info('{} in disease_normalizer.NOFINDS'.format(name))
+        NOFINDS.append(name)
+        return []
     term = {'ontology_term': doc['obo_id'].encode('utf8'),
             'label': doc['label'].encode('utf8'),
-            'source': 'http://purl.obolibrary.org/obo/doid'}
+            'source': doc['iri'].encode('utf8')}
     family = get_family(doc['obo_id'])
     if family:
         term['family'] = family
