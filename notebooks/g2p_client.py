@@ -219,20 +219,10 @@ class G2PDatabase(object):
             :size -- number of documents to fetch per scan
             :verbose -- print the query
             '''
-            fields = ['source', 'association.evidence_label', 'genes', 'association.phenotype.type.id',
-                      'association.phenotype.type.term', 'association.environmentalContexts.id',
-                      'association.environmentalContexts.term', 'association.evidence.info.publications',
-                      'features'
-                     ]
-            # if not query_string:
-            #     query_string = ('-source:*trials '
-            #                     '+features.start:* '
-            #                     '+association.phenotype.type:* '
-            #                     '+association.environmentalContexts.id:* '
-            #     )
+
             s = Search(using=self.client, index=self.index)
             s = s.params(size=size)
-            s = s.query("query_string", query=query_string).source(includes=fields)
+            s = s.query("query_string", query=query_string)
             if verbose:
                 print json.dumps(s.to_dict(),indent=2, separators=(',', ': '))
 
@@ -244,7 +234,8 @@ class G2PDatabase(object):
 
             # create df with the first level of json formatted by pandas
             # return json_normalize([hit_with_id(hit) for hit in s.scan()])
-            return [hit_with_id(hit) for hit in s.scan()]
+            for hit in s.scan():
+                yield hit_with_id(hit)
 
 
 

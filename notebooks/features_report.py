@@ -94,16 +94,142 @@ def print_top_results(features_of_interest):
             evidence_level_c[fa['association']['evidence_label']] += 1
             source_c[fa['source']] += 1
 
-        print "    query", qs
-        print "    top publication", publications_c.most_common(1)
-        print "    top drug", drugs_c.most_common(1)
-        print "    top allele", alleles_c.most_common(1)
-        print "    top protein_effect", protein_effects_c.most_common(1)
-        print "    top protein_domain", protein_domains_c.most_common(1)
-        print "    top biomarker", biomarkers_c.most_common(1)
+        # print "    query", qs
+
+        def match_publication(fa, publication):
+            try:
+                for e in fa['association']['evidence']:
+                    if publication in [p for p in e['info']['publications']]:
+                        return fa
+            except Exception as e:
+                pass
+
+        def match_drug(fa, drug):
+            for environmentalContext in fa['association'].get('environmentalContexts', []):
+                if drug == environmentalContext['term']:
+                    return fa
+
+        def match_allele(fa, allele):
+            for f in fa['features']:
+                if allele in f.get('synonyms', []):
+                    return fa
+
+        def match_protein_effect(fa, protein_effect):
+            for f in fa['features']:
+                if allele in f.get('synonyms', []):
+                    return fa
+            for f in fa['features']:
+                if protein_effect in [pe.split(':')[1] for pe in f.get('protein_effects', [])]:
+                    return fa
+
+        def match_protein_domain(fa, protein_domain):
+            for f in fa['features']:
+                if protein_domain in f.get('protein_domains', []):
+                    return fa
+
+        def match_common_biomarkers(fa, biomarker):
+            for biomarker in biomarkers:
+                for f in fa['features']:
+                    b = '{} {}'.format(f.get('geneSymbol', None), f.get('biomarker_type', None))
+                    if biomarker == b:
+                        return fa
+
+
+        def match_common_pathways(fa, pathway):
+            for f in fa['features']:
+                if pathway in f.get('pathways', []):
+                    return fa
+
+        def print_details(fa):
+            association = a['association']
+            drugs = [ec['term'] for ec in association['environmentalContexts']]
+            pubs = []
+            for ei in fa['association'].get('evidence', []):
+                for p in ei['info']['publications']:
+                    pubs.append(p)
+            print "        ", fa['source'], association['evidence_label'], drugs, association.get('description', ''), pubs
+
+        most_common_pub = publications_c.most_common(1)
+        if most_common_pub:
+            print "    top publication", most_common_pub
+            sorted_list = sorted(filter(None, map(lambda fa: match_publication(fa, most_common_pub[0][0]), r)), key=lambda k: k['association']['evidence_label'])
+            for c, a in enumerate(sorted_list):
+                print_details(a)
+                if c > 10:
+                    break
+
+        most_common_drug = drugs_c.most_common(1)
+        if most_common_drug:
+            print "    top drug", most_common_drug
+            sorted_list = sorted(filter(None, map(lambda fa: match_drug(fa, most_common_drug[0][0]), r)), key=lambda k: k['association']['evidence_label'])
+            for c, a in enumerate(sorted_list):
+                print_details(a)
+                if c > 10:
+                    break
+
+        most_common_allele = alleles_c.most_common(1)
+        if most_common_allele:
+            print "    top allele", most_common_allele
+            sorted_list = sorted(filter(None, map(lambda fa: match_allele(fa, most_common_allele[0][0]), r)), key=lambda k: k['association']['evidence_label'])
+            for c, a in enumerate(sorted_list):
+                print_details(a)
+                if c > 10:
+                    break
+
+        most_common_protein_effect = protein_effects_c.most_common(1)
+        if most_common_protein_effect:
+            print "    top protein_effect", most_common_protein_effect
+            sorted_list = sorted(filter(None, map(lambda fa: match_protein_effect(fa, most_common_protein_effect[0][0]), r)), key=lambda k: k['association']['evidence_label'])
+            for c, a in enumerate(sorted_list):
+                print_details(a)
+                if c > 10:
+                    break
+
+
+        most_common_protein_effect = protein_effects_c.most_common(1)
+        if most_common_protein_effect:
+            print "    top protein_effect", most_common_protein_effect
+            sorted_list = sorted(filter(None, map(lambda fa: match_protein_effect(fa, most_common_protein_effect[0][0]), r)), key=lambda k: k['association']['evidence_label'])
+            for c, a in enumerate(sorted_list):
+                print_details(a)
+                if c > 10:
+                    break
+
+        most_common_protein_domain = protein_domains_c.most_common(1)
+        if most_common_protein_effect:
+            print "    top protein_domain", most_common_protein_domain
+            sorted_list = sorted(filter(None, map(lambda fa: match_protein_domain(fa, most_common_protein_domain[0][0]), r)), key=lambda k: k['association']['evidence_label'])
+            for c, a in enumerate(sorted_list):
+                print_details(a)
+                if c > 10:
+                    break
+
+        most_common_biomarkers = biomarkers_c.most_common(1)
+        if most_common_biomarkers:
+            print "    top biomarker", most_common_biomarkers
+            sorted_list = sorted(filter(None, map(lambda fa: match_common_biomarkers(fa, most_common_biomarkers[0][0]), r)), key=lambda k: k['association']['evidence_label'])
+            for c, a in enumerate(sorted_list):
+                print_details(a)
+                if c > 10:
+                    break
+
+        most_common_pathways = pathways_c.most_common(1)
+        if most_common_pathways:
+            print "    top pathway", most_common_pathways
+            sorted_list = sorted(filter(None, map(lambda fa: match_common_pathways(fa, most_common_pathways[0][0]), r)), key=lambda k: k['association']['evidence_label'])
+            for c, a in enumerate(sorted_list):
+                print_details(a)
+                if c > 10:
+                    break
+
         print "    top pathway", pathways_c.most_common(1)
         print "    evidence_levels", evidence_level_c.most_common(4)
         print "    sources", source_c.most_common(4)
 
+
+
+
+
 for f in patient_features:
     print_top_results([f])
+    break

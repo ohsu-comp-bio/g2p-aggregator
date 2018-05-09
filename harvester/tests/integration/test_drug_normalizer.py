@@ -135,3 +135,16 @@ def test_TRAMETINIB():
     assert len(compounds) == 1
     assert compounds[0]['source']
     print compounds
+
+
+def test_SMMART():
+    drug_names = "Olaparib Folfox Pembrolizumab Palbociclib ATRA Afatinib Vorinostat Everolimus Trametinib Cabozantinib Lenvatinib Ponatinib Ipilimumab Nivolumab Pertuzumab Carboplatin Enzalutamide Abiraterone Vemurafenib Cabazitaxel Panobinostat Imatinib Dasatinib Sunitinib Sorafenib Ruxolitinib Bortezomib Idelalisib Venetoclax Sirolimus Bevacizumab Erlotinib Celecoxib".split()
+    ids = []
+    for drug_name in drug_names:
+        compounds = normalize(drug_name)
+        id = ''
+        if len(compounds) > 0:
+            id = compounds[0]['ontology_term']
+            ids.append(id)
+        print drug_name, id
+    print ids
