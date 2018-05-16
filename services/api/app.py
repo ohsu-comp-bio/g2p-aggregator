@@ -24,6 +24,8 @@ from OpenSSL import SSL
 
 # our utils
 from log_setup import init_logging
+import feature_queries
+
 
 # ***** globals
 # set the WSGI application callable to allow using uWSGI:
@@ -228,6 +230,12 @@ def getAssociation(**kwargs):
     association = client.get(index="associations",
                              doc_type='association', id=kwargs['id'])
     return association['_source']
+
+
+def postFeatureAssociations(**kwargs):
+    """ query for matches to a query """
+
+
 
 
 # setup server
