@@ -1,14 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import json
+import os
 
 # load gene names
 # ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/json/non_alt_loci_set.json
 GENES = {}
 ALIASES = {}
+DATA_DIR = os.environ.get('HARVESTER_DATA', '../data')
+
 
 # trim payload, we only need symbol and ensembl
-data = json.load(open('../data/non_alt_loci_set.json'))
+data = json.load(open('{}/non_alt_loci_set.json'.format(DATA_DIR)))
 for doc in data['response']['docs']:
     gene = {
         'symbol': doc['symbol'],
