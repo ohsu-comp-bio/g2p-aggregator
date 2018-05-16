@@ -11,7 +11,7 @@ elasticsearch-dsl==6.0.0
 elasticsearch==6.0.0
 
 # harvester
-git+https://github.com/ohsu-comp-bio/g2p-aggregator.git@smmart
+git+git://github.com/ohsu-comp-bio/g2p-aggregator.git@smmart#egg=harvester
 
 # # for basic_authorizer
 # passlib==1.7.1
