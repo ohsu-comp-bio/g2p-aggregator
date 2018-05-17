@@ -163,7 +163,7 @@ def getBeaconAlleleResponse(**kwargs):
 
 def postBeaconAlleleResponse(queryBeaconAllele):
     """ lookup by allele (aka variant/feature) """
-    log.debug(queryBeaconAllele)
+    log.info(queryBeaconAllele)
     return _location_lookup(Params(queryBeaconAllele))
 
 
@@ -232,10 +232,9 @@ def getAssociation(**kwargs):
     return association['_source']
 
 
-def postFeatureAssociations(**kwargs):
+def postFeaturesQuery(**kwargs):
     """ query for matches to a query """
-
-
+    return feature_queries.get_associations(kwargs, _es())
 
 
 # setup server
@@ -253,6 +252,7 @@ def configure_app(args):
         else:
             function_name = operation_id
         function = getattr(sys.modules[__name__], function_name)
+        # print 'configure_app', function_name, function
         return function
 
     app = connexion.App(

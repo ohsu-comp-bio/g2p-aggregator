@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.4.0
+  version: 0.5.0
   title: GA4GH G2P & Beacon API specification
   description: >-
       This protocol defines the associations between genotype
@@ -289,8 +289,6 @@ paths:
         type: "string"
         description: "Field name "
         x-example: "association.evidence_label"
-        x-example: "genes"
-        x-example: "features.name"
       responses:
         200:
           description: "Status 200"
@@ -305,11 +303,11 @@ paths:
       tags:
       - "Associations"
       description: Performs a set of feature queries
-      operationId: postFeatureAssociations
+      operationId: postFeaturesQuery
       produces:
         - application/json
       parameters:
-        - name: queryFeatures
+        - name: features
           in: body
           required: true
           schema:
@@ -809,20 +807,43 @@ definitions:
     description: "This general error structure is used throughout this API."
     example: "{\n  \"code\": 400,\n  \"description\": \"Bad query parameter [size]:\
       \ Invalid integer value [abc]\",\n  \"reasonPhrase\": \"Bad Request\"\n}"
-
   FeatureQueriesRequest:
     description: 'Lookup evidence for this set of alleles'
     type: array
     items:
       $ref: '#/definitions/Feature'
 
+  FeatureQueriesResponse:
+    description: 'evidence for alleles'
+    type: array
+    items:
+      $ref: '#/definitions/FeatureQueryResponse'
+
+  FeatureQueryResponse:
+    type: object
+    properties:
+      name:
+        description: 'The name of the query, describes location specificity'
+        type: string
+      query_string:
+        description: 'The raw query string issued against the database'
+        type: string
+      allele:
+        description: 'An allele description, typically hgvs g. '
+        type: string
+      biomarker_type:
+        description: 'An normalized biomarker type '
+        type: string
+      hits:
+        description: 'array of evidence'
+        type: array
+
+
   Feature:
     type: object
     properties:
-      - name: referenceName
+      referenceName:
         description: 'Reference name (chromosome). Accepting values 1-22, X, Y.'
-        in: query
-        required: true
         type: string
         enum:
           - '1'
@@ -849,18 +870,17 @@ definitions:
           - '22'
           - 'X'
           - 'Y'
-      - name: start
+      start:
         description: |
           Precise start coordinate position, allele locus (0-based).
-        required: true
         type: integer
         format: int64
         minimum: 0
-      - name: end
+      end:
         description: 'Precise end coordinate'
         type: integer
         format: int64
-      - name: referenceBases
+      referenceBases:
         description: |
           Reference bases for this variant (starting from `start`).
           For accepted values see the REF field in VCF 4.2 specification.
@@ -871,13 +891,11 @@ definitions:
           - G
           - T
           - N
-      - name: alternateBases
+      alternateBases:
         description: |
           The bases that appear instead of the reference bases.
           For accepted values see the ALT field in VCF 4.2 specification.
         type: string
-      - name: assemblyId
+      assemblyId:
         description: 'Assembly identifier (GRC notation, e.g. GRCh37).'
-        in: query
-        required: true
         type: string

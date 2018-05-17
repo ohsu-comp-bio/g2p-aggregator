@@ -1,7 +1,7 @@
 connexion==1.1.16
 pytest
 requests==2.18.4
-Flask-Cors==2.0.1
+Flask-Cors==3.0.4
 Flask-Testing==0.6.2
 Flask-WebTest==0.0.9
 pyOpenSSL==17.5.0
