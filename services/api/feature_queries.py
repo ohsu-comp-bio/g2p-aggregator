@@ -21,12 +21,6 @@ def get_features(args):
         location_normalizer.normalize_feature_association(fa)
         biomarker_normalizer.normalize_feature_association(fa)
         enriched_features.append(fa['features'][0])
-
-    counter = Counter()
-    for f in enriched_features:
-        for p in f.get('pathways', []):
-            counter[p] += 1
-    log.info(('top3 pathways', counter.most_common(3)))
     return enriched_features
 
 
@@ -42,6 +36,7 @@ def allele_identifier(feature):
 
 
 def biomarker_type(feature_associations):
+    """ get the SO:name """
     for fa in feature_associations:
         for f in fa['features']:
             return f['sequence_ontology']['name']
@@ -77,7 +72,9 @@ def raw_dataframe(query_string, client, size=1000, verbose=False,
 
 def get_associations(args, client):
     queries = []
-    for f in get_features(args):
+    enriched_features = get_features(args)
+
+    for f in enriched_features:
         location_query = location_query_generator.generate([f])
         identifier = allele_identifier(
             location_query['feature_associations'][0]['features'][0]
@@ -94,4 +91,23 @@ def get_associations(args, client):
                             'query_string': qs,
                             'feature': f
                             })
+
+    counter = Counter()
+    for f in enriched_features:
+        for p in f.get('pathways', []):
+            counter[p] += 1
+    top3_pathways = [t[0] for t in counter.most_common(3)]
+    log.info(('top3_pathways', top3_pathways))
+    if len(top3_pathways) > 0:
+        qs = '+features.pathways:({})'.format(
+            ' AND '.join(['"{}"'.format(d) for d in top3_pathways]))
+        hits = list(raw_dataframe(query_string=qs, client=client))
+        queries.append({'biomarker_type': None,
+                        'allele': 'All features',
+                        'name': 'pathways',
+                        'hits': hits,
+                        'query_string': qs,
+                        'feature': None
+                        })
+
     return queries

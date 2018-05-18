@@ -49,7 +49,6 @@ def harvest(features):
                                'association': association,
                                'source': 'ad-hoc',
                                }
-        feature_association
         yield feature_association
 
 
@@ -153,8 +152,6 @@ def generate(features):
             yield '+features.synonyms:({})'.format(' OR '.join(['"{}"'.format(g) for g in genomic_locations])), 'alleles'
         if len(protein_domains) > 0:
             yield '+features.protein_domains.name:({})'.format(' OR '.join(["'{}'".format(d) for d in protein_domains])), 'protein_domains'
-        if len(pathways) > 0:
-            yield '+features.pathways:({})'.format(' AND '.join(['"{}"'.format(d) for d in pathways])), 'pathways'
 
         chromosome_starts = []
         for genomic_start in genomic_starts:
