@@ -146,10 +146,12 @@ def test_features_associations(client):
     dataset_features = p204
 
     # json.dumps({'queryFeatures': features})
+    print json.dumps([p204[0]])
     rsp = client.post('/api/v1/features/associations',
                       data=json.dumps([p204[0]]),
                       content_type='application/json')
     rsp = json.loads(rsp.get_data())
     assert len(rsp) > 0
+    print 'results'
     for q in rsp:
-        print q['allele'], q['name'], q['biomarker_type'], len(q['hits']) # , q['query_string']
+        print q['allele'], q['name'], q['biomarker_type'], len(q['hits'])  # , q['query_string']

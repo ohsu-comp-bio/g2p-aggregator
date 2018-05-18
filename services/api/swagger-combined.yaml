@@ -837,6 +837,9 @@ definitions:
       hits:
         description: 'array of evidence'
         type: array
+        items:
+          type: object
+
 
 
   Feature:

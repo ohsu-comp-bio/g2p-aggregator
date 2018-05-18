@@ -1,7 +1,8 @@
 import logging
 import requests_cache
 import re
-from harvester import location_normalizer, location_query_generator
+from harvester import location_normalizer, location_query_generator, \
+    biomarker_normalizer
 from elasticsearch_dsl import Search, Q
 
 # cache responses
@@ -14,8 +15,9 @@ def get_features(args):
     """ find all associations associated with these features"""
     enriched_features = []
     for f in args['features']:
-        fa = {'features': [f]}
+        fa = {'features': [f], 'dev_tags': []}
         location_normalizer.normalize_feature_association(fa)
+        biomarker_normalizer.normalize_feature_association(fa)
         enriched_features.append(fa['features'][0])
     return enriched_features
 
@@ -34,7 +36,7 @@ def allele_identifier(feature):
 def biomarker_type(feature_associations):
     for fa in feature_associations:
         for f in fa['features']:
-            return f['biomarker_type']
+            return f['sequence_ontology']['name']
 
 
 def raw_dataframe(query_string, client, size=1000, verbose=False,
@@ -81,6 +83,7 @@ def get_associations(args, client):
                             'allele': identifier,
                             'name': name,
                             'hits': hits,
-                            'query_string': qs
+                            'query_string': qs,
+                            'feature': f
                             })
     return queries

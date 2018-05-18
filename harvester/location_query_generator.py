@@ -169,7 +169,8 @@ def generate(features):
         biomarker_queries = []
         for t in biomarker_types:
             biomarker_queries.append('+features.geneSymbol:{} +features.sequence_ontology.name:{}'.format(t[0],t[1]))
-        yield ' OR '.join(biomarker_queries),  '~biomarker_type'
+        if len(biomarker_queries) > 0:
+            yield ' OR '.join(biomarker_queries),  '~biomarker_type'
 
     def to_elastic(queries, all_drugs=False, smmart_drugs=None, all_sources=False, sources=None):
         if not all_drugs and not smmart_drugs:

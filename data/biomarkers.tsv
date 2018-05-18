@@ -57,6 +57,7 @@ Microsatellite	microsatellite
 Minus 1 Frameshift Variant	minus_1_frameshift_variant
 Missense	missense_variant
 Missense Variant	missense_variant
+Missense_Mutation	missense_variant
 N	stop_gained
 Non Sense	stop_gained
 Nonsynonymous Variant	nonsynonymous_variant
