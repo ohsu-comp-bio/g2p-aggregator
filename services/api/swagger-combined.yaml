@@ -841,12 +841,11 @@ definitions:
           type: object
 
 
-
   Feature:
     type: object
     properties:
-      referenceName:
-        description: 'Reference name (chromosome). Accepting values 1-22, X, Y.'
+      chromosome:
+        description: 'chromosome (Reference name). Accepting values 1-22, X, Y.'
         type: string
         enum:
           - '1'

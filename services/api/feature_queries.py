@@ -5,6 +5,8 @@ from harvester import location_normalizer, location_query_generator, \
     biomarker_normalizer
 from elasticsearch_dsl import Search, Q
 
+from collections import Counter
+
 # cache responses
 requests_cache.install_cache('harvester', allowable_codes=(200, 400, 404))
 # our logger
@@ -19,6 +21,12 @@ def get_features(args):
         location_normalizer.normalize_feature_association(fa)
         biomarker_normalizer.normalize_feature_association(fa)
         enriched_features.append(fa['features'][0])
+
+    counter = Counter()
+    for f in enriched_features:
+        for p in f.get('pathways', []):
+            counter[p] += 1
+    log.info(('top3 pathways', counter.most_common(3)))
     return enriched_features
 
 
