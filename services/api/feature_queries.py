@@ -102,7 +102,7 @@ def get_associations(args, client):
         qs = '+features.pathways:({})'.format(
             ' AND '.join(['"{}"'.format(d) for d in top3_pathways]))
         hits = list(raw_dataframe(query_string=qs, client=client))
-        queries.append({'biomarker_type': None,
+        queries.append({'biomarker_type': 'Uncategorized',
                         'allele': 'All features',
                         'name': 'pathways',
                         'hits': hits,
