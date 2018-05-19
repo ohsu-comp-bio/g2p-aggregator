@@ -99,6 +99,8 @@ def get_associations(args, client):
     top3_pathways = [t[0] for t in counter.most_common(3)]
     log.info(('top3_pathways', top3_pathways))
     if len(top3_pathways) > 0:
+        smmart_drugs = "+association.environmentalContexts.id:('CID23725625', 'CID56842121', u'CHEMBL3137343', 'CID5330286', 'CID444795', 'CID10184653', 'CID5311', 'CID6442177', 'CID11707110', 'CID25102847', 'CID9823820', 'CID24826799', u'CHEMBL1789844', u'CHEMBL2108738', u'CHEMBL2007641', u'CHEMBL1351', 'CID15951529', 'CID132971', 'CID42611257', 'CID9854073', 'CID6918837', 'CID5291', 'CID3062316', 'CID5329102', 'CID216239', 'CID25126798', 'CID387447', 'CID11625818', 'CID49846579', 'CID5284616', u'CHEMBL1201583', 'CID176870', 'CID2662')"
+        sources = "-source:*trials"
         qs = '+features.pathways:({})'.format(
             ' AND '.join(['"{}"'.format(d) for d in top3_pathways]))
         hits = list(raw_dataframe(query_string=qs, client=client))
@@ -106,8 +108,8 @@ def get_associations(args, client):
                         'allele': 'All features',
                         'name': 'pathways',
                         'hits': hits,
-                        'query_string': qs,
-                        'feature': None
+                        'query_string': '{} {} {}'.format(sources, smmart_drugs, qs),
+                        'feature': {'pathways': top3_pathways}
                         })
 
     return queries
