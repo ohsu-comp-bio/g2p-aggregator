@@ -8,7 +8,7 @@ except ImportError:  # for pip <= 9.0.3
 print 'start'
 
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
-install_reqs = parse_requirements('smmart_notebook/requirements.txt', session=False)
+install_reqs = parse_requirements('smmartnotebook/requirements.txt', session=False)
 
 # reqs is a list of requirement
 # e.g. ['django==1.5.1', 'mezzanine==1.4.6']
@@ -17,11 +17,11 @@ reqs = [str(ir.req) for ir in install_reqs]
 print reqs
 
 setup(
-   name='smmart_notebook',
+   name='smmartnotebook',
    version='1.0',
    description='create pandas dataset from g2p data',
    author='Brian Walsh',
    author_email='walsbr@ohsu.edu',
-   packages=['smmart_notebook'],  # same as name
+   packages=['smmartnotebook'],  # same as name
    install_requires=reqs,  # external packages as dependencies
 )
