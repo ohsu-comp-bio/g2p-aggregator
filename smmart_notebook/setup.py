@@ -13,11 +13,11 @@ reqs = [str(ir.req) for ir in install_reqs]
 print reqs
 
 setup(
-   name='harvester',
+   name='smmart_notebook',
    version='1.0',
-   description='harvest and normalize g2p data',
+   description='create pandas dataset from g2p data',
    author='Brian Walsh',
    author_email='walsbr@ohsu.edu',
-   packages=['harvester'],  # same as name
+   packages=['smmart_notebook'],  # same as name
    install_requires=reqs,  # external packages as dependencies
 )
