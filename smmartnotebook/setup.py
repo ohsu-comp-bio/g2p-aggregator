@@ -5,8 +5,6 @@ try:  # for pip >= 10
 except ImportError:  # for pip <= 9.0.3
     from pip.req import parse_requirements
 
-print 'start'
-
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
 install_reqs = parse_requirements('smmartnotebook/requirements.txt', session=False)
 
@@ -14,7 +12,6 @@ install_reqs = parse_requirements('smmartnotebook/requirements.txt', session=Fal
 # e.g. ['django==1.5.1', 'mezzanine==1.4.6']
 reqs = [str(ir.req) for ir in install_reqs]
 
-print reqs
 
 setup(
    name='smmartnotebook',
