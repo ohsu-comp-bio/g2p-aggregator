@@ -69,7 +69,7 @@ def to_df(generator, feature):
                        'matches': matches
                        }
             except Exception as e:
-                print '!!!', e
+                print('!!! {}'.format(e))
 
     try:
         return pd.DataFrame.from_records(to_dict(generator, feature),
@@ -108,11 +108,11 @@ def query(url, features, verify=True):
         location_query['hits'] = len(location_query['hits'])
         queries.append(location_query)
 
-    print '{} queries, {} total hits, {} unique hits returned in {}'.format(
+    print('{} queries, {} total hits, {} unique hits returned in {}'.format(
         len(queries),
         len(evidence_ids),
         len(list(set(evidence_ids))),
-        datetime.datetime.now() - t)
+        datetime.datetime.now() - t))
 
     queries_summary = {}
     for q in queries:
