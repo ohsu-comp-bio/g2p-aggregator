@@ -152,7 +152,7 @@ def generate(features):
 
                 for protein_domain in f.get('protein_domains', []):
                     # do not include these domains
-                    if protein_domain['name'] in ['1', '2', '3', '4']:
+                    if protein_domain['name'] in [1, 2, 3, 4]:
                         continue
                     protein_domains.append(protein_domain['name'])
 
