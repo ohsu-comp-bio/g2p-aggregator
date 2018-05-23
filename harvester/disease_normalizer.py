@@ -14,7 +14,7 @@ if not API_KEY:
 
 
 disease_alias = {}
-with open('disease_alias.tsv', "r") as f:
+with open('{}/disease_alias.tsv'.format(os.path.dirname(os.path.realpath(__file__))), "r") as f:
     for line in f:
         if line.startswith("#"):
             continue

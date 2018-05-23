@@ -80,11 +80,18 @@ def test_semicolon_separator():
     assert diseases[1]['source']
 
 
+def test_LUAD():
+    diseases = normalize("LUAD")
+    assert len(diseases) == 1
+    assert diseases[0]['ontology_term'] == 'DOID:3910'
+
+
 def test_LUAD_TH():
     diseases = normalize("LUAD;TH")
     assert len(diseases) == 2
-    assert diseases[0]['source']
-    assert diseases[1]['source']
+    assert diseases[0]['ontology_term'] == 'DOID:3910'
+    assert diseases[1]['ontology_term'] == 'DOID:1781'
+    print diseases
 
 
 def test_BRCA_BOCA():
