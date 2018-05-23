@@ -79,7 +79,7 @@ def to_df(generator, feature):
         return pd.DataFrame()
 
 
-def query(url, features, verify=True):
+def query(url, features, verify=True, timeout=60*5):
     """ query the /api/v1/features/associations endpoint
         returns a tuple of (queries, data_frames, summary)
     """
@@ -87,7 +87,7 @@ def query(url, features, verify=True):
     data_frames = {}
     t = datetime.datetime.now()
 
-    rsp = requests.post(url, json=features, verify=verify)
+    rsp = requests.post(url, json=features, verify=verify, timeout=timeout)
 
     location_queries = rsp.json()
 
