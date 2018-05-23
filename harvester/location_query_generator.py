@@ -151,6 +151,9 @@ def generate(features):
                     genomic_ranges.append({'chromosome': f['chromosome'], 'start': f['start'], 'end': f['end']})
 
                 for protein_domain in f.get('protein_domains', []):
+                    # do not include these domains
+                    if protein_domain in ['1', '2', '3', '4']:
+                        contine
                     protein_domains.append(protein_domain['name'])
 
                 for pathway in f.get('pathways', []):
