@@ -12,9 +12,11 @@ API_KEY = os.environ.get('BIOONTOLOGY_API_KEY')
 if not API_KEY:
     raise ValueError('Please set BIOONTOLOGY_API_KEY in environment')
 
+DATA_DIR = os.environ.get('HARVESTER_DATA', '../data')
+
 
 disease_alias = {}
-with open('{}/disease_alias.tsv'.format(os.path.dirname(os.path.realpath(__file__))), "r") as f:
+with open('{}/disease_alias.tsv'.format(DATA_DIR), "r") as f:
     for line in f:
         if line.startswith("#"):
             continue
