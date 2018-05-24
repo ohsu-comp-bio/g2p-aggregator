@@ -266,8 +266,8 @@ def configure_app(args):
         swagger_host = args.swagger_host
     else:
         swagger_host = 'localhost'  # socket.gethostname()
-    if args.port != 80:
-        swagger_host += ':{}'.format(args.port)
+    # if args.port != 80:
+    #    swagger_host += ':{}'.format(args.port)
 
     # with open('swagger-beacon.yaml', 'r') as stream:
     #     swagger_beacon = yaml.load(stream)
