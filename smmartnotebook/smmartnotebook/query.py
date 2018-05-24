@@ -46,7 +46,9 @@ def to_df(generator, feature):
                                 matches.append(sp)
 
                         for pe in f.get('protein_effects', []):
+                            pe = pe.split(':')[1]
                             for pe2 in f2.get('protein_effects', []):
+                                pe2 = pe2.split(':')[1]
                                 if pe == pe2:
                                     matches.append(pe)
 
