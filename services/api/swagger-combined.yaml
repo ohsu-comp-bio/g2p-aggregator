@@ -302,7 +302,7 @@ paths:
     post:
       tags:
       - "Associations"
-      description: Performs a set of feature queries
+      description: Performs a set of feature associations queries, returns g2p association hit
       operationId: postFeaturesQuery
       produces:
         - application/json
@@ -312,6 +312,29 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/FeatureQueriesRequest'
+      responses:
+        '200':
+          description: OK / Call is successful
+        '400':
+          description: Bad request (e.g. missing mandatory parameter)
+        '401':
+          description: Unauthorised (e.g. when an unauthenticated user tries to access a protected resource)
+        '403':
+          description: Forbidden (e.g. the resource is protected for all users or the user is authenticated but s/he is not granted for this resource)
+  /feature:
+    post:
+      tags:
+      - "Features"
+      description: Performs a single feature query, returns a harmonized feature
+      operationId: postFeature
+      produces:
+        - application/json
+      parameters:
+        - name: feature
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Feature'
       responses:
         '200':
           description: OK / Call is successful
