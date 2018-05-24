@@ -233,8 +233,14 @@ def getAssociation(**kwargs):
 
 
 def postFeaturesQuery(**kwargs):
-    """ query for matches to a query """
+    """ return  a set of associations  for matches to a set of features """
     return feature_queries.get_associations(kwargs, _es())
+
+
+def postFeature(**kwargs):
+    """ return  a set of associations  for matches to a set of features """
+    return feature_queries.get_feature(kwargs)
+
 
 
 # setup server

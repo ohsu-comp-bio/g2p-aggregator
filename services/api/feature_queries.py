@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 
 def get_features(args):
-    """ find all associations associated with these features"""
+    """ harmonize these features"""
     enriched_features = []
     for f in args['features']:
         fa = {'features': [f], 'dev_tags': []}
@@ -22,6 +22,17 @@ def get_features(args):
         biomarker_normalizer.normalize_feature_association(fa)
         enriched_features.append(fa['features'][0])
     return enriched_features
+
+
+def get_feature(args):
+    """ harmonize this feature"""
+    f = args['feature']
+    if 'description' not in f:
+        f['description'] = ''
+    fa = {'features': [f], 'dev_tags': []}
+    location_normalizer.normalize_feature_association(fa)
+    biomarker_normalizer.normalize_feature_association(fa)
+    return fa['features'][0]
 
 
 def allele_identifier(feature):

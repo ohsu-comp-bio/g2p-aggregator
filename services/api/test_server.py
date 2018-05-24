@@ -159,3 +159,16 @@ def test_features_associations(client):
         print q['allele'], q['name'], q['biomarker_type'], len(q['hits'])
         # if q['name'] == 'pathways':
         #     print q['query_string']
+
+
+def test_feature(client):
+    test = {"start": 228566043, "end": 228566043, "name": "OBSCN p.V8839A", "referenceName": "GRCh37", "geneSymbol": "OBSCN", "alt": "C", "description": "obscurin, cytoskeletal calmodulin and titin-interacting RhoGEF", "ref": "T", "chromosome": "1", "biomarker_type": "Missense_Mutation"}
+    test = {"start": 228566043, "end": 228566043, "referenceName": "GRCh37", "alt": "C", "ref": "T", "chromosome": "1", "biomarker_type": "Missense_Mutation"}
+
+    # json.dumps({'queryFeatures': features})
+    rsp = client.post('/api/v1/feature',
+                      data=json.dumps(test),
+                      content_type='application/json')
+    rsp = json.loads(rsp.get_data())
+    print 'results'
+    print rsp
