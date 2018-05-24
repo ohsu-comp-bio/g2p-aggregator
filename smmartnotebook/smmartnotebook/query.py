@@ -46,8 +46,9 @@ def to_df(generator, feature):
                                 matches.append(sp)
 
                         for pe in f.get('protein_effects', []):
-                            if pe in f2.get('protein_effects', []):
-                                matches.append(pe)
+                            for pe2 in f2.get('protein_effects', []):
+                                if pe in pe2:
+                                    matches.append(pe)
 
                         for pd in f.get('protein_domains', []):
                             for pd2 in f2.get('protein_domains', []):
