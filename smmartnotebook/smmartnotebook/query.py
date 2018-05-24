@@ -21,6 +21,7 @@ def to_df(generator, feature):
             description = hit['association']['description'].encode('utf-8')
             source = hit['source'].encode('utf-8')
             evidence_label = hit['association']['evidence_label']
+            genes = hit['genes']
             id = hit['evidence.id']
             phenotype = hit['association']['phenotype']['type']['term']\
                 .encode('utf-8')
@@ -78,7 +79,8 @@ def to_df(generator, feature):
                        'description': description,
                        'phenotype': phenotype,
                        'publications': publications,
-                       'matches': matches
+                       'matches': matches,
+                       'genes': genes
                        }
             except Exception as e:
                 print('!!! {}'.format(e))
