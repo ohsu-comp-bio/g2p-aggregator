@@ -9,8 +9,6 @@ services:
   # elastic    | max virtual memory areas vm.max_map_count [65530] likely too low, increase to at least [262144]
   # ... see this
   # https://github.com/elastic/elasticsearch-docker/blob/master/README.md#osx-with-docker-toolbox
-  # to increase elastic memory size see...
-  # /usr/share/elasticsearch/config/jvm.options
   elastic:
     container_name: elastic_g2p
     build:
@@ -26,6 +24,7 @@ services:
       - path.repo=/util/elastic/backups
       - http.cors.enabled=true
       - http.cors.allow-origin=*
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
       # - http.cors.allow-methods=OPTIONS, HEAD, GET, POST, PUT, DELETE
       # - http.cors.allow-headers="X-Requested-With,X-Auth-Token,Content-Type, Content-Length, Authorization"
 
@@ -43,5 +42,20 @@ services:
       - xpack.security.enabled=false
       - XPACK_MONITORING_REPORT_STATS=false
       # - SERVER_BASEPATH=/kibana  # set in nginx-proxy
+
+  api:
+    container_name: api
+    build:
+      context: ./services/api
+    volumes:
+      - "./util:/util/"
+      - "./data:/data/"
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    environment:
+      - ES=${ES}
+      - SWAGGER_HOST=${SWAGGER_HOST}
+      - HARVESTER_DATA=/data
+      - BIOONTOLOGY_API_KEY=${BIOONTOLOGY_API_KEY}
 
 # see docker-compose-nginx.yml for nginx proxy
