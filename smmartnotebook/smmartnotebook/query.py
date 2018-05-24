@@ -45,6 +45,15 @@ def to_df(generator, feature):
                             if sp in f2.get('swissprots', []):
                                 matches.append(sp)
 
+                        for pe in f.get('protein_effects', []):
+                            if pe in f2.get('protein_effects', []):
+                                matches.append(pe)
+
+                        for pd in f.get('protein_domains', []):
+                            for pd2 in f2.get('protein_domains', []):
+                                if pd['name'] == pd2['name']:
+                                    matches.append(pd['name'])
+
                         if f.get('sequence_ontology', {'name': 'X'}) == \
                                 f2.get('sequence_ontology', {'name': None}):
                             matches.append(f['sequence_ontology']['name'])
