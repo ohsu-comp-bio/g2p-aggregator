@@ -6,9 +6,13 @@ from harvester import location_normalizer, location_query_generator, \
 from elasticsearch_dsl import Search, Q
 
 from collections import Counter
+import os
+
+DATA_DIR = os.environ.get('HARVESTER_DATA', '../data')
 
 # cache responses
-requests_cache.install_cache('harvester', allowable_codes=(200, 400, 404))
+requests_cache.install_cache('{}/harvester'.format(DATA_DIR),
+                             allowable_codes=(200, 400, 404))
 # our logger
 log = logging.getLogger(__name__)
 
