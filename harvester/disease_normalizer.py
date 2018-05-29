@@ -212,7 +212,7 @@ def normalize_feature_association(feature_association):
     association = feature_association['association']
     if 'phenotypes' in association:
         diseases = normalize_multi(association['phenotypes'])
-        association['phenotypes_info'] = diseases
+        association['phenotypes'] = diseases
     if 'phenotype' not in association:
         return
     diseases = normalize(association['phenotype']['description'])
