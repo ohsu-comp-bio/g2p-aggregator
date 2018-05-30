@@ -223,7 +223,8 @@ def convert(jax_evidence):
     association['environmentalContexts'].append({
         'description': evidence.therapy.therapyName})
     association['phenotypes'] = [{ 'description' : evidence.indication.name,
-                                   'id' :  '{}:{}'.format(i.source, i.id) }]
+                                   'id' :  '{}:{}'.format(evidence.indication.source, 
+                                                          evidence.indication.id) }]
     association['evidence'] = [{
         "evidenceType": {
             "sourceName": "jax"
