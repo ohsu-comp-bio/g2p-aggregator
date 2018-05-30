@@ -172,13 +172,9 @@ def convert(evidence):
     association['environmentalContexts'] = []
     association['environmentalContexts'].append({
         'description': evidence['Drug full name']})
-    phenotype_description = evidence['Primary Tumor type']
+    association['phenotypes'] = [{ 'description' : evidence['Primary Tumor type']} ]
     if not evidence['Metastatic Tumor Type'] == '':
-        phenotype_description = '{} {}'.format(
-                phenotype_description, evidence['Metastatic Tumor Type'])
-    association['phenotype'] = {
-        'description': phenotype_description
-    }
+        association['phenotypes'].append({ 'description' : evidence['Metastatic Tumor Type'] })
 
     pubs = []
     for p in evidence['Source'].split(';'):

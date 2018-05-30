@@ -178,9 +178,7 @@ def convert(gene_data):
         association['environmentalContexts'] = []
         for drug in clinical['drug'].split(', '):
             association['environmentalContexts'].append({'description': drug})
-        association['phenotype'] = {
-            'description': clinical['cancerType'],
-        }
+        association['phenotypes'] = [{ 'description': clinical['cancerType'] }]
 
         # grab all publications from abstracts or PMIDs for piblication list
         abstract = []

@@ -120,13 +120,14 @@ def convert(evidence):
     clinicalSignificance = evidence['clinicalSignificance']
     tags = evidence['tags']
     gene = None
-    condition = None
+    condition = []
     mutation = None
+
     for tag in tags:
         if tag['facet'] == 'GENE' and tag['priority'] == 1:
             gene = tag['term']
-        if tag['facet'] == 'CONDITION' and tag['priority'] == 1:
-            condition = tag['term']
+        if tag['facet'] == 'CONDITION':
+            condition.append({ 'description': tag['term'] })
         if tag['facet'] == 'MUTATION' and tag['priority'] == 1:
             mutation = tag['term']
         if tag['facet'] == 'PHRASE' and 'ISOFORM EXPRESSION' in tag['term']:
@@ -217,9 +218,8 @@ def convert(evidence):
     association['environmentalContexts'] = []
     association['environmentalContexts'].append({
         'description': drug_label})
-    association['phenotype'] = {
-        'description': condition
-    }
+
+    association['phenotypes'] = condition
 
     pubs = []
     for p in sources:

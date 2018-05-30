@@ -78,17 +78,10 @@ def convert(interpretation):
     # TODO pmkb does not break out drug !?!?
     # association['environmentalContexts'] = []
 
-    desc = []
+    association['phenotypes'] = []
     for tumor in tumors:
-        desc.append(tumor['name'])
-    association['phenotypes'] = desc
-    if len(desc) > 0:
-        t = desc[0]
-    else:
-        t = ''
-    association['phenotype'] = {
-         'description': t
-    }
+        association['phenotypes'].append({ 'description': tumor['name'] })
+
     association['drug_labels'] = 'NA'
     association['evidence'] = [{
          "evidenceType": { "sourceName": "pmkb" },

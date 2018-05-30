@@ -192,7 +192,7 @@ def normalize(name):
 def normalize_multi(phenotypes):
     diseases = []
     for pheno in phenotypes:
-        disease = normalize(pheno)
+        disease = normalize(pheno['description'])
         phenotype = {
             'id': disease[0]['ontology_term'],
             'term': disease[0]['label'],
@@ -210,27 +210,16 @@ def normalize_feature_association(feature_association):
     update it with normalized diseases """
     # nothing to read?, return
     association = feature_association['association']
-    if 'phenotypes' in association:
-        diseases = normalize_multi(association['phenotypes'])
-        association['phenotypes'] = diseases
-    if 'phenotype' not in association:
+    if 'phenotypes' not in association:
         return
-    diseases = normalize(association['phenotype']['description'])
+    diseases = normalize_multi(association['phenotypes'])
     if len(diseases) == 0:
         feature_association['dev_tags'].append('no-doid')
-        association['phenotype']['family'] = 'Uncategorized-PHN'
+        for i in range(len(association['phenotypes'])):
+            association['phenotypes'][i]['family'] = 'Uncategorized-PHN'
         return
-    # TODO we are only looking for exact match of one disease right now
-    association['phenotype']['type'] = {
-        'id': diseases[0]['ontology_term'],
-        'term': diseases[0]['label'],
-        'source': diseases[0]['source']
-    }
-    if 'family' in diseases[0]:
-        association['phenotype']['family'] = diseases[0]['family']
-    else:
-        association['phenotype']['family'] = 'Uncategorized-PHN'
-    association['phenotype']['description'] = diseases[0]['label']
+    association['phenotypes'] = diseases
+    return
 
 
 def project_lookup(name):
