@@ -58,9 +58,7 @@ def convert(gene_data):
             )
             association = {
                 'description': description,
-                'phenotype': {
-                    'description': evidence_item['clinical_manifestation'],
-                },
+                'phenotypes': [{ 'description': evidence_item['clinical_manifestation'] }],
                 'evidence': [{
                     "evidenceType": {
                         "sourceName": "sage",
