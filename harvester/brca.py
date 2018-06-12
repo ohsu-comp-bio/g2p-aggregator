@@ -54,10 +54,7 @@ def convert(gene_data):
         association['description'] = brca['Pathogenicity_expert']
         association['environmentalContexts'] = []
         if not brca['Condition_ID_value_ENIGMA'] == '-':
-            association['phenotype'] = {
-                'description': brca['Condition_ID_value_ENIGMA'],
-                # 'id': ?
-            }
+            association['phenotypes'] = [{ 'description': brca['Condition_ID_value_ENIGMA'] }]
 
         citations = brca['Clinical_significance_citations_ENIGMA']
         info = None
