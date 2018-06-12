@@ -57,7 +57,7 @@ def normalize_ebi(name):
     if name in NOFINDS:
         logging.info('{} in disease_normalizer.NOFINDS'.format(name))
         return []
-    name = urllib.quote_plus(project_lookup(name))
+    name = urllib.quote_plus(name)
     url = 'https://www.ebi.ac.uk/ols/api/search?q={}&groupField=iri&exact=on&start=0&ontology=doid'.format(name)  # NOQA
     # .response
     """
@@ -165,6 +165,7 @@ def normalize(name):
         pass
     try:
         diseases = []
+        name = project_lookup(name)
         if name:
             # find in ebi
             normalized_diseases = normalize_ebi(name)
@@ -173,6 +174,8 @@ def normalize(name):
             else:
                 names = re.split("[\,;]+", name)
                 for name_part in names:
+                    name_part = project_lookup(name_part)
+                    logging.debug("name_part {}".format(name_part))
                     normalized_diseases = normalize_ebi(name_part)
                     # if we had to break this apart to find a hit,
                     # add the original name back

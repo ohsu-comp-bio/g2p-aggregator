@@ -52,6 +52,9 @@ $ cd harvester
 $ make oncokb_all_actionable_variants.tsv cgi_biomarkers_per_variant.tsv cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv benchmark_results.txt
 ```
 
+Note:  If you will be extracting from molecularmatch, you will need to contact them from an API key.
+Disease normalization depends on bioontology, see https://bioportal.bioontology.org/accounts/new for an API key.
+
 4. Install required python packages
 
 ```
@@ -160,7 +163,7 @@ docker-compose -f docker-compose.yml -f cloud-setup/docker-compose-nginx.yml up 
 ```
 This will do the same setup, but will also include an nginx proxy to map http and https ports.  
 
-Our demo site is hosted on aws and includes the API server and nginx proxy 
+Our demo site is hosted on aws and includes the API server and nginx proxy
 ```
 docker-compose -f docker-compose-aws.yml up -d
 ```
