@@ -200,15 +200,16 @@ def normalize_multi(phenotypes):
     diseases = []
     for pheno in phenotypes:
         disease = normalize(pheno['description'])
-        phenotype = {
-            'id': disease[0]['ontology_term'],
-            'term': disease[0]['label'],
-            'source': disease[0]['source'],
-            'description': disease[0]['label']
-        }
-        if 'family' in disease[0]:
-            phenotype['family'] = disease[0]['family']
-        diseases.append(phenotype)
+        if len(disease) != 0:
+            phenotype = {
+                'id': disease[0]['ontology_term'],
+                'term': disease[0]['label'],
+                'source': disease[0]['source'],
+                'description': disease[0]['label']
+            }
+            if 'family' in disease[0]:
+                phenotype['family'] = disease[0]['family']
+            diseases.append(phenotype)
     return diseases
 
 
