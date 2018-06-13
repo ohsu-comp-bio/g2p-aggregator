@@ -97,6 +97,8 @@ def normalize_ebi(name):
         NOFINDS.append(name)
         return []
     doc = response['docs'][0]
+    # check whether returned info is actually DOID or some other response
+    # since we only want DOID entries
     if doc['obo_id'][:2] != 'DO':
         logging.info('{} in disease_normalizer.NOFINDS'.format(name))
         NOFINDS.append(name)
