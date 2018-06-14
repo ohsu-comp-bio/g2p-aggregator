@@ -58,11 +58,11 @@ def get_soid_data(soid):
                 parent = data['parents'].split(',')[0]
                 btype = get_soid_data(parent)
                 if btype['hierarchy']:
-                    bsubtype['parent_soid'] = btype['parent_soid']
-                    bsubtype['parent_name'] = btype['parent_name']
+                    bsubtype['root_soid'] = btype['root_soid']
+                    bsubtype['root_name'] = btype['root_name']
                 else:
-                    bsubtype['parent_soid'] = btype['soid']
-                    bsubtype['parent_name'] = btype['name']
+                    bsubtype['root_soid'] = btype['soid']
+                    bsubtype['root_name'] = btype['name']
                 btype['hierarchy'].append(btype['soid'])
                 bsubtype['hierarchy'] = btype['hierarchy']
         except:
@@ -115,8 +115,8 @@ def normalize_feature_association(feature_association):
             feat['sequence_ontology'] = {
                 'soid': '',
                 'name': 'Uncategorized',
-                'parent_soid': '',
-                'parent_name': 'Uncategorized',
+                'root_soid': '',
+                'root_name': 'Uncategorized',
             }
             continue
         # Currently only dealing with a exact matches

@@ -24,8 +24,8 @@ def test_get_so_data():
     soid = get_soid_data(term)
     assert soid['soid'] == term
     assert soid['name'] == 'feature_amplification'
-    assert soid['parent_soid'] == 'SO:0001060'
-    assert soid['parent_name'] == 'sequence_variant'
+    assert soid['root_soid'] == 'SO:0001060'
+    assert soid['root_name'] == 'sequence_variant'
     assert len(soid['hierarchy']) == 2
 
 def test_normalize_amp():
@@ -33,8 +33,8 @@ def test_normalize_amp():
     soid = normalize(term)
     assert soid['soid'] == 'SO:0001880'
     assert soid['name'] == 'feature_amplification'
-    assert soid['parent_soid'] == 'SO:0001060'
-    assert soid['parent_name'] == 'sequence_variant'
+    assert soid['root_soid'] == 'SO:0001060'
+    assert soid['root_name'] == 'sequence_variant'
     assert len(soid['hierarchy']) == 2
 
 def test_normalize_amp():
@@ -42,8 +42,8 @@ def test_normalize_amp():
     soid = normalize(term)
     assert soid['soid'] == 'SO:1000002'
     assert soid['name'] == 'substitution'
-    assert soid['parent_soid'] == 'SO:0000110'
-    assert soid['parent_name'] == 'sequence_feature'
+    assert soid['root_soid'] == 'SO:0000110'
+    assert soid['root_name'] == 'sequence_feature'
     assert len(soid['hierarchy']) == 3
 
 def test_normalize_wildtype():
@@ -51,8 +51,8 @@ def test_normalize_wildtype():
     soid = normalize(term)
     assert soid['soid'] == 'SO:0000817'
     assert soid['name'] == 'wild_type'
-    assert soid['parent_soid'] == 'SO:0000400'
-    assert soid['parent_name'] == 'sequence_attribute'
+    assert soid['root_soid'] == 'SO:0000400'
+    assert soid['root_name'] == 'sequence_attribute'
     assert len(soid['hierarchy']) == 2
 
 def test_normalize_wildtype():
@@ -60,8 +60,8 @@ def test_normalize_wildtype():
     soid = normalize(term)
     assert soid['soid'] == 'SO:0002054'
     assert soid['name'] == 'loss_of_function_variant'
-    assert soid['parent_soid'] == 'SO:0001060'
-    assert soid['parent_name'] == 'sequence_variant'
+    assert soid['root_soid'] == 'SO:0001060'
+    assert soid['root_name'] == 'sequence_variant'
     assert len(soid['hierarchy']) == 2
 
 def test_uncategorized():
@@ -81,8 +81,8 @@ def test_get_so_data_0001587():
     soid = get_soid_data(term)
     assert soid['soid'] == term
     assert soid['name'] == 'stop_gained'
-    assert soid['parent_soid'] == 'SO:0001060'
-    assert soid['parent_name'] == 'sequence_variant'
+    assert soid['root_soid'] == 'SO:0001060'
+    assert soid['root_name'] == 'sequence_variant'
     assert len(soid['hierarchy']) == 10
 
 

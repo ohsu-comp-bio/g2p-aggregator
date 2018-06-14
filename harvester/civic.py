@@ -76,10 +76,10 @@ def convert(gene_data):
                         'description': drug['name'],
                         'id': drug['pubchem_id']
                     })
-                association['phenotype'] = {
+                association['phenotypes'] = [{
                     'description': evidence_item['disease']['name'],
-                    'id': evidence_item['disease']['url']
-                }
+                    'id' : evidence_item['disease']['url']
+                }]
                 association['evidence'] = [{
                     "evidenceType": {
                         "sourceName": "CIVIC",

@@ -28,6 +28,7 @@ import jax_trials
 import drug_normalizer
 import disease_normalizer
 import reference_genome_normalizer
+import gene_enricher
 
 from elastic_silo import ElasticSilo
 import elastic_silo
@@ -132,7 +133,7 @@ def normalize(feature_association):
     disease_normalizer.normalize_feature_association(feature_association)
     elapsed = timeit.default_timer() - start_time
     if elapsed > 1:
-        disease = feature_association['association']['phenotype']['description']
+        disease = feature_association['association']['phenotypes'][0]['description']
         logging.info('disease_normalizer {} {}'.format(elapsed, disease))
 
     start_time = timeit.default_timer()
@@ -159,6 +160,11 @@ def normalize(feature_association):
     biomarker_normalizer.normalize_feature_association(feature_association)
     if elapsed > 1:
         logging.info('biomarker_normalizer {}'.format(elapsed))
+
+    start_time = timeit.default_timer()
+    gene_enricher.normalize_feature_association(feature_association)
+    if elapsed > 1:
+        logging.info('gene_enricher {}'.format(elapsed))
 
 
 def main():

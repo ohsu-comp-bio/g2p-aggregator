@@ -1,0 +1,3 @@
+[submodule "notebooks/paper_analysis"]
+	path = notebooks/paper_analysis
+	url = https://github.com/ahwagner/vicckb.git

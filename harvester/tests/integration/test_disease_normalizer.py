@@ -221,3 +221,18 @@ def test_Cancer_of_digestive_system():
     diseases = normalize('Cancer of digestive system')
     assert diseases[0]['ontology_term'] == 'DOID:8377'
     assert diseases[0]['source']
+
+
+def test_misc_tcga_codes():
+    codes = ['COADREAD', 'DLBC', 'KIRC', 'KIRP', 'LGG', 'LIHC', 'MESO', 'PCPG',
+             'SKCM', 'TGCT']
+    for code in codes:
+        diseases = normalize(code)
+        assert len(diseases) > 0
+        print code, "-->", diseases
+
+
+def test_PCPG():
+    diseases = normalize('PCPG')
+    assert len(diseases) > 0
+    print diseases
