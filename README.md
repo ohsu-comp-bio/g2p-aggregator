@@ -3,7 +3,7 @@
 
 ## What is it?  Why use it?
 
-![image](https://user-images.githubusercontent.com/47808/36181526-0920bd12-10da-11e8-8edf-538a7b2b8f3e.png)
+![image](vicc_fig_2.png)
 
 * For researchers, who need to investigate genotype phenotype associations, smmart-g2p is a search tool that aggregates evidence from several knowledge bases unlike ad-hoc searches, the product allows the researcher to focus on the evidence, not on the search. [more](docs/smmart.pdf)
 
@@ -51,6 +51,9 @@ JUST GOOGLE IT:
 $ cd harvester
 $ make oncokb_all_actionable_variants.tsv cgi_biomarkers_per_variant.tsv cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv benchmark_results.txt
 ```
+
+Note:  If you will be extracting from molecularmatch, you will need to contact them from an API key.
+Disease normalization depends on bioontology, see https://bioportal.bioontology.org/accounts/new for an API key.
 
 4. Install required python packages
 
@@ -160,7 +163,7 @@ docker-compose -f docker-compose.yml -f cloud-setup/docker-compose-nginx.yml up 
 ```
 This will do the same setup, but will also include an nginx proxy to map http and https ports.  
 
-Our demo site is hosted on aws and includes the API server and nginx proxy 
+Our demo site is hosted on aws and includes the API server and nginx proxy
 ```
 docker-compose -f docker-compose-aws.yml up -d
 ```

@@ -178,9 +178,7 @@ def convert(gene_data):
         association['environmentalContexts'] = []
         for drug in clinical['drug'].split(', '):
             association['environmentalContexts'].append({'description': drug})
-        association['phenotype'] = {
-            'description': clinical['cancerType'],
-        }
+        association['phenotypes'] = [{ 'description': clinical['cancerType'] }]
 
         # grab all publications from abstracts or PMIDs for piblication list
         abstract = []
@@ -273,9 +271,7 @@ def convert(gene_data):
         association['environmentalContexts'] = []
 
         if biological['oncogenic'] in ['Likely Oncogenic', 'Oncogenic']:
-            association['phenotype'] = {
-                'description': 'cancer'
-            }
+            association['phenotypes'] = [{'description': 'cancer'}]
 
         association['evidence'] = [{
             "evidenceType": {

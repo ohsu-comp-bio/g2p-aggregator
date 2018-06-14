@@ -12,19 +12,28 @@ def harvest(genes=None):
         for line in ins:
             interpretations = json.loads(line)['interpretations']
             for interpretation in interpretations:
-                yield interpretation
+                if not genes:
+                    yield interpretation
+                else:
+                    if interpretation['gene']['name'] in genes:
+                        yield interpretation
 
 
 def convert(interpretation):
-    """create feature_association from pmkb evidence"""
-    for variant in interpretation['variants']:
-        if 'coordinates' in variant:
-            # '7:140453135-140453136'
-            # '3:41266097-41266099, 3:41266100-41266102, 3:41266103-41266105, 3:41266106-41266108, 3:41266109-41266111, 3:41266112-41266114, 3:41266124-41266126, 3:41266136-41266138'  # NOQA
-            s = variant['coordinates']
-            if not s:
-                continue
-            coordinates = s.replace(' ', '').split(',')
+    # for each interpretation
+    association = {}
+    genes = interpretation['gene']['name']
+    variants = interpretation['variants']
+    tumors = interpretation['tumors']
+
+    features = []
+    variant_name = []
+    for variant in variants:
+	if 'coordinates' in variant:
+	    s = variant['coordinates']
+            if not s: 
+		continue
+	    coordinates = s.replace(' ', '').split(',')
             for coordinate in coordinates:
                 feature = {}
                 feature['geneSymbol'] = variant['gene']['name']
@@ -44,70 +53,60 @@ def convert(interpretation):
                         attributes[key] = {'string_value': variant[key]}
                 feature['attributes'] = attributes
 
-                # TODO - replace w/ biocommons/hgvs ?
-                if 'dna_change' in variant:
-                    dna_change = variant['dna_change']
-                    if dna_change and '>' in dna_change:
-                        prefix, alt = dna_change.split('>')
-                        ref = prefix[-len(alt):]
-                        if len(ref) > 0 and len(alt) > 0:
-                            feature['ref'] = ref
-                            feature['alt'] = alt
+        # TODO - replace w/ biocommons/hgvs ?
+        if 'dna_change' in variant:
+            dna_change = variant['dna_change']
+            if dna_change and '>' in dna_change:
+                prefix, alt = dna_change.split('>')
+                ref = prefix[-len(alt):]
+                if len(ref) > 0 and len(alt) > 0:
+                    feature['ref'] = ref
+                    feature['alt'] = alt
 
-                gene = variant['gene']['name']
+        if attributes['amino_acid_change']['string_value']:
+	    variant_name.append(attributes['amino_acid_change']['string_value'])
 
-                association = {}
+	features.append(feature)
 
-                if attributes['amino_acid_change']['string_value']:
-                    association['variant_name'] = attributes['amino_acid_change']['string_value']
+    # association['evidence_label'] = interpretation['tier']
+    association['source_link'] = 'https://pmkb.weill.cornell.edu/therapies/{}'.format(interpretation['id'])
 
-                # association['evidence_label'] = interpretation['tier']
-                association['source_link'] = 'https://pmkb.weill.cornell.edu/variants/{}'.format(variant['id'])
-                association = el.evidence_label(str(interpretation['tier']),
-                                                association, na=True)
-                association = ed.evidence_direction(
-                                str(interpretation['tier']),
-                                association, na=True)
+    association = el.evidence_label(str(interpretation['tier']), association, na=True)
+    association = ed.evidence_direction(str(interpretation['tier']), association, na=True)
 
-                association['description'] = interpretation['interpretation']
-                # TODO pmkb does not break out drug !?!?
-                # association['environmentalContexts'] = []
+    association['description'] = interpretation['interpretation']
+    # TODO pmkb does not break out drug !?!?
+    # association['environmentalContexts'] = []
 
-                for tumor in interpretation['tumors']:
-                    association['phenotype'] = {
-                        'description': tumor['name']
-                    }
-                    association['drug_labels'] = 'NA'
-                    association['evidence'] = [{
-                        "evidenceType": {
-                            "sourceName": "pmkb"
-                        },
-                        'description': str(interpretation['tier']),
-                        'info': {
-                            'publications': [
-                                'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(c['pmid']) for c in interpretation['citations']  # NOQA
-                            ]
-                        }
-                    }]
-                    # add summary fields for Display
-                    if len(interpretation['citations']) > 0:
-                        association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])  # NOQA
-                    feature_association = {'genes': [gene],
-                                           'features': [feature],
-                                           'feature_names':
-                                           '{} {}'.format(
-                                                feature["geneSymbol"],
-                                                feature["name"]
-                                            ),
-                                           'association': association,
-                                           'source': 'pmkb',
-                                           'pmkb': {
-                                            'variant': variant,
-                                            'tumor': tumor,
-                                            'tissues':
-                                            interpretation['tissues']
-                                           }}
-                    yield feature_association
+    association['phenotypes'] = []
+    for tumor in tumors:
+        association['phenotypes'].append({ 'description': tumor['name'] })
+
+    association['drug_labels'] = 'NA'
+    association['evidence'] = [{
+         "evidenceType": { "sourceName": "pmkb" },
+         'description': str(interpretation['tier']),
+         'info': {
+             'publications': [
+    #             'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(c['pmid']) for c in interpretation['citations']  # NOQA
+             ]
+         }
+    }]
+        # add summary fields for Display
+   #     if len(interpretation['citations']) > 0:
+   #          association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])  # NOQA
+    association['publication_url'] = ''
+    feature_association = {'genes': [genes],
+                           'features': features,
+                           'feature_names': ['{} {}'.format(f["geneSymbol"], f["name"]) for f in features],
+                           'association': association,
+                           'source': 'pmkb',
+                           'pmkb': {
+                               'variant': variants,
+                               'tumor': tumors,
+                               'tissues': interpretation['tissues']
+                           }}
+    yield feature_association
 
 
 def harvest_and_convert(genes):

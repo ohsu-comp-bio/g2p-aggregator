@@ -136,69 +136,59 @@ def convert(evidence):
             has_mutation = True
     if has_drug and has_condition and has_gene:
         feature_objs = []
+
         genes = set([])
+        features = set([])
+        drugs = set([])
+        conditions = []
+        priority_phenotype = None
+
         for t in evidence_tags:
             if t['facet'] == 'GENE':
                 genes.add(t['term'])
-        genes = list(genes)
-
-        features = set([])
-        for t in evidence_tags:
             if t['facet'] == 'MUTATION':
                 features.add(t['term'])
                 feature_objs.append({'description': t['term']})
-        features = list(features)
-
-        drugs = set([])
-        for t in evidence_tags:
             if t['facet'] == 'DRUG':
                 drugs.add(t['term'])
+            if t['facet'] == 'CONDITION':
+                conditions.append({ 'description' : t['term'] })
+
+        genes = list(genes)
+        features = list(features)
         drugs = list(drugs)
 
-        conditions = set([])
-        priority_phenotype = None
-        for t in evidence_tags:
-            if (t['facet'] == 'CONDITION' and t['filterType'] == 'include' and not t['suppress']):  # noqa
-                generatedByTerm = t.get('generatedByTerm', None)
-                if generatedByTerm == '':
-                    generatedByTerm = None
-                if generatedByTerm:
-                    continue
-                priority_phenotype = t['term']
-        conditions = [priority_phenotype or generatedByTerm]
-
-        # TODO - only one phenotype per association
-        for condition in conditions:
-            association = {}
-            association['phenotype'] = {'description': condition}
-            association['description'] = evidence['title']
-            association['environmentalContexts'] = []
-            for drug in drugs:
-                association['environmentalContexts'].append(
-                    {'description': drug})
-            association['evidence'] = [{
-                "evidenceType": {
-                    "sourceName": "molecularmatch_trials"
-                },
-                'description': evidence['title'],
-                'info': {
-                    'publications': [
-                        'https://clinicaltrials.gov/ct2/show/{}'
-                        .format(evidence['id'])]
-                }
-            }]
-            # add summary fields for Display
-            association = el.evidence_label(evidence['phase'],
-                                            association, na=False)
-            feature_association = {
-                                   'genes': genes,
-                                   'feature_names': features,
-                                   'features': feature_objs,
-                                   'association': association,
-                                   'source': 'molecularmatch_trials',
-                                   'molecularmatch_trials': evidence
-                                   }
-            yield feature_association
+        association = {}
+        association['phenotypes'] = conditions
+        #association['phenotype'] = {'description': condition}
+        association['description'] = evidence['title']
+        association['environmentalContexts'] = []
+        for drug in drugs:
+            association['environmentalContexts'].append(
+                {'description': drug})
+        association['evidence'] = [{
+            "evidenceType": {
+                "sourceName": "molecularmatch_trials"
+            },
+            'description': evidence['title'],
+            'info': {
+                'publications': [
+                    'https://clinicaltrials.gov/ct2/show/{}'
+                    .format(evidence['id'])]
+            }
+        }]
+        # add summary fields for Display
+        association = el.evidence_label(evidence['phase'],
+                                        association, na=False)
+        feature_association = {
+                               'genes': genes,
+                               'feature_names': features,
+                               'features': feature_objs,
+                               'association': association,
+                               'source': 'molecularmatch_trials',
+                               'molecularmatch_trials': evidence
+                               }
+        yield feature_association
 
 
 def harvest(genes):
