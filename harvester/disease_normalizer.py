@@ -97,6 +97,8 @@ def normalize_ebi(name):
         NOFINDS.append(name)
         return []
     doc = response['docs'][0]
+    # check whether returned info is actually DOID or some other response
+    # since we only want DOID entries
     if doc['obo_id'][:2] != 'DO':
         logging.info('{} in disease_normalizer.NOFINDS'.format(name))
         NOFINDS.append(name)
@@ -200,15 +202,16 @@ def normalize_multi(phenotypes):
     diseases = []
     for pheno in phenotypes:
         disease = normalize(pheno['description'])
-        phenotype = {
-            'id': disease[0]['ontology_term'],
-            'term': disease[0]['label'],
-            'source': disease[0]['source'],
-            'description': disease[0]['label']
-        }
-        if 'family' in disease[0]:
-            phenotype['family'] = disease[0]['family']
-        diseases.append(phenotype)
+        if len(disease) != 0:
+            phenotype = {
+                'id': disease[0]['ontology_term'],
+                'term': disease[0]['label'],
+                'source': disease[0]['source'],
+                'description': disease[0]['label']
+            }
+            if 'family' in disease[0]:
+                phenotype['family'] = disease[0]['family']
+            diseases.append(phenotype)
     return diseases
 
 

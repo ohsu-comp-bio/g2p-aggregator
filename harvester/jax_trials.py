@@ -212,7 +212,7 @@ def convert(jax_evidence):
     association['phenotypes'] = []
     for indication in evidence['indications']:
         s = { 'description' : indication['name'], 
-              'id' : '{}:{}'.format(i.source, i.id) }
+              'id' : '{}:{}'.format(indication['source'], indication['id']) }
         association['phenotypes'].append(s)
 
     association['evidence'] = [{
