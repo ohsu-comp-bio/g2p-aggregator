@@ -1,8 +1,7 @@
 import logging
 import requests_cache
 import re
-from harvester import location_normalizer, location_query_generator, \
-    biomarker_normalizer
+from harvester import location_normalizer, biomarker_normalizer
 from elasticsearch_dsl import Search, Q
 
 from collections import Counter
@@ -50,11 +49,9 @@ def allele_identifier(feature):
                              feature['sequence_ontology']['name'])
 
 
-def biomarker_type(feature_associations):
+def biomarker_type(feature):
     """ get the SO:name """
-    for fa in feature_associations:
-        for f in fa['features']:
-            return f['sequence_ontology']['name']
+    return feature['sequence_ontology']['name']
 
 
 def raw_dataframe(query_string, client, size=1000, verbose=False,
@@ -85,16 +82,119 @@ def raw_dataframe(query_string, client, size=1000, verbose=False,
             yield hit_with_id(hit)
 
 
+def to_elastic(queries, all_drugs=False, smmart_drugs=None, all_sources=False,
+               sources=None):
+    if not all_drugs and not smmart_drugs:
+        smmart_drugs = "+association.environmentalContexts.id:(CID23725625,CID56842121,CHEMBL3137343,CID5330286,CID444795,CID10184653,CID5311,CID6442177,CID11707110,CID25102847,CID9823820,CID24826799,CHEMBL1789844,CHEMBL2108738,CHEMBL2007641,CHEMBL1351,CID15951529,CID132971,CID42611257,CID9854073,CID6918837,CID5291,CID3062316,CID5329102,CID216239,CID25126798,CID387447,CID11625818,CID49846579,CID5284616,CHEMBL1201583,CID176870,CID2662)"  # noqa
+    if not all_sources and not sources:
+        sources = "-source:*trials"
+    for query, name in queries:
+        if smmart_drugs:
+            query = '{} {}'.format(smmart_drugs, query)
+        if sources:
+            query = '{} {}'.format(sources, query)
+        yield {'name': name,
+               'query':  {
+                   "query": {
+                       "query_string": {
+                         "analyze_wildcard": True,
+                         "default_field": "*",
+                         "query": query
+                         }
+                       }
+                   }
+               }
+
+
+def generate(features):
+
+    def make_queries(features):
+        # +features.protein_effects:()
+        protein_effects = []
+        genes = []
+        genomic_locations = []
+        genomic_starts = []
+        genomic_ranges = []
+        protein_domains = []
+        pathways = []
+        biomarker_types = []
+        for f in features:
+
+            if 'protein_effects' in f:
+                for pe in f['protein_effects']:
+                    protein_effects.append(pe.split(':')[1])
+
+            if 'synonyms' in f:
+                for s in f['synonyms']:
+                    genomic_locations.append(s)
+                    # is_HG37 = re.compile('NC_.*\.10:g')
+                    # if is_HG37.match(s):
+                    #     genomic_locations.append(s)
+
+            if 'start' in f:
+                genomic_starts.append({'chromosome': f['chromosome'], 'range': [str(f['start']-i) for i in range(-2, 3)]})  # noqa
+                genomic_ranges.append({'chromosome': f['chromosome'], 'start': f['start'], 'end': f['end']})  # noqa
+
+            for protein_domain in f.get('protein_domains', []):
+                # do not include these domains
+                if protein_domain['name'] in [1, 2, 3, 4]:
+                    continue
+                protein_domains.append(protein_domain['name'])
+
+            for pathway in f.get('pathways', []):
+                pathways.append(pathway)
+
+            if 'sequence_ontology' in f:
+                biomarker_types.append((f['geneSymbol'],
+                                        f['sequence_ontology']['name']))
+
+            genes.append(f['geneSymbol'])
+
+        protein_effects = list(set(protein_effects))
+        genes = list(set(genes))
+        genomic_locations = list(set(genomic_locations))
+        protein_domains = list(set(protein_domains))
+        pathways = list(set(pathways))
+        biomarker_types = list(set(biomarker_types))
+
+        if len(protein_effects) > 0:
+            yield '+features.protein_effects:({})'.format(' OR '.join(protein_effects)), 'protein_effects'  # noqa
+        yield '+genes:({})'.format(' OR '.join(genes)), 'genes'
+        if len(genomic_locations) > 0:
+            yield '+features.synonyms:({})'.format(' OR '.join(['"{}"'.format(g) for g in genomic_locations])), 'alleles'  # noqa
+        if len(protein_domains) > 0:
+            yield '+features.protein_domains.name:({})'.format(' OR '.join(["'{}'".format(d) for d in protein_domains])), 'protein_domains'  # noqa
+
+        chromosome_starts = []
+        for genomic_start in genomic_starts:
+            chromosome_starts.append('+features.chromosome:{} +features.start:({})'.format(genomic_start['chromosome'], ' OR '.join(genomic_start['range'])))  # noqa
+        yield ' OR '.join(chromosome_starts), '~location'
+
+        chromosome_ranges = []
+        for genomic_range in genomic_ranges:
+            chromosome_ranges.append('+features.chromosome:{} +features.start:>={} +features.end:<={}'.format(genomic_range['chromosome'], genomic_range['start'], genomic_range['end']))  # noqa
+        yield ' OR '.join(chromosome_ranges), '~range'
+
+        biomarker_queries = []
+        for t in biomarker_types:
+            biomarker_queries.append('+features.geneSymbol:{} +features.sequence_ontology.name:{}'.format(t[0], t[1]))  # noqa
+        if len(biomarker_queries) > 0:
+            yield ' OR '.join(biomarker_queries),  '~biomarker_type'
+
+    response = {'queries': {}, 'features': features}
+    for q in to_elastic(make_queries(features)):
+        response['queries'][q['name']] = q['query']
+    return response
+
+
 def get_associations(args, client):
     queries = []
     enriched_features = get_features(args)
 
     for f in enriched_features:
-        location_query = location_query_generator.generate([f])
-        identifier = allele_identifier(
-            location_query['feature_associations'][0]['features'][0]
-        )
-        b_type = biomarker_type(location_query['feature_associations'])
+        location_query = generate([f])
+        identifier = allele_identifier(f)
+        b_type = biomarker_type(f)
         for name in location_query['queries'].keys():
             q = location_query['queries'][name]
             qs = q['query']['query_string']['query']
@@ -114,7 +214,7 @@ def get_associations(args, client):
     top3_pathways = [t[0] for t in counter.most_common(3)]
     log.info(('top3_pathways', top3_pathways))
     if len(top3_pathways) > 0:
-        smmart_drugs = "+association.environmentalContexts.id:(CID23725625,CID56842121,CHEMBL3137343,CID5330286,CID444795,CID10184653,CID5311,CID6442177,CID11707110,CID25102847,CID9823820,CID24826799,CHEMBL1789844,CHEMBL2108738,CHEMBL2007641,CHEMBL1351,CID15951529,CID132971,CID42611257,CID9854073,CID6918837,CID5291,CID3062316,CID5329102,CID216239,CID25126798,CID387447,CID11625818,CID49846579,CID5284616,CHEMBL1201583,CID176870,CID2662)"
+        smmart_drugs = "+association.environmentalContexts.id:(CID23725625,CID56842121,CHEMBL3137343,CID5330286,CID444795,CID10184653,CID5311,CID6442177,CID11707110,CID25102847,CID9823820,CID24826799,CHEMBL1789844,CHEMBL2108738,CHEMBL2007641,CHEMBL1351,CID15951529,CID132971,CID42611257,CID9854073,CID6918837,CID5291,CID3062316,CID5329102,CID216239,CID25126798,CID387447,CID11625818,CID49846579,CID5284616,CHEMBL1201583,CID176870,CID2662)"  # noqa
         sources = "-source:*trials"
         qs = '+features.pathways:({})'.format(
             ' AND '.join(['"{}"'.format(d) for d in top3_pathways]))
@@ -123,7 +223,7 @@ def get_associations(args, client):
                         'allele': 'All features',
                         'name': 'pathways',
                         'hits': hits,
-                        'query_string': '{} {} {}'.format(sources, smmart_drugs, qs),
+                        'query_string': '{} {} {}'.format(sources, smmart_drugs, qs),  # noqa
                         'feature': {'pathways': top3_pathways}
                         })
 
