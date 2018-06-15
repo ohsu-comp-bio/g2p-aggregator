@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>G2P 0.9</title>
+    <title>G2P 0.10 smmart</title>
 
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
@@ -103,7 +103,7 @@
       console.log('update_kibana',  user_query) ;
       user_query = "'" + encodeURIComponent( user_query ) +"'";
       query = '_a=(query:(query_string:(analyze_wildcard:!t,query:'+user_query+')))' ;
-      s = 'kibana/app/kibana#/dashboard/9e921030-37aa-11e7-b744-3f569d1a1d0c?embed=true&' + query ;
+      s = 'kibana/app/kibana#/dashboard/3133fb80-4338-11e8-8cde-f5ff5a0509d8?embed=true&' + query ;
       // force update
       console.log('update_kibana',  s) ;
 
