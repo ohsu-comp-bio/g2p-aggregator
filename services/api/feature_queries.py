@@ -15,6 +15,8 @@ requests_cache.install_cache('{}/harvester'.format(DATA_DIR),
 # our logger
 log = logging.getLogger(__name__)
 
+SMMART_DRUGS = '+association.environmentalContexts.id:("CID23725625","CID56842121","CHEMBL3137343","CID5330286","CID444795","CID10184653","CID5311","CID6442177","CID11707110","CID25102847","CID9823820","CID24826799","CHEMBL1789844","CHEMBL2108738","CHEMBL2007641","CHEMBL1351","CID15951529","CID132971","CID42611257","CID9854073","CID6918837","CID5291","CID3062316","CID5329102","CID216239","CID25126798","CID387447","CID11625818","CID49846579","CID5284616","CHEMBL1201583","CID176870","CID2662")'  # noqa
+
 
 def get_features(args):
     """ harmonize these features"""
@@ -85,7 +87,7 @@ def raw_dataframe(query_string, client, size=1000, verbose=False,
 def to_elastic(queries, all_drugs=False, smmart_drugs=None, all_sources=False,
                sources=None):
     if not all_drugs and not smmart_drugs:
-        smmart_drugs = "+association.environmentalContexts.id:(CID23725625,CID56842121,CHEMBL3137343,CID5330286,CID444795,CID10184653,CID5311,CID6442177,CID11707110,CID25102847,CID9823820,CID24826799,CHEMBL1789844,CHEMBL2108738,CHEMBL2007641,CHEMBL1351,CID15951529,CID132971,CID42611257,CID9854073,CID6918837,CID5291,CID3062316,CID5329102,CID216239,CID25126798,CID387447,CID11625818,CID49846579,CID5284616,CHEMBL1201583,CID176870,CID2662)"  # noqa
+        smmart_drugs = SMMART_DRUGS  # noqa
     if not all_sources and not sources:
         sources = "-source:*trials"
     for query, name in queries:
@@ -214,7 +216,6 @@ def get_associations(args, client):
     top3_pathways = [t[0] for t in counter.most_common(3)]
     log.info(('top3_pathways', top3_pathways))
     if len(top3_pathways) > 0:
-        smmart_drugs = "+association.environmentalContexts.id:(CID23725625,CID56842121,CHEMBL3137343,CID5330286,CID444795,CID10184653,CID5311,CID6442177,CID11707110,CID25102847,CID9823820,CID24826799,CHEMBL1789844,CHEMBL2108738,CHEMBL2007641,CHEMBL1351,CID15951529,CID132971,CID42611257,CID9854073,CID6918837,CID5291,CID3062316,CID5329102,CID216239,CID25126798,CID387447,CID11625818,CID49846579,CID5284616,CHEMBL1201583,CID176870,CID2662)"  # noqa
         sources = "-source:*trials"
         qs = '+features.pathways:({})'.format(
             ' AND '.join(['"{}"'.format(d) for d in top3_pathways]))
@@ -223,7 +224,7 @@ def get_associations(args, client):
                         'allele': 'All features',
                         'name': 'pathways',
                         'hits': hits,
-                        'query_string': '{} {} {}'.format(sources, smmart_drugs, qs),  # noqa
+                        'query_string': '{} {} {}'.format(sources, SMMART_DRUGS, qs),  # noqa
                         'feature': {'pathways': top3_pathways}
                         })
 
