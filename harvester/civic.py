@@ -108,11 +108,13 @@ def convert(gene_data):
                 v = copy.deepcopy(variant)
                 del v['evidence_items']
                 v['evidence_items'] = [evidence_item]
+                source_url = "https://civicdb.org/events/genes/{}/summary/variants/{}/summary/evidence/{}/summary#evidence".format(variant['gene_id'], variant['id'], evidence_item['id'])  # NOQA
                 feature_association = {'genes': [gene_data['gene']],
                                        'features': [feature],
                                        'feature_names': evidence_item['name'],
                                        'association': association,
                                        'source': 'civic',
+                                       'source_url': source_url,
                                        'civic': v}
                 yield feature_association
     except Exception as e:

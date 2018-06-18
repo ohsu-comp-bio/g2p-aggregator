@@ -223,8 +223,8 @@ def convert(jax_evidence):
     association['environmentalContexts'].append({
         'description': evidence.therapy.therapyName})
     association['phenotypes'] = [{ 'description' : evidence.indication.name,
-                                   'id' :  '{}:{}'.format(evidence.indication.source, 
-                                                          evidence.indication.id) }]
+                                   'id' :  '{}:{}'.format(evidence.indication.source,
+                                                          evidence.indication.id)}]
     association['evidence'] = [{
         "evidenceType": {
             "sourceName": "jax"
@@ -243,12 +243,14 @@ def convert(jax_evidence):
         association['publication_url'] = evidence.references[0].url
 
     association['drug_labels'] = evidence.therapy.therapyName
+    source_url = "https://ckb.jax.org/therapy/show/{}".format(evidence.therapy.id)
     feature_association = {'genes': [f['geneSymbol'] for f in features],
                            'feature_names':
                            evidence.molecularProfile.profileName,
                            'features': features,
                            'association': association,
                            'source': 'jax',
+                           'source_url': source_url,
                            'jax': evidence}
     yield feature_association
 
