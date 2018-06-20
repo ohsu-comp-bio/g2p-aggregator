@@ -13,3 +13,4 @@ services:
       - elastic:elasticsearch
     volumes:
       - "./util:/util/"
+      - ".:/home/moc/work"
