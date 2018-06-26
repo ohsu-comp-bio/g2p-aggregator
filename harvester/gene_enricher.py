@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import json
+import requests
 
 # load gene names
 # ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/json/non_alt_loci_set.json
@@ -42,7 +43,9 @@ def get_gene(identifier):
         if genes and len(genes) == 1:
             return genes
         else:
-            raise ValueError('gene reference does not exist or refers to multiple genes')
+            raise ValueError(
+                'gene reference does not exist or refers to multiple genes')
+
 
 def normalize_feature_association(feature_association):
     """ add gene_identifiers array to feature_association """
@@ -55,3 +58,25 @@ def normalize_feature_association(feature_association):
         if (gene):
             gene_identifiers.extend(gene)
     feature_association['gene_identifiers'] = gene_identifiers
+
+
+def get_transcripts(geneSymbol):
+    """ returns a list of [{ensembl_transcript_id, strand}],
+        empty array if no hit """
+    url = '''http://grch37.ensembl.org/biomart/martservice?query=<?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE Query>
+    <Query  virtualSchemaName = "default" formatter = "CSV" header = "0" uniqueRows = "0" count = "" datasetConfigVersion = "0.6" >
+    <Dataset name = "hsapiens_gene_ensembl" interface = "default" >
+    <Filter name = "hgnc_symbol" value = "{}"/>
+    <Attribute name = "ensembl_transcript_id" />
+    <Attribute name = "strand" />
+    </Dataset>
+    </Query>'''.format(geneSymbol)  # NOQA
+    r = requests.get(url)
+    transcripts = []
+    for transcript in r.text.split('\n'):
+        if len(transcript) < 1:
+            continue
+        a = transcript.split(',')
+        transcripts.append({'ensembl_transcript_id': a[0], 'strand': int(a[1])})
+    return transcripts
