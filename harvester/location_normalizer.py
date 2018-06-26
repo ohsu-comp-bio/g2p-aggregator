@@ -9,14 +9,32 @@ import hgvs.posedit
 import hgvs.edit
 from hgvs.sequencevariant import SequenceVariant
 from feature_enricher import enrich
+import string
 
 
-def _complement(bases):
+COMPLEMENT = {
+    'A': 'T',
+    'T': 'A',
+    'G': 'C',
+    'C': 'G',
+    '-': '-'
+}
+COMPLEMENT_MAP = string.maketrans('ATGC-',
+                                  'TACG-')
+
+
+def complement(bases):
     """
     return complement of bases string
     """
-    complements = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
-    return ''.join([complements.get(base, base) for base in bases])
+    return str(bases)[::].translate(COMPLEMENT_MAP)
+
+
+def reverse_complement(bases):
+    """
+    return complement of bases string
+    """
+    return str(bases)[::-1].translate(COMPLEMENT_MAP)
 
 
 def _get_ref_alt(description):
@@ -111,8 +129,8 @@ def genomic_hgvs(feature, complement=False, description=False):
         alt = None
 
     if complement:
-        ref = _complement(ref)
-        alt = _complement(alt)
+        ref = complement(ref)
+        alt = complement(alt)
 
     feature_description = feature.get('description', feature.get('name', None))
 
@@ -159,7 +177,7 @@ def normalize(feature):
             message = allele['message']
             actualAllele = allele['actualAllele']
 
-            complement_ref = _complement(feature['ref'])
+            complement_ref = complement(feature['ref'])
             if complement_ref == actualAllele:
                 # print 'reverse strand re-try'
                 hgvs = genomic_hgvs(feature, complement=True)
