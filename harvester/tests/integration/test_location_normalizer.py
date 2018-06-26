@@ -4,6 +4,7 @@ import sys
 import time
 sys.path.append('.')  # NOQA
 from location_normalizer import normalize_feature_association
+from location_normalizer import complement, reverse_complement
 
 
 def test_normalize_feature_association_ALK_D1203N():
@@ -41,4 +42,14 @@ def test_normalize_feature_association_ABL1_BCR_fusion():
     }
     normalize_feature_association(fa)
     print fa
-    assert len(fa['features'])==2
+    assert len(fa['features']) == 2
+
+
+def test_complement():
+    assert 'GATC-' == complement('CTAG-')
+
+
+def test_reverse_complement():
+    assert '-CTAG' == reverse_complement('CTAG-')
+    assert '-CG' == reverse_complement('CG-')
+    assert 'TA-' == reverse_complement('-TA')

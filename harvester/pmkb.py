@@ -7,6 +7,10 @@ import json
 import evidence_label as el
 import evidence_direction as ed
 
+from gene_enricher import get_transcripts
+from location_normalizer import reverse_complement
+
+
 def harvest(genes=None):
     with open("../data/pmkb_interpretations.json", "r") as ins:
         for line in ins:
@@ -29,11 +33,11 @@ def convert(interpretation):
     features = []
     variant_name = []
     for variant in variants:
-	if 'coordinates' in variant:
-	    s = variant['coordinates']
-            if not s: 
-		continue
-	    coordinates = s.replace(' ', '').split(',')
+        if 'coordinates' in variant:
+            s = variant['coordinates']
+            if not s:
+                continue
+            coordinates = s.replace(' ', '').split(',')
             for coordinate in coordinates:
                 feature = {}
                 feature['geneSymbol'] = variant['gene']['name']
@@ -53,20 +57,33 @@ def convert(interpretation):
                         attributes[key] = {'string_value': variant[key]}
                 feature['attributes'] = attributes
 
-        # TODO - replace w/ biocommons/hgvs ?
-        if 'dna_change' in variant:
-            dna_change = variant['dna_change']
-            if dna_change and '>' in dna_change:
-                prefix, alt = dna_change.split('>')
-                ref = prefix[-len(alt):]
-                if len(ref) > 0 and len(alt) > 0:
-                    feature['ref'] = ref
-                    feature['alt'] = alt
+            # TODO - replace w/ biocommons/hgvs ?
+            if 'dna_change' in variant:
+                dna_change = variant['dna_change']
+                if dna_change and '>' in dna_change:
+                    prefix, alt = dna_change.split('>')
+                    ref = prefix[-len(alt):]
+                    # lookup strand direction
+                    ensembl_transcript_id = variant['transcript']
+                    geneSymbol = variant['gene']['name']
+                    negative_strand = False
+                    for transcript_strand in get_transcripts(geneSymbol):
+                        if transcript_strand['ensembl_transcript_id'] == \
+                                ensembl_transcript_id:
+                            if transcript_strand['strand'] == -1:
+                                negative_strand = True
+                                break
+                    if len(ref) > 0 and len(alt) > 0:
+                        if negative_strand:
+                            ref = reverse_complement(ref)
+                            alt = reverse_complement(alt)
+                        feature['ref'] = ref
+                        feature['alt'] = alt
 
-        if attributes['amino_acid_change']['string_value']:
-	    variant_name.append(attributes['amino_acid_change']['string_value'])
+            if attributes['amino_acid_change']['string_value']:
+                variant_name.append(attributes['amino_acid_change']['string_value'])
 
-	features.append(feature)
+            features.append(feature)
 
     # association['evidence_label'] = interpretation['tier']
     association['source_link'] = 'https://pmkb.weill.cornell.edu/therapies/{}'.format(interpretation['id'])
@@ -80,11 +97,11 @@ def convert(interpretation):
 
     association['phenotypes'] = []
     for tumor in tumors:
-        association['phenotypes'].append({ 'description': tumor['name'] })
+        association['phenotypes'].append({'description': tumor['name']})
 
     association['drug_labels'] = 'NA'
     association['evidence'] = [{
-         "evidenceType": { "sourceName": "pmkb" },
+         "evidenceType": {"sourceName": "pmkb"},
          'description': str(interpretation['tier']),
          'info': {
              'publications': [
@@ -92,9 +109,9 @@ def convert(interpretation):
              ]
          }
     }]
-        # add summary fields for Display
-   #     if len(interpretation['citations']) > 0:
-   #          association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])  # NOQA
+    # add summary fields for Display
+    #     if len(interpretation['citations']) > 0:
+    #          association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])  # NOQA
     association['publication_url'] = ''
     feature_association = {'genes': [genes],
                            'features': features,
