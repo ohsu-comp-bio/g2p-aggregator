@@ -277,6 +277,7 @@ def convert(evidence):
                            'feature_names': mutation,
                            'association': association,
                            'source': 'molecularmatch',
+                           'source_url': 'https://www.molecularmatch.com/technology#our-knowledge-platform',
                            'molecularmatch': evidence}
     yield feature_association
 
