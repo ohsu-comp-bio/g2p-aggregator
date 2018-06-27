@@ -25,7 +25,7 @@ def test_civic():
     for f in fa['features']:
         print f['name'], f['provenance']
     assert len(fa['features']) == 1
-    assert fa['source_url'] == 'https://civicdb.org/events/genes/30/summary/variants/148/summary/evidence/3703/summary#evidence'
+    assert fa['source_url'] == 'https://civicdb.org/links/evidence/3703'
 
 
 def test_civic2():
@@ -39,4 +39,4 @@ def test_civic2():
     assert len(fa['features']) == 1
     assert fa['features'][0]['geneSymbol'] == "HLA-C"
     assert fa['features'][0]['provenance_rule'] == "is_loss"
-    assert fa['source_url'] == 'https://civicdb.org/events/genes/2608/summary/variants/821/summary/evidence/1899/summary#evidence'
+    assert fa['source_url'] == 'https://civicdb.org/links/evidence/1899'
