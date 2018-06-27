@@ -227,11 +227,19 @@ def convert(gene_data):
         association['drug_labels'] = ','.join([drug for drug in clinical['drug']])   # NOQA
         feature_names = ', '.join(['{}:{}'.format(
                                 f["geneSymbol"], f["name"]) for f in features])
+
+        source_url = None
+        if len(features) > 0:
+            f = features[0]
+            source_url = 'http://oncokb.org/#/gene/{}/variant/{}'.format(
+                f["geneSymbol"], f["name"])
+
         feature_association = {'genes': [gene],
                                'features': features,
                                'feature_names': feature_names,
                                'association': association,
                                'source': 'oncokb',
+                               'source_url': source_url,
                                'oncokb': {'clinical': clinical}}
         yield feature_association
 
@@ -305,11 +313,16 @@ def convert(gene_data):
                 break
 
         feature_names = feature["geneSymbol"] + ' ' + feature["name"]
+
+        source_url = 'http://oncokb.org/#/gene/{}/variant/{}'.format(
+            feature["geneSymbol"].encode('utf8'), feature["name"].encode('utf8'))
+
         feature_association = {'genes': [gene],
                                'features': [feature],
                                'feature_names': feature_names,
                                'association': association,
                                'source': 'oncokb',
+                               'source_url': source_url,
                                'oncokb': {'biological': biological}}
         yield feature_association
 
