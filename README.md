@@ -35,10 +35,21 @@ To see analysis of harmonization and overlaps see [figures](figures/README.md)
 
 JUST GOOGLE IT:
 
-* Use the search box like a google search. To search your data, enter your search criteria in the Query bar and press Enter or click Search to submit the request. For a full explanation of the search capabilities see [here](https://lucene.apache.org/core/2_9_4/queryparsersyntax.html)
+* Use the search box like a google search. To search your data, enter your search criteria in the Query bar and press Enter or click Search to submit the request. For a full explanation of the search capabilities see [Search examples](search.md),  [syntax](https://lucene.apache.org/core/2_9_4/queryparsersyntax.html)
 
 * The charts and list are all tied to the search. Click to constrain your results
 
+
+## Technology stack
+
+
+![image](https://user-images.githubusercontent.com/47808/41993994-df42c058-7a01-11e8-96fe-563fde37ef11.png)
+
+* ElasticSearch, Kibana v6.0
+* Python 2.7
+* Flask 0.12.2
+* Docker 17
+* nginx openresty/openresty
 
 
 ## How do I import new data into it?
