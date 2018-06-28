@@ -31,7 +31,7 @@ def convert(interpretation):
     for variant in variants:
 	if 'coordinates' in variant:
 	    s = variant['coordinates']
-            if not s: 
+            if not s:
 		continue
 	    coordinates = s.replace(' ', '').split(',')
             for coordinate in coordinates:
@@ -96,11 +96,13 @@ def convert(interpretation):
    #     if len(interpretation['citations']) > 0:
    #          association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])  # NOQA
     association['publication_url'] = ''
+    source_url = 'https://pmkb.weill.cornell.edu/therapies/{}'.format(interpretation['id'])
     feature_association = {'genes': [genes],
                            'features': features,
                            'feature_names': ['{} {}'.format(f["geneSymbol"], f["name"]) for f in features],
                            'association': association,
                            'source': 'pmkb',
+                           'source_url': source_url,
                            'pmkb': {
                                'variant': variants,
                                'tumor': tumors,

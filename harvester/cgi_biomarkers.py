@@ -210,6 +210,7 @@ def convert(evidence):
                            'feature_names': evidence['Biomarker'],
                            'association': association,
                            'source': 'cgi',
+                           'source_url': 'https://www.cancergenomeinterpreter.org/biomarkers',
                            'cgi': evidence}
 
     yield feature_association

@@ -11,7 +11,7 @@
 
 * Inform GA4GH G2P discussions
 
-A prototype of the Genotype to phenotype user interface exists [here](https://g2p-ohsu.ddns.net/g2p).   
+A prototype of the Genotype to phenotype user interface exists [here](https://search.cancervariants.org).   
 
 ##  Where does the data come from?
 
@@ -35,10 +35,30 @@ To see analysis of harmonization and overlaps see [figures](figures/README.md)
 
 JUST GOOGLE IT:
 
-* Use the search box like a google search. To search your data, enter your search criteria in the Query bar and press Enter or click Search to submit the request. For a full explanation of the search capabilities see [here](https://lucene.apache.org/core/2_9_4/queryparsersyntax.html)
+* Use the search box like a google search. To search your data, enter your search criteria in the Query bar and press Enter or click Search to submit the request. For a full explanation of the search capabilities see [Search examples](search.md),  [syntax](https://lucene.apache.org/core/2_9_4/queryparsersyntax.html)
 
 * The charts and list are all tied to the search. Click to constrain your results
 
+
+## Technology stack
+
+
+![image](https://user-images.githubusercontent.com/47808/41993994-df42c058-7a01-11e8-96fe-563fde37ef11.png)
+
+* ElasticSearch, Kibana v6.0
+  * Provisioned using [aws](https://aws.amazon.com/elasticsearch-service/getting-started/) or locally using [docker](docker-compose-es.yml)
+  * Snapshots and exports are managed by these [utilities](util/elastic)
+* Python 2.7
+  * Provisioned by your OS image
+* API Flask 0.12.2
+  * Provisioned by [docker](services/api/Dockerfile)
+* nginx openresty/openresty
+  * Provisioned by [docker](services/nginx), for more information see [cloud setup](cloud-setup/)
+
+
+On top of Elasticsearch, we built REST-based web services using the Flask web framework.
+
+search.cancervariants.org provides two simple REST-based web services: an association query service and a GA4GH beacon service. The association query service allows users to query for evidence using any combination of keywords, while the beacon service provisions associations into the [GA4GH beacon network](http://science.sciencemag.org/content/352/6291/1278.full) enabling retrieval of associations based on genomic location.
 
 
 ## How do I import new data into it?
