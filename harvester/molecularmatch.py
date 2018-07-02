@@ -238,7 +238,7 @@ def convert(evidence):
 
     # association['evidence_label'] = direction
     association = el.evidence_label(tier, association, na=False)
-    association = ed.evidence_direction(tier, association, na=False)
+    association = ed.evidence_direction(evidence['direction'], association, na=False)
 
     if len(pubs) > 0:
         association['publication_url'] = pubs[0]

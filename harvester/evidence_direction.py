@@ -6,7 +6,8 @@
 def evidence_direction(evidence, association, na=False):
     resistant = ['resistant', 'resistance', 'poor outcome',
                  'decreased response']
-    sensitive = ['sensitive', 'predictive of response']
+    sensitive = ['sensitive', 'predictive of response',
+                 'fda-approved biomarker and drug']
     nb = ['no benefit']
 
     res_type = {
