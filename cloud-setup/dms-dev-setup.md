@@ -2,7 +2,7 @@
 
 ## first: clone git
 
-`git clone git@github.com:ohsu-comp-bio/g2p-aggregator.git`
+`git clone https://github.com/ohsu-comp-bio/g2p-aggregator.git`
 
 ## second: docker setup
 
