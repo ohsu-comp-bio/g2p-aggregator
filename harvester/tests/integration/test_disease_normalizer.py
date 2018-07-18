@@ -7,7 +7,7 @@ from disease_normalizer import normalize
 import requests
 import requests_cache
 # cache responses
-requests_cache.install_cache('harvester')
+# requests_cache.install_cache('harvester')
 
 
 def test_comma():
@@ -120,21 +120,23 @@ def test_Malignant_Lymphoma():
 
 def test_Glioma():
     diseases = normalize('Glioma')
-    assert diseases[0]['ontology_term'] == 'HP:0009733'
-    assert diseases[0]['family'] == 'Neuroepithelial neoplasm'
+    assert diseases[0]['ontology_term'] == 'DOID:3070'
+    assert diseases[0]['family'] == 'cell type cancer'
     assert diseases[0]['source']
+    assert diseases[0]['label'] == 'malignant glioma'
 
 
 def test_Heart_failure():
     diseases = normalize('Heart failure')
-    assert diseases[0]['ontology_term'] == 'SYMP:0000292'
-    assert diseases[0]['family'] == 'cardiovascular system symptom'
+    assert diseases[0]['ontology_term'] == 'MEDDRA:10019279' or  diseases[0]['ontology_term'] ==  'MEDDRA:10016145'
+    # assert diseases[0]['family'] == 'cardiovascular system symptom'
     assert diseases[0]['source']
+    assert diseases[0]['label'] == 'Heart failure'
 
 
 def test_HF():
     diseases = normalize('HF - Heart failure')
-    assert diseases[0]['ontology_term'] == 'SYMP:0000292'
+    assert diseases[0]['ontology_term'] == 'MEDDRA:10019279' or  diseases[0]['ontology_term'] ==  'MEDDRA:10016145'
     assert diseases[0]['family'] == 'cardiovascular system symptom'
     assert diseases[0]['source']
 

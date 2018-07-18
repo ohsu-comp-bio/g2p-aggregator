@@ -3,7 +3,7 @@ import urllib
 import logging
 import re
 import os
-
+import doid_normalizer
 
 NOFINDS = []
 BIOONTOLOGY_NOFINDS = []
@@ -127,7 +127,9 @@ def get_family(ontology_id):
         if not (ontology == 'SNOMEDCT' or
                 ontology == 'DOID' or
                 ontology == 'RCD' or
-                ontology == 'OMIM'):
+                ontology == 'OMIM' or
+                ontology == 'MEDDRA'
+                ):
             k = ontology_id
         url = 'http://data.bioontology.org/ontologies/{}/classes/{}/ancestors?apikey={}'.format(ontology, k, API_KEY)  # NOQA
         r = requests.get(url, timeout=20)
@@ -160,7 +162,12 @@ def print_hierarchy(hierarchy_list, indent=0):
 
 
 def get_hierarchy_family(_a):
+    # logging.info(('get_hierarchy_family', _a))
     midpoint = int(len(_a)/2) + 1
+    if midpoint >= len(_a):
+        midpoint = len(_a)-1
+    #     logging.info(('get_hierarchy_family set midpoint ',midpoint))
+    # logging.info(('get_hierarchy_family midpoint ',midpoint))
     return _a[midpoint]
 
 
@@ -198,10 +205,25 @@ def normalize(name):
         return []
 
 
+def normalize_doid(phenotype):
+    logging.debug(('normalize_doid looking', phenotype))
+    disease = doid_normalizer.normalize(phenotype)
+    if disease:
+        family = get_family(disease['ontology_term'])
+        if family:
+            disease['family'] = family
+        return [disease]
+    logging.debug(('normalize_doid not found', phenotype))
+    return []
+
+
 def normalize_multi(phenotypes):
     diseases = []
     for pheno in phenotypes:
-        disease = normalize(pheno['description'])
+        disease = None
+        disease = normalize_doid(pheno)
+        if len(disease) == 0:
+            disease = normalize(pheno['description'])
         if len(disease) != 0:
             phenotype = {
                 'id': disease[0]['ontology_term'],

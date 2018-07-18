@@ -75,6 +75,10 @@ def _enrich_gene(feature,
 def _enrich_feature(feature,
                     provenance_rule='default'):
     """ description contains a gene + variant, get its location """
+
+    ## TODO accession
+    # curl -X GET "http://myvariant.info/v1/variant/rs60369023" -H "accept: application/json"
+
     #  curl -s http://myvariant.info/v1/query?q=FLT3%20N676D |
     # jq '.hits[0] |
     # { referenceName: "GRCh37", chromosome: .chrom,
@@ -88,14 +92,25 @@ def _enrich_feature(feature,
     #   "alt": "A"
     # }
     url = "http://myvariant.info/v1/query?q={}".format(feature['description'])
+    if 'accession' in feature and '@rs' in feature['accession']:
+        logging.debug("'litvar rs accession' in feature")
+        # parse litvar accession "litvar@rs121913507##"
+        accession = feature['accession'].split('@')[1].replace('#', '')
+        url = "http://myvariant.info/v1/variant/{}".format(accession)
+
     r = requests.get(url, timeout=60)
     hits = r.json()
     hit = None
+    # query response
     if 'hits' in hits:
         for a_hit in hits['hits']:
             if 'hg19' in a_hit and 'vcf' in a_hit:
                 hit = a_hit
                 break
+    # variant response
+    if 'hg19' in hits and 'vcf' in hits:
+        hit = hits
+
     if hit:
         hg19 = hit.get('hg19')
         vcf = hit.get('vcf')
@@ -114,11 +129,18 @@ def _enrich_feature(feature,
             feature['provenance'] = []
         feature['provenance'].append(url)
         feature['provenance_rule'] = provenance_rule
-
+        if 'dbsnp' in hit:
+            feature['rsid'] = hit['dbsnp']['rsid']
         if 'biomarker_type' not in feature:
             if 'cadd' in hit and 'type' in hit['cadd']:
                 feature['biomarker_type'] = \
                     mut.norm_biomarker(hit['cadd']['type'])
+        # TODO - if geneSymbol none
+        # jq  .clinvar.gene.symbol
+        # TODO - if name == rsid
+        # jq  .clinvar.rcv.preferred_name
+
+
 
     return feature
 

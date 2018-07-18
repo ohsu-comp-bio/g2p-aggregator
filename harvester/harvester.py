@@ -16,13 +16,13 @@ import cgi_biomarkers
 import molecularmatch
 import molecularmatch_trials
 import pmkb
-import drug_normalizer
 import disease_normalizer
 import oncogenic_normalizer
 import biomarker_normalizer
 import sage
 import brca
 import jax_trials
+import litvar
 
 import drug_normalizer
 import disease_normalizer
@@ -45,7 +45,8 @@ import location_normalizer
 DUPLICATES = []
 
 # cache responses
-requests_cache.install_cache('harvester', allowable_codes=(200, 400, 404))
+requests_cache.install_cache('harvester', allowable_codes=(200, 400, 404),
+                             allowable_methods=('GET', 'POST'))
 
 args = None
 silos = None
@@ -119,14 +120,15 @@ def harvest_only(genes):
 
 def normalize(feature_association):
     """ standard representation of drugs,disease etc. """
-    start_time = timeit.default_timer()
-    drug_normalizer.normalize_feature_association(feature_association)
-    elapsed = timeit.default_timer() - start_time
-    if elapsed > 1:
-        environmentalContexts = feature_association['association'].get(
-            'environmentalContexts', None)
-        logging.info('drug_normalizer {} {}'.format(elapsed,
-                                                    environmentalContexts))
+
+    # start_time = timeit.default_timer()
+    # drug_normalizer.normalize_feature_association(feature_association)
+    # elapsed = timeit.default_timer() - start_time
+    # if elapsed > 1:
+    #     environmentalContexts = feature_association['association'].get(
+    #         'environmentalContexts', None)
+    #     logging.info('drug_normalizer {} {}'.format(elapsed,
+    #                                                 environmentalContexts))
 
     start_time = timeit.default_timer()
     disease_normalizer.normalize_feature_association(feature_association)
