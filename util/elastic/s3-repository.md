@@ -25,7 +25,7 @@ dc restart  elastic
 
 see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
 ```
-curl -XPUT $ES'/_snapshot/g2p-test?pretty' -H 'Content-Type: application/json' -d'
+curl -XPUT $ES'/_snapshot/g2p-test-snapshots?pretty' -H 'Content-Type: application/json' -d'
 {
   "type": "s3",
   "settings": {
@@ -41,7 +41,7 @@ curl -XPUT $ES'/_snapshot/g2p-test?pretty' -H 'Content-Type: application/json' -
 $ curl -s $ES/_cat/repositories?v
 id            type
 g2p-test-snapshots   s3
-$ export REPOSITORY=s3_repository
+$ export REPOSITORY=g2p-test-snapshots
 ```
 
 

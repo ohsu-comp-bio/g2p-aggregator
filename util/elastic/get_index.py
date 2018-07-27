@@ -22,7 +22,7 @@ def _to_stdout(index='association'):
 def _de_stringify(hit):
     """ we have stored some fields as json strings, convert back to obj"""
     sources = set(['cgi', 'jax', 'civic', 'oncokb', 'molecularmatch_trials',
-                   'molecularmatch', 'pmkb', 'sage', 'brca', 'jax_trials'])
+                   'molecularmatch', 'pmkb', 'sage', 'brca', 'jax_trials', 'litvar'])
     props = set(dir(hit))
     source = sources.intersection(props)
     if len(source) == 1:

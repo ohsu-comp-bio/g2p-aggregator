@@ -9,4 +9,5 @@ python get_index.py --index associations | tee  \
   >(grep '"source":"molecularmatch_trials"' > molecularmatch_trials.json ) \
   >(grep '"source":"brca"' > brca.json ) \
   >(grep '"source":"civic"' > civic.json ) \
+  >(grep '"source":"litvar"' > litvar.json ) \
 > all.json
