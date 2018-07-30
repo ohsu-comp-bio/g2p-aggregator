@@ -307,6 +307,11 @@ paths:
       produces:
         - application/json
       parameters:
+        - name: q
+          description: 'query string'
+          in: query
+          required: false
+          type: string
         - name: features
           in: body
           required: true
