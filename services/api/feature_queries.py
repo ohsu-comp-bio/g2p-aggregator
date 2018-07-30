@@ -23,8 +23,8 @@ def get_features(args):
     enriched_features = []
     for f in args['features']:
         fa = {'features': [f], 'dev_tags': []}
-        location_normalizer.normalize_feature_association(fa)
-        biomarker_normalizer.normalize_feature_association(fa)
+        # location_normalizer.normalize_feature_association(fa)
+        # biomarker_normalizer.normalize_feature_association(fa)
         enriched_features.append(fa['features'][0])
     return enriched_features
 
@@ -35,8 +35,8 @@ def get_feature(args):
     if 'description' not in f:
         f['description'] = ''
     fa = {'features': [f], 'dev_tags': []}
-    location_normalizer.normalize_feature_association(fa)
-    biomarker_normalizer.normalize_feature_association(fa)
+    # location_normalizer.normalize_feature_association(fa)
+    # biomarker_normalizer.normalize_feature_association(fa)
     return fa['features'][0]
 
 
@@ -48,12 +48,12 @@ def allele_identifier(feature):
         if is_HG37.match(s):
             return '{} {}'.format(feature['geneSymbol'], s)
     return '{} {} {}'.format(feature['geneSymbol'], feature['start'],
-                             feature['sequence_ontology']['name'])
+                             feature.get('sequence_ontology', {'name': ''} )['name'])
 
 
 def biomarker_type(feature):
     """ get the SO:name """
-    return feature['sequence_ontology']['name']
+    return feature.get('sequence_ontology', {'name': ''} )['name']
 
 
 def raw_dataframe(query_string, client, size=1000, verbose=False,
@@ -84,13 +84,15 @@ def raw_dataframe(query_string, client, size=1000, verbose=False,
             yield hit_with_id(hit)
 
 
-def to_elastic(queries, all_drugs=False, smmart_drugs=None, all_sources=False,
+def to_elastic(queries, user_query=None, all_drugs=False, smmart_drugs=None, all_sources=False,
                sources=None):
     if not all_drugs and not smmart_drugs:
         smmart_drugs = SMMART_DRUGS  # noqa
     if not all_sources and not sources:
         sources = "-source:*trials"
     for query, name in queries:
+        if user_query:
+            query = '{} {}'.format(user_query, query)
         if smmart_drugs:
             query = '{} {}'.format(smmart_drugs, query)
         if sources:
@@ -108,9 +110,8 @@ def to_elastic(queries, all_drugs=False, smmart_drugs=None, all_sources=False,
                }
 
 
-def generate(features):
-
-    def make_queries(features):
+def generate(features, user_query):
+    def make_queries(features, user_query):
         # +features.protein_effects:()
         protein_effects = []
         genes = []
@@ -135,7 +136,10 @@ def generate(features):
 
             if 'start' in f:
                 genomic_starts.append({'chromosome': f['chromosome'], 'range': [str(f['start']-i) for i in range(-2, 3)]})  # noqa
-                genomic_ranges.append({'chromosome': f['chromosome'], 'start': f['start'], 'end': f['end']})  # noqa
+		if 'end' in f:
+                    genomic_ranges.append({'chromosome': f['chromosome'], 'start': f['start'], 'end': f['end']})  # noqa
+		else:
+		    genomic_ranges.append({'chromosome': f['chromosome'], 'start': f['start']}) # noqa
 
             for protein_domain in f.get('protein_domains', []):
                 # do not include these domains
@@ -184,7 +188,7 @@ def generate(features):
             yield ' OR '.join(biomarker_queries),  '~biomarker_type'
 
     response = {'queries': {}, 'features': features}
-    for q in to_elastic(make_queries(features)):
+    for q in to_elastic(make_queries(features, user_query), user_query):
         response['queries'][q['name']] = q['query']
     return response
 
@@ -192,9 +196,9 @@ def generate(features):
 def get_associations(args, client):
     queries = []
     enriched_features = get_features(args)
-
+    user_query = args.get('q', '')
     for f in enriched_features:
-        location_query = generate([f])
+        location_query = generate([f], user_query)
         identifier = allele_identifier(f)
         b_type = biomarker_type(f)
         for name in location_query['queries'].keys():
@@ -205,7 +209,7 @@ def get_associations(args, client):
                             'allele': identifier,
                             'name': name,
                             'hits': hits,
-                            'query_string': qs,
+                            'query_string': '{} {}'.format(qs, user_query) ,
                             'feature': f
                             })
 
@@ -224,7 +228,7 @@ def get_associations(args, client):
                         'allele': 'All features',
                         'name': 'pathways',
                         'hits': hits,
-                        'query_string': '{} {} {}'.format(sources, SMMART_DRUGS, qs),  # noqa
+                        'query_string': '{} {} {} {}'.format(sources, SMMART_DRUGS, qs, user_query),  # noqa
                         'feature': {'pathways': top3_pathways}
                         })
 
