@@ -108,7 +108,8 @@ def convert(gene_data):
                 v = copy.deepcopy(variant)
                 del v['evidence_items']
                 v['evidence_items'] = [evidence_item]
-                source_url = "https://civicdb.org/events/genes/{}/summary/variants/{}/summary/evidence/{}/summary#evidence".format(variant['gene_id'], variant['id'], evidence_item['id'])  # NOQA
+                source_url = "https://civicdb.org/links/evidence/{}".format(evidence_item['id'])  # NOQA
+
                 feature_association = {'genes': [gene_data['gene']],
                                        'features': [feature],
                                        'feature_names': evidence_item['name'],
