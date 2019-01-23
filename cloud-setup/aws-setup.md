@@ -121,7 +121,9 @@ nginx_g2p    /usr/local/openresty/bin/o ...   Up      0.0.0.0:443->443/tcp, 0.0.
   * You may want to restore elastic indices from another instance.
   * See http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains-snapshots.html
   * First create an iam_role if you haven't already `cloud-setup/create_iam_role`
-  * Then export the following:
+  * Then run the following:
+  
+  ```
   export ESTEST_MANUAL_SNAPSHOT_S3_BUCKET=g2p-test-snapshots
   export ESTEST_REGION=us-west-2
   export ESTEST_IAM_MANUAL_SNAPSHOT_ROLE_ARN=arn:aws:iam::XXXX:role/ES_Manual_Snapshot_Role
@@ -130,8 +132,9 @@ nginx_g2p    /usr/local/openresty/bin/o ...   Up      0.0.0.0:443->443/tcp, 0.0.
   export ES_CLUSTER_DNS=XXXXX.es.amazonaws.com
   export ESTEST_MANUAL_SNAPSHOT_ROLENAME=ES_Manual_Snapshot_Role
   export ESTEST_MANUAL_SNAPSHOT_IAM_POLICY_NAME=ES_Manual_Snapshot_IAM_Policy
+  ```
 
-
+```
 cat << EOF > /tmp/iam-policy_for_es_snapshot_to_s3.json
  {
      "Version":"2012-10-17",
@@ -152,7 +155,7 @@ cat << EOF > /tmp/iam-policy_for_es_snapshot_to_s3.json
     ]
 }
 EOF
-
+```
 
 
 ## Functionality in Internet Explorer
