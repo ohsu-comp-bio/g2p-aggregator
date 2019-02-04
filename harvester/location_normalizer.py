@@ -380,9 +380,6 @@ if __name__ == '__main__':
                           "description": {"string_value": None}},
            "alt": "A", "ref": "T", "chromosome": "7"})
 
-    # _test({"end": 1806125, "name": "FGFR3 F384L", "referenceName": "GRCh37", "start": 1806125, "biomarker_type": "snp", "geneSymbol": "FGFR3", "attributes": {"amino_acid_change": {"string_value": "F384L"}, "germline": {"string_value": False}, "partner_gene": {"string_value": None}, "cytoband": {"string_value": None}, "exons": {"string_value": "9"}, "notes": {"string_value": None}, "cosmic": {"string_value": None}, "effect": {"string_value": None}, "cnv_type": {"string_value": None}, "id": {"string_value": 391}, "variant_type": {"string_value": "missense"}, "dna_change": {"string_value": "1150T>C"}, "codons": {"string_value": "384"}, "chromosome_based_cnv": {"string_value": False}, "transcript": {"string_value": "ENST00000340107"}, "description_type": {"string_value": "HGVS"}, "chromosome": {"string_value": None}, "description": {"string_value": None}}, "alt": "C", "ref": "T", "chromosome": "4"})
-
     _test( {"entrez_id": 1956, "end": None, "name": "R776C", "start": None, "referenceName": "GRCh37", "geneSymbol": "EGFR", "alt": "None", "ref": "None", "chromosome": "None"})
-
 
     _test({"end": "55242478", "description": "EGFR E746_E749delELRE", "links": ["https://api.molecularmatch.com/v2/mutation/get?name=EGFR+E746_E749delELRE"], "start": "55242467", "biomarker_type": "nonsense", "referenceName": "GRCh37", "alt": "-", "ref": "12", "chromosome": "7", "name": "EGFR E746_E749delELRE"})
