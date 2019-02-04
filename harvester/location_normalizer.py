@@ -256,15 +256,31 @@ def normalize_feature_association(feature_association):
                                                            allele_registry))
 
 
-def _test(feature):
+def _test(feature, expected_hgvs_g='', expected_hgvs_p=''):
     allele_registry = normalize(feature)[0]
-    if allele_registry and '@id' not in allele_registry:
-        print 'FAIL', allele_registry['message']
-        print "\t", allele_registry['hgvs_g']
-        print "\t", feature
-        print "\t", allele_registry
-    elif allele_registry:
-        print 'OK', allele_registry['hgvs_g']
+    if allele_registry:
+        hgvs_g = allele_registry['hgvs_g']
+        if '@id' not in allele_registry:
+            print 'FAIL', allele_registry['message']
+            print "\t", hgvs_g
+            print "\t", feature
+            print "\t", allele_registry
+        elif expected_hgvs_g and hgvs_g != expected_hgvs_g:
+            print 'FAIL', 'did not match expected hgvs_g'
+            print "\t", hgvs_g
+            print "\t", feature
+            print "\t", allele_registry
+        elif expected_hgvs_p:
+            hgvs_p = allele_registry['hgvs_p']
+            if expected_hgvs_p != hgvs_p:
+                print 'FAIL', 'did not match expected hgvs_g'
+                print "\t", hgvs_p
+                print "\t", feature
+                print "\t", allele_registry
+            else:
+                print 'OK', allele_registry['hgvs_g']
+        else:
+            print 'OK', allele_registry['hgvs_g']
     else:
         print 'OK', 'not normalized'
 
