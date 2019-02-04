@@ -6,46 +6,11 @@ if [ -z "$ES" ]
     ES=http://localhost:9200
 fi
 echo setting up $ES
-curl  -X DELETE $ES"/associations-new"
+curl  -X DELETE $ES"/associations"
 echo deleted
 
-# shards disk.indices disk.used disk.avail disk.total disk.percent host      ip        node
-#     21        9.7gb    20.4gb     42.2gb     62.7gb           32 127.0.0.1 127.0.0.1 -BRXEWH
-#     21                                                                               UNASSIGNED
 
-# curl -XPUT $ES"/associations-new" -H 'Content-Type: application/json' -d'
-# {
-#   "settings" : {
-#       "index" : {
-#         "mapping.total_fields.limit": 30000
-#       }
-#   },
-#
-#   "mappings": {
-#     "association": {
-#       "dynamic_templates": [
-#         {
-#           "strings": {
-#             "match_mapping_type": "string",
-#             "mapping": {
-#               "type": "text",
-#               "fields": {
-#                 "keyword": {
-#                   "type":  "keyword",
-#                   "ignore_above": 1024,
-#                   "store": true
-#                 }
-#               }
-#             }
-#           }
-#         }
-#       ]
-#     }
-#   }
-# }'
-echo created
-
-curl -XPUT $ES"/associations-new" -H 'Content-Type: application/json' -d'
+curl -XPUT $ES"/associations" -H 'Content-Type: application/json' -d'
 {
   "settings":{
     "index":{
@@ -94,25 +59,48 @@ curl -XPUT $ES"/associations-new" -H 'Content-Type: application/json' -d'
         "molecularmatch_trials":{
           "type":"keyword",
           "store":true, "index":false, "ignore_above":0
-        }
-      },
-      "dynamic_templates":[
-        {
-          "strings":{
-            "match_mapping_type":"string",
-            "mapping":{
-              "type":"text",
-              "fields":{
-                "keyword":{
-                  "type":"keyword",
-                  "ignore_above":1024,
-                  "store":true
+        },
+        "evidence": {
+          "properties": {
+            "evidenceType": {
+              "properties": {
+                "id": {
+                  "type": "keyword"
                 }
               }
             }
           }
+        },
+        "features": {
+          "properties": {
+            "protein_domains": {
+              "properties": {
+                "name": {
+                  "type":"keyword"
+                }
+              }
+            }
+          }
+        },
+        "association": {
+          "properties": {
+            "description": {
+              "type": "text"
+            }
+          }
+        }
+      },
+      "dynamic_templates": [
+        {
+          "strings_as_keywords": {
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword"
+            }
+          }
         }
       ]
+
     }
   }
 }
@@ -120,27 +108,11 @@ curl -XPUT $ES"/associations-new" -H 'Content-Type: application/json' -d'
 echo created
 
 
-# curl  -X PUT $ES"/associations-new/_settings" -d'
-# {
-#   "index.mapping.total_fields.limit": 30000
-# }'
-# echo settings
-#
-# curl  -X PUT $ES"/associations-new" -d'
-# {
-#     "settings" : {
-#         "index" : {
-#           "mapping.total_fields.limit": 30000
-#         }
-#     }
-# }
-# '
-# echo created
 
-curl -XPOST  $ES"/_aliases" -H 'Content-Type: application/json' -d'
-{
-    "actions" : [
-        { "add" : { "index" : "associations-new", "alias" : "associations" } }
-    ]
-}'
-echo aliased
+# curl -XPOST  $ES"/_aliases" -H 'Content-Type: application/json' -d'
+# {
+#     "actions" : [
+#         { "add" : { "index" : "associations-new", "alias" : "associations" } }
+#     ]
+# }'
+# echo aliased
