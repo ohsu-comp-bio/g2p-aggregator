@@ -257,7 +257,7 @@ def normalize_feature_association(feature_association):
 
 
 def _test(feature):
-    allele_registry = normalize(feature)
+    allele_registry = normalize(feature)[0]
     if allele_registry and '@id' not in allele_registry:
         print 'FAIL', allele_registry['message']
         print "\t", allele_registry['hgvs_g']
