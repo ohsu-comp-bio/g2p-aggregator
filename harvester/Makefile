@@ -19,11 +19,11 @@ oncokb_all_actionable_variants.tsv:
 
 ## Do bulk download of CGI and set up TSV for ingestion.
 cgi_biomarkers_per_variant.tsv:
-	mkdir cgi_biomarkers_$(CGI_VERSION)
-	cd cgi_biomarkers_$(CGI_VERSION) && \
-	curl -Ok https://www.cancergenomeinterpreter.org/data/cgi_biomarkers_$(CGI_VERSION).zip && \
-	unzip cgi_biomarkers_$(CGI_VERSION).zip
-	cp cgi_biomarkers_$(CGI_VERSION)/cgi_biomarkers_per_variant.tsv .
+	mkdir cgi_biomarkers_latest
+	cd cgi_biomarkers_latest && \
+	curl -Ok https://www.cancergenomeinterpreter.org/data/cgi_biomarkers_latest.zip && \
+	unzip cgi_biomarkers_latest.zip
+	cp cgi_biomarkers_latest/cgi_biomarkers_per_variant.tsv .
 
 ## Create COSMIC lookup table suitable for annotating variants with chrom/start/end/ref/alt
 cosmic_lookup_table.tsv:
