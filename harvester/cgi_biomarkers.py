@@ -116,7 +116,7 @@ def convert(evidence):
 
     gDNA = evidence['gDNA']
     indiv_mut = evidence['individual_mutation']
-    if len(gDNA) != 0 or len(indiv_mut) != 0:
+    if any(gDNA) or any(indiv_mut):
         if not LOOKUP_TABLE:
             LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
                 "./cosmic_lookup_table.tsv")
