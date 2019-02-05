@@ -215,6 +215,17 @@ def _apply_allele_registry(feature, allele_registry, provenance):
             synonyms = synonyms + genomicAllele['hgvs']
             links.append(genomicAllele['referenceSequence'])
 
+    if 'transcriptAlleles' in allele_registry:
+        transcriptAlleles = allele_registry['transcriptAlleles']
+        for transcriptAllele in transcriptAlleles:
+            synonyms = synonyms + transcriptAllele['hgvs']
+            if 'proteinEffect' in transcriptAllele:
+                proteinEffect = transcriptAllele['proteinEffect']
+                if 'hgvs' in proteinEffect:
+                    synonyms.append(proteinEffect['hgvs'])
+                if 'hgvsWellDefined' in proteinEffect:
+                    synonyms.append(proteinEffect['hgvsWellDefined'])
+
     synonyms = list(set(synonyms))
     links = list(set(links))
     if len(synonyms) > 0:
