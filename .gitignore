@@ -27,6 +27,7 @@ data/*.tsv
 data/cgi_biomarkers_per_variant.tsv
 data/cgi_oncogenic_mutations.tsv
 data/oncokb_all_mutations.tsv
+data/proteins/
 harvester/data
 harvester/cosmic_lookup_table.tsv
 harvester/CosmicMutantExport.tsv.gz

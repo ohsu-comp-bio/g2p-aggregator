@@ -31,6 +31,10 @@ cosmic_lookup_table.tsv:
 	(head -n 1 temp.tsv ; tail -n +2 temp.tsv | sort | uniq) > cosmic_lookup_table.tsv
 	rm -f temp.tsv
 
+## Create lookup tables for proteins
+mkdir -p ../data/proteins/
+wget -r -l1 -np -nd "ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/" -P ../data/proteins -A "human.*.protein.faa.gz"
+
 ## Create cgi_mut_benchmarking.tsv file.
 cgi_mut_benchmarking.tsv:
 	grep MUT cgi_biomarkers_20170208.tsv | \
