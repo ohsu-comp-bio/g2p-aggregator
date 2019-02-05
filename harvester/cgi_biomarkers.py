@@ -119,7 +119,7 @@ def convert(evidence):
     if any(gDNA) or any(indiv_mut):
         if not LOOKUP_TABLE:
             LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
-                "./cosmic_lookup_table.tsv")
+                "../data/cosmic_lookup_table.tsv")
         for idx, emut in enumerate(indiv_mut):
             # get genomic locus from COSMIC; if mutation not in COSMIC,
             # get locus info from given gDNA instead
