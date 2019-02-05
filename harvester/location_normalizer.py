@@ -54,6 +54,8 @@ def genomic_hgvs(feature, complement=False, description=False):
     given a feature, create a hgvs genomic representation
     http://varnomen.hgvs.org/bg-material/refseq/#DNAg
     """
+
+    assert feature.get('referenceName') == 'GRCh37'
     ac_map = {
         '1': 'NC_000001.10',
         '2': 'NC_000002.11',
