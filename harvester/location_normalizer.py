@@ -281,6 +281,8 @@ def _test(feature, expected_hgvs_g='', expected_hgvs_p=''):
                 print 'OK', allele_registry['hgvs_g']
         else:
             print 'OK', allele_registry['hgvs_g']
+    elif expected_hgvs_g or expected_hgvs_p:
+        print 'FAIL', 'no response object'
     else:
         print 'OK', 'not normalized'
 
@@ -383,3 +385,43 @@ if __name__ == '__main__':
     _test( {"entrez_id": 1956, "end": None, "name": "R776C", "start": None, "referenceName": "GRCh37", "geneSymbol": "EGFR", "alt": "None", "ref": "None", "chromosome": "None"})
 
     _test({"end": "55242478", "description": "EGFR E746_E749delELRE", "links": ["https://api.molecularmatch.com/v2/mutation/get?name=EGFR+E746_E749delELRE"], "start": "55242467", "biomarker_type": "nonsense", "referenceName": "GRCh37", "alt": "-", "ref": "12", "chromosome": "7", "name": "EGFR E746_E749delELRE"})
+
+    # Testing for AA normalization:
+
+    expected_hgvs_p = "NP_004439.2:p.Ala772_Met775dup"
+    expected_hgvs_g = "NC_000017.10:g.37880985_37880996dup"
+
+    civic_entry = {
+      "provenance_rule": "from_source",
+      "entrez_id": 2064,
+      "end": 37880994,
+      "name": "M774INSAYVM",
+      "sequence_ontology": {
+        "hierarchy": [
+          "SO:0001060",
+          "SO:0001537",
+          "SO:0001878",
+          "SO:0001564",
+          "SO:0001576",
+          "SO:0001791",
+          "SO:0001580",
+          "SO:0001818",
+          "SO:0001650",
+          "SO:0001820"
+        ],
+        "soid": "SO:0001821",
+        "root_name": "sequence_variant",
+        "name": "inframe_insertion",
+        "root_soid": "SO:0001060"
+      },
+      "start": 37880993,
+      "biomarker_type": "Inframe Insertion",
+      "referenceName": "GRCh37",
+      "geneSymbol": "ERBB2",
+      "alt": "GCTTACGTGATG",
+      "ref": "None",
+      "chromosome": "17",
+      "description": "ERBB2 M774INSAYVM"
+    }
+
+    _test(civic_entry, expected_hgvs_g=expected_hgvs_g)
