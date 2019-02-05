@@ -251,8 +251,9 @@ def harvest_and_convert(genes=None, drugs=None):
 
 
 def _test():
-    for feature_association in harvest_and_convert(['KIT']):
-        logging.info(feature_association.keys())
+    logging.basicConfig(filename='cgi_biomarkers_test.log', level=logging.DEBUG)
+    for feature_association in harvest_and_convert(['ERBB2']):
+        logging.info(feature_association['features'])
 
 if __name__ == '__main__':
     _test()
