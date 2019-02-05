@@ -156,13 +156,31 @@ def convert(evidence):
             features.append(feature)
 
     if len(features) == 0:
-        description_parts = re.split(' +|:|__', evidence['Biomarker'].strip())
-        features.append({
-            'description': ' '.join(description_parts),
-            'name': ' '.join(description_parts),
-            'geneSymbol': genes[0],
-            'biomarker_type': mut.norm_biomarker(evidence['Alteration type'], evidence['Biomarker'])
-        })
+        gene, remainder = evidence['Biomarker'].split(' ', 1)
+        idx = 0
+        if 'inframe insertion' in remainder:
+            while True:
+                idx = remainder.find('inframe insertion', idx)
+                if idx == -1:
+                    break
+                start = remainder.find('(', idx) + 1
+                stop = remainder.find(')', idx)
+                idx = stop
+                insertion = remainder[start:stop]
+                features.append({
+                    'description': 'Inframe insertion {}'.format(insertion),
+                    'name': insertion,
+                    'geneSymbol': gene,
+                    'biomarker_type': 'insertion'
+                })
+        else:
+            description_parts = re.split(' +|:|__', evidence['Biomarker'].strip())
+            features.append({
+                'description': ' '.join(description_parts),
+                'name': ' '.join(description_parts),
+                'geneSymbol': genes[0],
+                'biomarker_type': mut.norm_biomarker(evidence['Alteration type'], evidence['Biomarker'])
+            })
 
     association = {}
 
