@@ -9,6 +9,7 @@ import hgvs.posedit
 import hgvs.edit
 from hgvs.sequencevariant import SequenceVariant
 from feature_enricher import enrich
+import protein
 
 
 def _complement(bases):
@@ -35,9 +36,9 @@ def _get_ref_alt(description):
     return None
 
 
-def allele_registry(hgvs):
+def hgvs_query_allele_registry(hgvs):
     """
-    call allele registry with hgvs notation, return allele_registry
+    call allele registry with hgvs notation, return allele registry response and url
     """
     url = 'http://reg.genome.network/allele?hgvs={}' \
         .format(requests.utils.quote(hgvs))
@@ -49,13 +50,13 @@ def allele_registry(hgvs):
     return rsp, url
 
 
-def genomic_hgvs(feature, complement=False, description=False):
+def construct_hgvs(feature, complement=False, description=False):
     """
-    given a feature, create a hgvs genomic representation
+    given a feature, create an hgvs representation
     http://varnomen.hgvs.org/bg-material/refseq/#DNAg
+    http://varnomen.hgvs.org/bg-material/refseq/#proteinp
     """
 
-    assert feature.get('referenceName') == 'GRCh37'
     ac_map = {
         '1': 'NC_000001.10',
         '2': 'NC_000002.11',
@@ -83,42 +84,92 @@ def genomic_hgvs(feature, complement=False, description=False):
         '23': 'NC_000023.10',
         'Y': 'NC_000024.9',
     }
-    ac = ac_map[feature['chromosome']]
 
-    start = None
-    end = None
-    start_i = None
-    end_i = None
-    if 'start' in feature:
-        start_i = int(feature['start'])
-        start = hgvs.location.SimplePosition(
-                base=start_i)
-    if 'end' in feature:
-        end_i = int(feature['end'])
-        end = hgvs.location.SimplePosition(
-              base=end_i)
+    pa = feature.get('protein_allele', False)
 
-    iv = None
+    if pa:
+        start_i = int(feature.get('protein_start', '_-1')[1:])
+        try:
+            end_i = int(feature.get('protein_end', '_-1')[1:])
+        except TypeError:
+            end_i = -1
+    else:
+        start_i = int(feature.get('start', -1))
+        end_i = int(feature.get('end', -1))
+
+    # Make an edit object
+
+    feature_description = feature.get('description', feature.get('name', None))
+
+    if pa:
+        ref = feature.get('protein_ref', None)
+        alt = feature.get('protein_alt', None)
+        var_type = feature['biomarker_type']
+        if var_type == 'ins':
+            edit = hgvs.edit.AARefAlt(alt=alt)
+        else:
+            edit = hgvs.edit.AARefAlt(ref=ref, alt=alt)
+        hgvs_type = 'p'
+        ac = protein.lookup_from_gene(
+            feature['geneSymbol'],
+            ref_start=feature.get('protein_start', None),
+            ref_end=feature.get('protein_end', None)
+        )
+    else:
+        ref = feature.get('ref', None)
+        if ref == '-':
+            ref = None
+        alt = feature.get('alt', None)
+        if alt == '-':
+            alt = None
+
+        if complement:
+            ref = _complement(ref)
+            alt = _complement(alt)
+
+        edit = hgvs.edit.NARefAlt(ref=ref, alt=alt)
+        hgvs_type = 'g'
+        assert feature.get('referenceName') == 'GRCh37'
+        ac = ac_map[feature['chromosome']]
+
+    if pa:
+        if start_i > -1:
+            start = hgvs.location.AAPosition(
+                base=start_i,
+                aa=feature['protein_start'][0]
+            )
+        else:
+            start = None
+        if end_i > -1:
+            end = hgvs.location.AAPosition(
+                base=end_i,
+                aa=feature['protein_end'][0]
+            )
+        elif var_type == 'ins':
+            end = hgvs.location.AAPosition(
+                aa=protein.fasta[ac][start_i],
+                base=start_i + 1
+            )
+        else:
+            end = None
+    else:
+        if start_i > -1:
+            start = hgvs.location.SimplePosition(
+                base=start_i
+            )
+        else:
+            start = None
+        if end_i > -1:
+            end = hgvs.location.SimplePosition(
+                base=end_i
+            )
+        else:
+            end = None
+
     if start_i == end_i:
         iv = hgvs.location.Interval(start=start)
     else:
         iv = hgvs.location.Interval(start=start, end=end)
-
-    # Make an edit object
-    ref = feature.get('ref', None)
-    if ref == '-':
-        ref = None
-    alt = feature.get('alt', None)
-    if alt == '-':
-        alt = None
-
-    if complement:
-        ref = _complement(ref)
-        alt = _complement(alt)
-
-    feature_description = feature.get('description', feature.get('name', None))
-
-    edit = hgvs.edit.NARefAlt(ref=ref, alt=alt)
 
     posedit = hgvs.posedit.PosEdit(pos=iv, edit=edit)
 
@@ -134,7 +185,7 @@ def genomic_hgvs(feature, complement=False, description=False):
                 posedit.edit = ref_alt + alt
 
     # Make the variant
-    var = SequenceVariant(ac=ac, type='g', posedit=posedit)
+    var = SequenceVariant(ac=ac, type=hgvs_type, posedit=posedit)
     # https://www.ncbi.nlm.nih.gov/grc/human/data?asm=GRCh37.p13
     try:
         return str(var)
@@ -154,22 +205,27 @@ def _get_feature_attr(feature, attr):
 
 def normalize(feature):
 
-    ref_assembly = _get_feature_attr(feature, 'referenceName')
-    chr = _get_feature_attr(feature, 'chromosome')
-    ref = _get_feature_attr(feature, 'ref')
-    alt = _get_feature_attr(feature, 'alt')
+    if feature.get('protein_allele', False):
+        start = _get_feature_attr(feature, 'protein_start')
+        if not start:
+            return None, None
+    else:
+        ref_assembly = _get_feature_attr(feature, 'referenceName')
+        chr = _get_feature_attr(feature, 'chromosome')
+        ref = _get_feature_attr(feature, 'ref')
+        alt = _get_feature_attr(feature, 'alt')
 
-    if ref_assembly is None or chr is None:
-        return None, None
+        if ref_assembly is None or chr is None:
+            return None, None
 
-    if ref is None and alt is None:
-        return None, None
+        if ref is None and alt is None:
+            return None, None
 
-    hgvs = genomic_hgvs(feature)
+    hgvs = construct_hgvs(feature)
     allele = None
     provenance = None
     if hgvs:
-        (allele, provenance) = allele_registry(hgvs)
+        (allele, provenance) = hgvs_query_allele_registry(hgvs)
         if ('errorType' in allele and
                 allele['errorType'] == 'IncorrectReferenceAllele'):
             message = allele['message']
@@ -178,8 +234,8 @@ def normalize(feature):
             complement_ref = _complement(feature['ref'])
             if complement_ref == actualAllele:
                 # print 'reverse strand re-try'
-                hgvs = genomic_hgvs(feature, complement=True)
-                (allele, provenance) = allele_registry(hgvs)
+                hgvs = construct_hgvs(feature, complement=True)
+                (allele, provenance) = hgvs_query_allele_registry(hgvs)
             # else:
             #     print 'complement_ref {} m[0] {}'.format(complement_ref,
             #                                              actualAllele)
@@ -187,8 +243,8 @@ def normalize(feature):
         if ('errorType' in allele and
                 allele['errorType'] == 'IncorrectHgvsPosition'):
             # print 'position error re-try'
-            hgvs = genomic_hgvs(feature, description=True)
-            (allele, provenance) = allele_registry(hgvs)
+            hgvs = construct_hgvs(feature, description=True)
+            (allele, provenance) = hgvs_query_allele_registry(hgvs)
 
     return allele, provenance
 
@@ -281,6 +337,8 @@ def normalize_feature_association(feature_association):
 
 
 def _test(feature, expected_hgvs=''):
+    if feature.get('protein_allele', False):
+        feature = enrich(feature, None)[0]
     ar, q = normalize(feature)
     if ar:
         _apply_allele_registry(feature, ar, q)
@@ -294,7 +352,7 @@ def _test(feature, expected_hgvs=''):
             print 'FAIL', 'expected hgvs not found in synonyms'
             print "\t", q
             print "\t", ', '.join(hgvs)
-            print "\t", expected_hgvs_g
+            print "\t", expected_hgvs
         else:
             print 'OK'
     elif expected_hgvs:
@@ -442,3 +500,14 @@ if __name__ == '__main__':
 
     _test(civic_entry, expected_hgvs=expected_hgvs_g)
     _test(civic_entry, expected_hgvs=expected_hgvs_p)
+
+    cgi_entry = {
+        'geneSymbol': 'ERBB2',
+        'biomarker_type': 'ins',
+        'description': 'Inframe insertion A775YVMA',
+        'name': 'A775YVMA',
+        'protein_allele': True
+    }
+
+    _test(cgi_entry, expected_hgvs=expected_hgvs_g)
+    _test(cgi_entry, expected_hgvs=expected_hgvs_p)

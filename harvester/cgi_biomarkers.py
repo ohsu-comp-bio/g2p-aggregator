@@ -171,7 +171,8 @@ def convert(evidence):
                     'description': 'Inframe insertion {}'.format(insertion),
                     'name': insertion,
                     'geneSymbol': gene,
-                    'biomarker_type': 'insertion'
+                    'biomarker_type': 'ins',
+                    'protein_allele': True,
                 })
         else:
             description_parts = re.split(' +|:|__', evidence['Biomarker'].strip())
