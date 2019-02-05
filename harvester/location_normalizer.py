@@ -142,13 +142,27 @@ def genomic_hgvs(feature, complement=False, description=False):
         return None
 
 
+def _get_feature_attr(feature, attr):
+    r = feature.get(attr, None)
+    if not r:
+        r = None
+    elif r.lower().strip() == 'none':
+        r = None
+    feature[attr] = r
+    return r
+
+
 def normalize(feature):
-    if 'referenceName' not in feature or \
-       'chromosome' not in feature or 'ref' not in feature:
-            return None, None
-    if feature['chromosome'] == 'None' or feature['chromosome'] is None:
+
+    ref_assembly = _get_feature_attr(feature, 'referenceName')
+    chr = _get_feature_attr(feature, 'chromosome')
+    ref = _get_feature_attr(feature, 'ref')
+    alt = _get_feature_attr(feature, 'alt')
+
+    if ref_assembly is None or chr is None:
         return None, None
-    if feature['ref'] == 'None' or feature['ref'] is None:
+
+    if ref is None and alt is None:
         return None, None
 
     hgvs = genomic_hgvs(feature)
