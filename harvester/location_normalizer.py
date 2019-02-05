@@ -190,9 +190,6 @@ def normalize(feature):
             hgvs = genomic_hgvs(feature, description=True)
             (allele, provenance) = allele_registry(hgvs)
 
-        if allele:
-            allele['hgvs_g'] = hgvs
-
     return allele, provenance
 
 
@@ -272,32 +269,24 @@ def normalize_feature_association(feature_association):
                                                            allele_registry))
 
 
-def _test(feature, expected_hgvs_g='', expected_hgvs_p=''):
-    allele_registry = normalize(feature)[0]
-    if allele_registry:
-        hgvs_g = allele_registry['hgvs_g']
-        if '@id' not in allele_registry:
-            print 'FAIL', allele_registry['message']
-            print "\t", hgvs_g
+def _test(feature, expected_hgvs=''):
+    ar, q = normalize(feature)
+    if ar:
+        _apply_allele_registry(feature, ar, q)
+        hgvs = feature.get('synonyms', [])
+        if '@id' not in ar:
+            print 'FAIL', ar['message']
+            print "\t", ', '.join(hgvs)
             print "\t", feature
-            print "\t", allele_registry
-        elif expected_hgvs_g and hgvs_g != expected_hgvs_g:
-            print 'FAIL', 'did not match expected hgvs_g'
-            print "\t", hgvs_g
-            print "\t", feature
-            print "\t", allele_registry
-        elif expected_hgvs_p:
-            hgvs_p = allele_registry['hgvs_p']
-            if expected_hgvs_p != hgvs_p:
-                print 'FAIL', 'did not match expected hgvs_g'
-                print "\t", hgvs_p
-                print "\t", feature
-                print "\t", allele_registry
-            else:
-                print 'OK', allele_registry['hgvs_g']
+            print "\t", ar
+        elif expected_hgvs and expected_hgvs not in hgvs:
+            print 'FAIL', 'expected hgvs not found in synonyms'
+            print "\t", q
+            print "\t", ', '.join(hgvs)
+            print "\t", expected_hgvs_g
         else:
-            print 'OK', allele_registry['hgvs_g']
-    elif expected_hgvs_g or expected_hgvs_p:
+            print 'OK'
+    elif expected_hgvs:
         print 'FAIL', 'no response object'
     else:
         print 'OK', 'not normalized'
@@ -440,4 +429,5 @@ if __name__ == '__main__':
       "description": "ERBB2 M774INSAYVM"
     }
 
-    _test(civic_entry, expected_hgvs_g=expected_hgvs_g)
+    _test(civic_entry, expected_hgvs=expected_hgvs_g)
+    _test(civic_entry, expected_hgvs=expected_hgvs_p)
