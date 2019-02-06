@@ -406,6 +406,7 @@ def _test(feature, expected_hgvs=''):
     else:
         print 'OK', 'not normalized'
 
+
 if __name__ == '__main__':
     import yaml
     import logging.config
