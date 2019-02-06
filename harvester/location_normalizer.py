@@ -317,6 +317,10 @@ def _fetch_allele_registry(allele):
     return resp.json()
 
 
+hgvs_g_re = re.compile(r':(g\.\S+)')
+hgvs_p_re = re.compile(r':(p\.\S+)')
+
+
 def _apply_allele_registry(feature, allele_registry, provenance):
     # there is a lot of info in registry, just get synonyms and links
     extract = _collect_metadata(feature, allele_registry)
@@ -335,6 +339,17 @@ def _apply_allele_registry(feature, allele_registry, provenance):
             links.update(extract['links'])
     if len(synonyms) > 0:
         feature['synonyms'] = list(synonyms)
+        hgvs_g = list()
+        hgvs_p = list()
+        for synonym in synonyms:
+            m = hgvs_g_re.search(synonym)
+            if m:
+                hgvs_g.append(str(m.group(1)))
+            m = hgvs_p_re.search(synonym)
+            if m:
+                hgvs_p.append(str(m.group(1)))
+        feature['hgvs_g_suffix'] = hgvs_g
+        feature['hgvs_p_suffix'] = hgvs_p
     if len(links) > 0:
         feature['links'] = list(links)
 
