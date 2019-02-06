@@ -1,5 +1,4 @@
 
-import sys
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from inflection import parameterize, underscore
@@ -125,7 +124,8 @@ def _get_gene_ids():
         url = 'https://ckb.jax.org/ckb-api/api/v1/genes?offset={}&max={}' \
                 .format(offset, size)
         response = AttrDict(
-            requests.get(url, verify=False, timeout=120).json())
+            requests.get(url, verify=False, timeout=120).json()
+        )
         gene_count = gene_count + len(response.genes)
         if gene_count >= response.totalCount:
             offset = -1

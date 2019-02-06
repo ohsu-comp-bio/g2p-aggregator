@@ -1,6 +1,5 @@
 import requests
 import re
-import os
 import gzip
 from pathlib2 import Path
 from Bio import SeqIO
@@ -23,10 +22,9 @@ for f in Path.glob(FASTA_FILE_DIR, '*.faa.gz'):
         fasta.update(_load_fasta_records(fasta_file))
 
 
-gene_proteins = {}
 gene_symbol_to_id = {}
 protein_id_re = re.compile('NP_\d+\.\d+')
-protein_name_re = re.compile(r'(?P<start>[A-Z]?\d+)(?:>-(?P<end>[A-Z]?\d+))?(?P<alt>[A-Z]+)?')
+protein_name_re = re.compile(r'(?P<start>[A-Z]?\d+)(?:-|_(?P<end>[A-Z]?\d+))?(?P<alt_type>ins|del|dup)?(?P<alt>[A-Z]+)?')
 
 
 def parse_components(name_string):
@@ -45,36 +43,33 @@ def lookup_from_gene(gene_symbol, ref_start=None, ref_end=None):
         _id = resp.json()['hits'][0]["_id"]
         gene_symbol_to_id[gene_symbol] = _id
 
-    if _id in gene_proteins:
-        proteins = gene_proteins[_id]
-    else:
-        resp = requests.get(
-            "https://www.ncbi.nlm.nih.gov/gene/{}?report=gene_table&format=text".format(_id)
-        )
-        resp.raise_for_status()
-        proteins = list()
-        for protein_match in protein_id_re.finditer(resp.text):
-            protein = str(protein_match.group())
-            if protein not in proteins:
-                proteins.append(protein)
-        p_set = set(proteins)
-        for known in [ref_start, ref_end]:
-            if known is None:
+    resp = requests.get(
+        "https://www.ncbi.nlm.nih.gov/gene/{}?report=gene_table&format=text".format(_id)
+    )
+    resp.raise_for_status()
+    proteins = list()
+    for protein_match in protein_id_re.finditer(resp.text):
+        protein = str(protein_match.group())
+        if protein not in proteins:
+            proteins.append(protein)
+    p_set = set(proteins)
+    for known in [ref_start, ref_end]:
+        if known is None:
+            continue
+        aa = known[0]
+        pos = int(known[1:])
+        keep = set()
+        for p in p_set:
+            try:
+                ref_aa = fasta[p][pos-1]
+            except IndexError:
                 continue
-            aa = known[0]
-            pos = int(known[1:])
-            keep = set()
-            for p in p_set:
-                try:
-                    ref_aa = fasta[p][pos-1]
-                except IndexError:
-                    continue
-                if ref_aa == aa:
-                    keep.add(p)
-            p_set = keep & p_set
-        for p in proteins:
-            if p in p_set:
-                return p
+            if ref_aa == aa:
+                keep.add(p)
+        p_set = keep & p_set
+    for p in proteins:
+        if p in p_set:
+            return p
     assert False
 
 
@@ -87,6 +82,7 @@ def _test_parse(name_string, **kwargs):
     components = parse_components(name_string)
     for k, v in kwargs.items():
         assert components[k] == v
+
 
 if __name__ == '__main__':
     _test_lookup('ERBB2', 'NP_001276865.1')

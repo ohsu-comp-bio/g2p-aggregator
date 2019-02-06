@@ -5,6 +5,7 @@ import os
 import evidence_label as el
 import evidence_direction as ed
 import logging
+import protein
 import mutation_type as mut
 from warnings import warn
 
@@ -126,11 +127,11 @@ def convert(evidence):
     for tag in tags:
         if tag['facet'] == 'GENE' and tag['priority'] == 1:
             gene = tag['term']
-        if tag['facet'] == 'CONDITION':
+        elif tag['facet'] == 'CONDITION':
             condition.append({ 'description': tag['term'] })
-        if tag['facet'] == 'MUTATION' and tag['priority'] == 1:
+        elif tag['facet'] == 'MUTATION' and tag['priority'] == 1:
             mutation = tag['term']
-        if tag['facet'] == 'PHRASE' and 'ISOFORM EXPRESSION' in tag['term']:
+        elif tag['facet'] == 'PHRASE' and 'ISOFORM EXPRESSION' in tag['term']:
             mutation = tag['term']
 
     if not gene:
@@ -154,9 +155,16 @@ def convert(evidence):
             wgsaData['locations'] = locations
 
         feature['geneSymbol'] = gene
-        feature['name'] = mutation
-        feature['description'] = '{} {}'.format(gene, mutation)
-
+        s = mutation_evidence.get('name', mutation)
+        if gene and s.startswith(gene) and ' ' in s:
+            s = s.split(' ', 1)[1]
+        feature['name'] = s
+        if protein.protein_name_re.match(s):
+            feature['protein_allele'] = True
+        if gene:
+            feature['description'] = ' '.join([gene, s])
+        else:
+            feature['description'] = s
 
         # Add variant-level information.
         # TODO: only looks at first location, not all locations.
@@ -175,20 +183,19 @@ def convert(evidence):
             if 'stop' in grch37_mutation and grch37_mutation['stop']:
                 feature['end'] = int(grch37_mutation['stop'])
 
-        biomarker_types = []
         if 'mutation_type' in mutation_evidence:
+            biomarker_type = None
             for mutation_type in mutation_evidence['mutation_type']:
                 if 'Fusion' in mutation_type:
-                    biomarker_types.append('fusion')
+                    biomarker_type = 'fusion'
                 elif ('Insertion' in mutation_type or 'Deletion' in mutation_type) and len(feature.get('ref', '')) < len(feature.get('alt', '')):  # NOQA
-                    biomarker_types.append('insertion')
+                    biomarker_type = 'ins'
                 elif ('Insertion' in mutation_type or 'Deletion' in mutation_type) and len(feature.get('alt', '')) < len(feature.get('ref', '')):  # NOQA
-                    biomarker_types.append('deletion')
+                    biomarker_type = 'del'
                 else:
-                    biomarker_types.append(mutation_type)
-            biomarker_types = list(set(biomarker_types))
-            if len(biomarker_types) != 0:
-                feature['biomarker_type'] = ','.join(biomarker_types)
+                    continue
+                break
+            feature['biomarker_type'] = biomarker_type
         features.append(feature)
 
     # if len(mutations['mutation_type']) == 1:
@@ -208,7 +215,7 @@ def convert(evidence):
         drug_names.append(tc['name'])
     drug_label = '+'.join(drug_names)
 
-    association = {}
+    association = dict()
     association['description'] = narrative
     association['variant_name'] = []
     for v in evidence['variantInfo']:
@@ -287,7 +294,7 @@ def harvest(genes=None):
         yield evidence
 
 
-def harvest_and_convert(genes):
+def harvest_and_convert(genes=None):
     """ get data from mm, convert it to ga4gh and return via yield """
     for evidence in harvest(genes):
         # print "harvester_yield {}".format(evidence.keys())
@@ -323,19 +330,17 @@ def _parse(mutation):
     return genes, tuples
 
 
-def _test():
+def _test_harvest_and_convert_all():
+    logging.basicConfig(filename='molecularmatch_test.log', level=logging.DEBUG)
     # gene_ids = ["CCND1", "CDKN2A", "CHEK1", "DDR2", "FGF19", "FGF3",
     #  "FGF4", "FGFR1", "MDM4", "PALB2", "RAD51D"]
-    gene_ids = None
-    for feature_association in harvest_and_convert(gene_ids):
-        print feature_association.keys()
-        print json.dumps(feature_association, indent=2)
-        break
+    for feature_association in harvest_and_convert():
+        logging.info(json.dumps(feature_association, indent=2))
 
-    # for evidence in harvest(gene_ids):
-    #     #print evidence['narrative']
-    #     print json.dumps(evidence, indent=2)
-    #     break
+
+def _test_convert(evidence, expected_result):
+    result = convert(evidence)
+    assert result == expected_result
 
 if __name__ == '__main__':
-    _test()
+    _test_harvest_and_convert_all()

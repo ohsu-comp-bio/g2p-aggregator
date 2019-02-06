@@ -136,6 +136,8 @@ def enrich(feature, feature_association):
         for component in ['alt', 'start', 'end']:
             if not feature.get('protein_{}'.format(component), False):
                 feature['protein_{}'.format(component)] = components[component]
+        if components.get('alt_type', False):
+            feature['biomarker_type'] = components['alt_type']
         return enriched_features
 
     # rules for other features

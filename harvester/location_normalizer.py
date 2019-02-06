@@ -559,9 +559,25 @@ if __name__ == '__main__':
     _test(cgi_entry, expected_hgvs=expected_hgvs_g)
     _test(cgi_entry, expected_hgvs=expected_hgvs_p)
 
-    jax_entry = {
-        # TODO: Identify JAX entry
-    }
+    # jax_entry = {
+    #     # TODO: Identify JAX entry
+    # }
+    #
+    # _test(jax_entry, expected_hgvs=expected_hgvs_g)
+    # _test(jax_entry, expected_hgvs=expected_hgvs_p)
 
-    _test(jax_entry, expected_hgvs=expected_hgvs_g)
-    _test(jax_entry, expected_hgvs=expected_hgvs_p)
+    mm_entry = {
+      "protein_allele": True,
+      "end": 37880997,
+      "description": "ERBB2 A775_G776insYVMA",
+      "start": 37880996,
+      "biomarker_type": "ins",
+      "referenceName": "GRCh37",
+      "geneSymbol": "ERBB2",
+      "alt": "TATGTAATGGCA",
+      "ref": "-",
+      "chromosome": "17",
+      "name": "A775_G776insYVMA"
+    }
+    _test(mm_entry, expected_hgvs=expected_hgvs_g)
+    _test(mm_entry, expected_hgvs=expected_hgvs_p)
