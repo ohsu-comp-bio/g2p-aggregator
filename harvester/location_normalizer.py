@@ -1,7 +1,7 @@
 import requests
 import re
 import logging
-import json
+from xml.etree import ElementTree
 import copy
 
 import hgvs.location
@@ -249,21 +249,42 @@ def normalize(feature):
     return allele, provenance
 
 
-def _apply_allele_registry(feature, allele_registry, provenance):
-    # there is a lot of info in registry, just get synonyms and links
+def _get_clingen_xrefs(clinvar_alleles):
+    url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&term={}[alleleid]'.format(
+        ','.join(clinvar_alleles)
+    )
+    resp = requests.get(url)
+    resp.raise_for_status()
+    tree = ElementTree.fromstring(resp.content)
+    variant_ids = [x.text for x in tree.find('IdList')]
+    clingen_alleles = set()
+    for variant_id in variant_ids:
+        url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=clinvar&id={}&rettype=variation'.format(variant_id)
+        resp = requests.get(url)
+        resp.raise_for_status()
+        tree = ElementTree.fromstring(resp.content)
+        xreflist = tree.find('VariationReport').find('Allele').find('XRefList')
+        clingen_alleles.update(
+            set([x.get('ID') for x in xreflist if x.get('DB') == 'ClinGen'])
+        )
+    return clingen_alleles
+
+
+def _collect_metadata(feature, allele_registry):
     links = feature.get('links', [])
     synonyms = feature.get('synonyms', [])
+    clinvar_alleles = set()
     links.append(allele_registry['@id'])
     if 'externalRecords' in allele_registry:
         externalRecords = allele_registry['externalRecords']
-        links = links + [externalRecords[r][0].get('@id')
-                         for r in externalRecords
-                         if '@id' in externalRecords[r][0]
-                         ]
-        synonyms = synonyms + [externalRecords[r][0].get('id')
-                               for r in externalRecords
-                               if 'id' in externalRecords[r][0]
-                               ]
+        for source, eRecord in externalRecords.items():
+            for r in eRecord:
+                if '@id' in r:
+                    links.append(r['@id'])
+                if 'id' in r:
+                    synonyms.append(r['id'])
+                if source == 'ClinVarAlleles':
+                    clinvar_alleles.add(str(r['alleleId']))
 
     if 'genomicAlleles' in allele_registry:
         genomicAlleles = allele_registry['genomicAlleles']
@@ -282,15 +303,40 @@ def _apply_allele_registry(feature, allele_registry, provenance):
                 if 'hgvsWellDefined' in proteinEffect:
                     synonyms.append(proteinEffect['hgvsWellDefined'])
 
-    synonyms = list(set(synonyms))
-    links = list(set(links))
-    if len(synonyms) > 0:
-        feature['synonyms'] = synonyms
-    if len(links) > 0:
-        feature['links'] = links
+    return {
+        'links': links,
+        'synonyms': synonyms,
+        'clinvar_alleles': clinvar_alleles
+    }
+
+
+def _fetch_allele_registry(allele):
+    url = 'http://reg.genome.network/allele/{}'.format(allele)
+    resp = requests.get(url)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def _apply_allele_registry(feature, allele_registry, provenance):
+    # there is a lot of info in registry, just get synonyms and links
+    extract = _collect_metadata(feature, allele_registry)
+    synonyms = set(extract['synonyms'])
+    links = set(extract['links'])
     if 'provenance' not in feature:
         feature['provenance'] = []
     feature['provenance'].append(provenance)
+    pa = feature.get('protein_allele', False)
+    if pa:
+        clingen_alleles = _get_clingen_xrefs(extract['clinvar_alleles'])
+        for allele in clingen_alleles:
+            allele_registry = _fetch_allele_registry(allele)
+            extract = _collect_metadata(feature, allele_registry)
+            synonyms.update(extract['synonyms'])
+            links.update(extract['links'])
+    if len(synonyms) > 0:
+        feature['synonyms'] = list(synonyms)
+    if len(links) > 0:
+        feature['links'] = list(links)
 
 
 def _fix_location_end(feature):
