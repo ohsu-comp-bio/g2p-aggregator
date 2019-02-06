@@ -558,3 +558,10 @@ if __name__ == '__main__':
 
     _test(cgi_entry, expected_hgvs=expected_hgvs_g)
     _test(cgi_entry, expected_hgvs=expected_hgvs_p)
+
+    jax_entry = {
+        # TODO: Identify JAX entry
+    }
+
+    _test(jax_entry, expected_hgvs=expected_hgvs_g)
+    _test(jax_entry, expected_hgvs=expected_hgvs_p)
