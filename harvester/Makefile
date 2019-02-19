@@ -9,8 +9,8 @@ CGI_VERSION=20170208
 
 all: oncokb_all_actionable_variants.tsv cgi_biomarkers_per_variant.tsv \
 		cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv \
-		benchmark_results.txt
-	
+		benchmark_results.txt \
+		proteins
 
 ## Do bulk download of OncoKB and set up TSV for ingestion.
 oncokb_all_actionable_variants.tsv:
@@ -32,8 +32,9 @@ cosmic_lookup_table.tsv:
 	rm -f temp.tsv
 
 ## Create lookup tables for proteins
-mkdir -p ../data/proteins/
-wget -r -l1 -np -nd "ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/" -P ../data/proteins -A "human.*.protein.faa.gz"
+proteins:
+	mkdir -p ../data/proteins/
+	wget -r -l1 -np -nd "ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/" -P ../data/proteins -A "human.*.protein.faa.gz"
 
 ## Create cgi_mut_benchmarking.tsv file.
 cgi_mut_benchmarking.tsv:
