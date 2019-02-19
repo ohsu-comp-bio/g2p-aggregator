@@ -3,6 +3,7 @@ import urllib
 import logging
 import re
 import os
+import json
 
 
 NOFINDS = []
@@ -42,7 +43,8 @@ def normalize_bioontology(name):
             (ontology, id) = id.split('_')
         term = {'ontology_term': '{}:{}'.format(ontology, id),
                 'label': name,
-                'source': ontology}
+                'source': ontology,
+                'provenance': url}
         terms.append(term)
         family = get_family(term['ontology_term'])
         if family:
@@ -58,7 +60,7 @@ def normalize_ebi(name):
         # logging.info('{} in disease_normalizer.NOFINDS'.format(name))
         return []
     name = urllib.quote_plus(name)
-    url = 'https://www.ebi.ac.uk/ols/api/search?q={}&groupField=iri&exact=on&start=0&ontology=doid'.format(name)  # NOQA
+    url = 'https://www.ebi.ac.uk/ols/api/search?q={}&groupField=iri&exact=on&start=0&ontology=mondo'.format(name)  # NOQA
     # .response
     """
     {
@@ -97,15 +99,17 @@ def normalize_ebi(name):
         NOFINDS.append(name)
         return []
     doc = response['docs'][0]
-    # check whether returned info is actually DOID or some other response
-    # since we only want DOID entries
-    if doc['obo_id'][:2] != 'DO':
-        logging.info('{} in disease_normalizer.NOFINDS'.format(name))
-        NOFINDS.append(name)
-        return []
+    # # check whether returned info is actually DOID or some other response
+    # # since we only want DOID entries
+    # if doc['obo_id'][:2] != 'DO':
+    #     logging.info('{} in disease_normalizer.NOFINDS'.format(name))
+    #     NOFINDS.append(name)
+    #     return []
     term = {'ontology_term': doc['obo_id'].encode('utf8'),
             'label': doc['label'].encode('utf8'),
-            'source': doc['iri'].encode('utf8')}
+            'source': doc['iri'].encode('utf8'),
+            'provenance': url
+            }
     family = get_family(doc['obo_id'])
     if family:
         term['family'] = family
@@ -123,18 +127,21 @@ def get_family(ontology_id):
             if not r.status_code == 500:
                 rsp = r.json()
                 return get_hierarchy_family(get_hierarchy(rsp[0], []))['text']
+
         (ontology, k) = ontology_id.split(':')
-        if not (ontology == 'SNOMEDCT' or
-                ontology == 'DOID' or
-                ontology == 'RCD' or
-                ontology == 'OMIM'):
+        if ontology not in ['SNOMEDCT', 'DOID', 'RCD', 'MESH',
+                            'OMIM', 'MEDDRA', 'MEDLINEPLUS', 'RCD']:
             k = ontology_id
         url = 'http://data.bioontology.org/ontologies/{}/classes/{}/ancestors?apikey={}'.format(ontology, k, API_KEY)  # NOQA
         r = requests.get(url, timeout=20)
         if r.status_code == 200:
             classes = r.json()
             if len(classes) > 0:
-                return r.json()[0]['prefLabel']
+                for clazz in classes:
+                    if '_' not in clazz['prefLabel']:
+                        if re.match('^C.[0-9]*', clazz['prefLabel']):
+                            continue
+                        return clazz['prefLabel']
         return None
     except Exception as e:
         logging.exception(e)
@@ -171,6 +178,7 @@ def normalize(name):
         pass
     try:
         diseases = []
+        original_name = name
         name = project_lookup(name)
         if name:
             # find in ebi
@@ -190,7 +198,8 @@ def normalize(name):
                     diseases = diseases + normalized_diseases
             if len(diseases) == 0:
                 diseases = normalize_bioontology(name)
-
+        for disease in diseases:
+            disease['original_name'] = original_name
         return diseases
     except Exception as e:
         logging.warning("Could not normalize {}".format(name))
@@ -198,7 +207,7 @@ def normalize(name):
         return []
 
 
-def normalize_multi(phenotypes):
+def normalize_multi(phenotypes, source):
     diseases = []
     for pheno in phenotypes:
         disease = normalize(pheno['description'])
@@ -212,6 +221,15 @@ def normalize_multi(phenotypes):
             if 'family' in disease[0]:
                 phenotype['family'] = disease[0]['family']
             diseases.append(phenotype)
+            log_msg = {
+                'lable': 'DISEASE_PROVENANCE',
+                'source': source,
+                'mapped_name': pheno['description'],
+                'original_name': disease[0]['original_name'],
+                'phenotype': phenotype,
+                'provenance': disease[0]['provenance'],
+            }
+            logging.warning(json.dumps(log_msg, separators=(',', ':')))
     return diseases
 
 
@@ -222,7 +240,8 @@ def normalize_feature_association(feature_association):
     association = feature_association['association']
     if 'phenotypes' not in association:
         return
-    diseases = normalize_multi(association['phenotypes'])
+    diseases = normalize_multi(association['phenotypes'],
+                               feature_association['source'])
     if len(diseases) == 0:
         feature_association['dev_tags'].append('no-doid')
         for i in range(len(association['phenotypes'])):
