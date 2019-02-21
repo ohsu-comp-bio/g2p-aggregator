@@ -13,7 +13,7 @@ def _to_stdout(index='association'):
     client = Elasticsearch(HOST)
     # validate connection
     assert(client.info()['version'])
-    s = Search(using=client, index="associations").params(size=1000)
+    s = Search(using=client, index=index).params(size=1000)
     for hit in s.scan():
         _de_stringify(hit)
         print json.dumps(hit.to_dict(), separators=(',', ':'))
@@ -36,4 +36,4 @@ if __name__ == '__main__':
                            help='index to write to stdout',
                            )
     args = argparser.parse_args()
-    _to_stdout(args.index)
+    _to_stdout(index=args.index)

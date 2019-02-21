@@ -13,6 +13,22 @@ FIX_COUNTERS = {'feature_end': {},
                 'genes': {},
                 }
 
+def _calculated_fields(hit):
+    """ add scripted fields """
+    if 'drug_labels' in hit['association']:
+        hit["association"]["drug_labels_truncated"] = '{:10.10}'.format(hit['association']['drug_labels'])
+        hit["drugs"] = hit['association']['drug_labels']
+    if 'phenotypes' in hit['association']:
+        hit["diseases"] = ','.join([p.get('term','') for p in hit['association']['phenotypes']])
+        hit["association"]["disease_labels_truncated"] = ','.join([p['description'] for p in hit['association']['phenotypes']])
+    publications = []
+    for e in hit['association']['evidence']:
+        if e and 'info' in e and e['info']:
+            for p in e.get('info', {}).get('publications', []):
+                publications.append(p)
+    hit["publications"] = ','.join(publications)
+    hit["evidence_label"] = hit['association']['evidence_label']
+    return hit
 
 def _stdin_actions(args):
     """ create a index record from std in """
@@ -23,8 +39,9 @@ def _stdin_actions(args):
             hit = json.loads(line)
             # hit = _fix_features(hit)
             # hit = _fix_genes(hit)
-            # hit = _stringify(hit)
-            hit = _del_source(hit)
+            hit = _stringify(hit)
+            # hit = _del_source(hit)
+            hit = _calculated_fields(hit)
             yield {
                 '_index': args.index,
                 '_op_type': 'index',
