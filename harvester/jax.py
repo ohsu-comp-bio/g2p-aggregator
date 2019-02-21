@@ -1,5 +1,6 @@
 
 import requests
+import requests_cache
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from inflection import parameterize, underscore
 import json
@@ -121,11 +122,12 @@ def _get_gene_ids():
     size = 100
     gene_count = 0
     while offset > -1:
-        url = 'https://ckb.jax.org/ckb-api/api/v1/genes?offset={}&max={}' \
+        url = 'https://ckb.jax.org/ckb-app/api/v1/genes?offset={}&max={}' \
                 .format(offset, size)
-        response = AttrDict(
-            requests.get(url, verify=False, timeout=120).json()
-        )
+        with requests_cache.disabled():
+            response = AttrDict(
+                requests.get(url, verify=False, timeout=120).json()
+            )
         gene_count = gene_count + len(response.genes)
         if gene_count >= response.totalCount:
             offset = -1
@@ -142,9 +144,10 @@ def get_evidence(genes):
     #     "approvalStatus": "Clinical Study",
     #     "evidenceType": "Actionable",
     for gene in genes:
-        url = 'https://ckb.jax.org/ckb-api/api/v1/genes/{}/evidence' \
+        url = 'https://ckb.jax.org/ckb-app/api/v1/genes/{}/evidence' \
                 .format(gene.id)
-        response = requests.get(url, verify=False, timeout=120).json()
+        with requests_cache.disabled():
+            response = requests.get(url, verify=False, timeout=120).json()
         for evidence in response:
             yield AttrDict({'gene': gene.geneSymbol,
                             'jax_id': gene.id,

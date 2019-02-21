@@ -6,13 +6,15 @@ import evidence_label as el
 import evidence_direction as ed
 import sys
 import logging
+import requests_cache
 
 
 def harvest(genes):
     """ given an array of gene symbols, harvest them from civic"""
     # harvest all genes
     if not genes:
-        r = requests.get('https://civic.genome.wustl.edu/api/genes?count=99999')  # NOQA
+        with requests_cache.disabled():
+            r = requests.get('https://civic.genome.wustl.edu/api/genes?count=99999')  # NOQA
         for record in r.json()['records']:
             variants = record['variants']
             gene = record['name']
@@ -56,7 +58,7 @@ def convert(gene_data):
             feature['alt'] = str(variant['coordinates']['variant_bases'])
             feature['name'] = variant['name']
             feature['description'] = '{} {}'.format(variant['entrez_name'],
-                                                   variant['name'])
+                                                   variant['name'].encode('utf8'))
             if (
                 'variant_types' in variant and
                 len(variant['variant_types']) > 0

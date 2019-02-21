@@ -88,7 +88,7 @@ def evidence_label(evidence, association, na=False):
 
     for item in ev_lab:
         for opt in ev_lab[item]:
-            if opt == evidence.lower():
+            if evidence and opt == evidence.lower():
                 association['evidence_label'] = item
                 association['evidence_level'] = ev_lev[item]
                 break

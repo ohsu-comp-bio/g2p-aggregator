@@ -5,6 +5,7 @@ from os.path import exists
 import pandas as pd
 import json
 import requests
+import requests_cache
 import json
 from urllib import urlencode, quote_plus
 
@@ -28,14 +29,15 @@ biov = Path('../data/oncokb_allAnnotatedVariants.txt')
 
 def harvest(genes):
     i = 0
-    r = requests.get('http://oncokb.org/api/v1/levels')
-    levels = r.json()
-    if not genes:
-        r = requests.get('http://oncokb.org/api/v1/genes')
-        all_genes = r.json()
-        genes = []
-        for gene in all_genes:
-            genes.append(gene['hugoSymbol'])
+    with requests_cache.disabled():
+        r = requests.get('http://oncokb.org/api/v1/levels')
+        levels = r.json()
+        if not genes:
+            r = requests.get('http://oncokb.org/api/v1/genes')
+            all_genes = r.json()
+            genes = []
+            for gene in all_genes:
+                genes.append(gene['hugoSymbol'])
 
     # get all variants
     print 'gathering all OncoKB variants'

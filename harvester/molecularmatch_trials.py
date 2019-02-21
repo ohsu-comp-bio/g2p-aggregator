@@ -1,5 +1,6 @@
 
 import requests
+import requests_cache
 import json
 import os
 import evidence_label as el
@@ -50,8 +51,9 @@ def get_evidence(gene_ids=None):
         try:
             # time.sleep(2)  # rate limit
             logging.info('%s %s', url, json.dumps(payload))
-            r = requests.post(url, data=payload, timeout=120)
-            assertions = r.json()
+            with requests_cache.disabled():
+                r = requests.post(url, data=payload, timeout=120)
+                assertions = r.json()
             if 'page' not in assertions:
                 logging.info(assertions)
             logging.info(

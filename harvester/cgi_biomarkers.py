@@ -156,7 +156,11 @@ def convert(evidence):
             features.append(feature)
 
     if len(features) == 0:
-        gene, remainder = evidence['Biomarker'].split(' ', 1)
+        a = evidence['Biomarker'].split(' ', 1)
+        gene = a[0]
+        remainder = ''
+        if len(a) > 1:
+            remainder = a[1]
         idx = 0
         if 'inframe insertion' in remainder:
             while True:

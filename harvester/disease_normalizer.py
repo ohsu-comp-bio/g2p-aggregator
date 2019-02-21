@@ -229,7 +229,7 @@ def normalize_multi(phenotypes, source):
                 'phenotype': phenotype,
                 'provenance': disease[0]['provenance'],
             }
-            logging.warning(json.dumps(log_msg, separators=(',', ':')))
+            # logging.warning(json.dumps(log_msg, separators=(',', ':')))
     return diseases
 
 

@@ -1,5 +1,6 @@
 
 import requests
+import requests_cache
 import json
 import os
 import evidence_label as el
@@ -49,8 +50,9 @@ def get_evidence():
         }
         try:
             logging.info('%s %s', url, json.dumps(payload))
-            r = requests.post(url, data=payload)
-            assertions = r.json()
+            with requests_cache.disabled():
+                r = requests.post(url, data=payload)
+                assertions = r.json()
             if assertions['total'] == 0:
                 start = -1
                 continue

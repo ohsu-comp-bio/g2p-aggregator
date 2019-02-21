@@ -4,6 +4,7 @@ import re
 from lxml import html
 from lxml import etree
 import requests
+import requests_cache
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from inflection import parameterize, underscore
 import json
@@ -119,8 +120,9 @@ def _get_trials_ids():
     """gets json for list of all trials yield"""
     offset = 0
     while True:
-        url = 'https://ckb.jax.org/ckb-api/api/v1/clinicalTrials?offset={}&max=100'.format(offset)  # NOQA
-        page = requests.get(url, verify=False)
+        url = 'https://ckb.jax.org/ckb-app/api/v1/clinicalTrials?offset={}&max=100'.format(offset)  # NOQA
+        with requests_cache.disabled():
+            page = requests.get(url, verify=False)
         trials_ids = []
         payload = page.json()
         logging.info('totalCount:{} offset:{}'.format(
@@ -137,8 +139,9 @@ def get_evidence(trial_infos):
     """ scrape api """
     gene_evidence = []
     for trial_info in trial_infos:
-        url = 'https://ckb.jax.org/ckb-api/api/v1/clinicalTrials/{}'.format(trial_info['id'])  # NOQA
-        page = requests.get(url, verify=False)
+        url = 'https://ckb.jax.org/ckb-app/api/v1/clinicalTrials/{}'.format(trial_info['id'])  # NOQA
+        with requests_cache.disabled():
+            page = requests.get(url, verify=False)
         clinicalTrial = page.json()
         if clinicalTrial['variantRequirements'] == 'no' or len(clinicalTrial['variantRequirementDetails']) == 0:  # NOQA
             logging.info('no variants, skipping {}'.format(trial_info['id']))
@@ -211,7 +214,7 @@ def convert(jax_evidence):
             'description': therapy['therapyName']})
     association['phenotypes'] = []
     for indication in evidence['indications']:
-        s = { 'description' : indication['name'], 
+        s = { 'description' : indication['name'],
               'id' : '{}:{}'.format(indication['source'], indication['id']) }
         association['phenotypes'].append(s)
 
