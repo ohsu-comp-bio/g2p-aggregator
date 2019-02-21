@@ -20,7 +20,6 @@ services:
     environment:
       - http.host=0.0.0.0
       - transport.host=127.0.0.1
-      - xpack.security.enabled=false
       - path.repo=/util/elastic/backups
       - http.cors.enabled=true
       - http.cors.allow-origin=*
@@ -38,9 +37,5 @@ services:
       - "${KIBANA_PORT}:${KIBANA_PORT}"
     links:
       - elastic:elasticsearch
-    environment:
-      - xpack.security.enabled=false
-      - XPACK_MONITORING_REPORT_STATS=false
-      # - SERVER_BASEPATH=/kibana  # set in nginx-proxy
 
 # see docker-compose-nginx.yml for nginx proxy
