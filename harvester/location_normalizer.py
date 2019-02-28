@@ -10,6 +10,11 @@ import hgvs.edit
 from hgvs.sequencevariant import SequenceVariant
 from feature_enricher import enrich
 import protein
+from Bio.SeqUtils import seq1
+import hgvs.parser
+
+# expensive resource, create only once
+HGVS_PARSER = hgvs.parser.Parser()
 
 
 def _complement(bases):
@@ -319,10 +324,6 @@ def _fetch_allele_registry(allele):
     return resp.json()
 
 
-hgvs_g_re = re.compile(r':(g\.\S+)')
-hgvs_p_re = re.compile(r':(p\.\S+)')
-
-
 def _apply_allele_registry(feature, allele_registry, provenance):
     # there is a lot of info in registry, just get synonyms and links
     extract = _collect_metadata(feature, allele_registry)
@@ -339,19 +340,27 @@ def _apply_allele_registry(feature, allele_registry, provenance):
             extract = _collect_metadata(feature, allele_registry)
             synonyms.update(extract['synonyms'])
             links.update(extract['links'])
+
     if len(synonyms) > 0:
         feature['synonyms'] = list(synonyms)
-        hgvs_g = list()
-        hgvs_p = list()
-        for synonym in synonyms:
-            m = hgvs_g_re.search(synonym)
-            if m:
-                hgvs_g.append(str(m.group(1)))
-            m = hgvs_p_re.search(synonym)
-            if m:
-                hgvs_p.append(str(m.group(1)))
-        feature['hgvs_g_suffix'] = hgvs_g
-        feature['hgvs_p_suffix'] = hgvs_p
+        hgvs_g = set()
+        hgvs_p = set()
+        for synonym in feature.get('synonyms', []):
+            if not ('g.' in synonym or 'p.' in synonym):
+                continue
+            try:
+                hgvs_variant = HGVS_PARSER.parse_hgvs_variant(synonym)
+            except Exception as e:
+                print(str(e))
+                continue
+            if hgvs_variant.type == 'p':
+                hgvs_p.add(hgvs_variant.format().split(':')[1])
+                hgvs_p.add(hgvs_variant.format(conf={"p_3_letter": False}).split(':')[1])
+            if hgvs_variant.type == 'g':
+                hgvs_g.add(hgvs_variant.format().split(':')[1])
+        feature['hgvs_g_suffix'] = list(hgvs_g)
+        feature['hgvs_p_suffix'] = list(hgvs_p)
+
     if len(links) > 0:
         feature['links'] = list(links)
 

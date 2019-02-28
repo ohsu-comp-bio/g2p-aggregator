@@ -3,6 +3,8 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from elasticsearch.helpers import bulk
 
+import hgvs.parser
+
 import json
 import os
 import argparse
@@ -12,6 +14,10 @@ FIX_COUNTERS = {'feature_end': {},
                 'feature_start': {},
                 'genes': {},
                 }
+
+# expensive resource, create only once
+HGVS_PARSER = hgvs.parser.Parser()
+
 
 def _calculated_fields(hit):
     """ add scripted fields """
@@ -28,6 +34,29 @@ def _calculated_fields(hit):
                 publications.append(p)
     hit["publications"] = ','.join(publications)
     hit["evidence_label"] = hit['association']['evidence_label']
+    hit["response"] = hit['association'].get('response_type', None)
+    return hit
+
+def _feature_suffixes(hit):
+    """ add scripted feature suffixes """
+    for feature in hit['features']:
+        hgvs_g = set()
+        hgvs_p = set()
+        for synonym in feature.get('synonyms', []):
+            if not ('g.' in synonym or 'p.' in synonym):
+                continue
+            try:
+                hgvs_variant = HGVS_PARSER.parse_hgvs_variant(synonym)
+            except Exception as e:
+                print(str(e))
+                continue
+            if hgvs_variant.type == 'p':
+                hgvs_p.add(hgvs_variant.format().split(':')[1])
+                hgvs_p.add(hgvs_variant.format(conf={"p_3_letter": False}).split(':')[1])
+            if hgvs_variant.type == 'g':
+                hgvs_g.add(hgvs_variant.format().split(':')[1])
+        feature['hgvs_g_suffix'] = list(hgvs_g)
+        feature['hgvs_p_suffix'] = list(hgvs_p)
     return hit
 
 def _stdin_actions(args):
@@ -42,6 +71,7 @@ def _stdin_actions(args):
             hit = _stringify(hit)
             # hit = _del_source(hit)
             hit = _calculated_fields(hit)
+            hit = _feature_suffixes(hit)
             yield {
                 '_index': args.index,
                 '_op_type': 'index',
