@@ -55,7 +55,7 @@ def hgvs_query_allele_registry(hgvs):
     return rsp, url
 
 
-def construct_hgvs(feature, complement=False, description=False):
+def construct_hgvs(feature, complement=False, description=False, exclude={}):
     """
     given a feature, create an hgvs representation
     http://varnomen.hgvs.org/bg-material/refseq/#DNAg
@@ -109,7 +109,7 @@ def construct_hgvs(feature, complement=False, description=False):
     if pa:
         ref = feature.get('protein_ref', None)
         alt = feature.get('protein_alt', None)
-        var_type = feature['biomarker_type']
+        var_type = feature['biomarker_type'].lower()
         if var_type == 'ins':
             edit = hgvs.edit.AARefAlt(alt=alt)
         else:
@@ -118,7 +118,8 @@ def construct_hgvs(feature, complement=False, description=False):
         ac = protein.lookup_from_gene(
             feature['geneSymbol'],
             ref_start=feature.get('protein_start', None),
-            ref_end=feature.get('protein_end', None)
+            ref_end=feature.get('protein_end', None),
+            exclude=exclude
         )
     else:
         ref = feature.get('ref', None)
@@ -246,6 +247,12 @@ def normalize(feature):
             # else:
             #     print 'complement_ref {} m[0] {}'.format(complement_ref,
             #                                              actualAllele)
+
+        if ('errorType' in allele and
+                allele['errorType'] == 'IncorrectHgvsPosition'):
+            # print 'position error re-try'
+            hgvs = construct_hgvs(feature, exclude={hgvs.split(':')[0],})
+            (allele, provenance) = hgvs_query_allele_registry(hgvs)
 
         if ('errorType' in allele and
                 allele['errorType'] == 'IncorrectHgvsPosition'):
@@ -568,7 +575,8 @@ if __name__ == '__main__':
       "alt": "GCTTACGTGATG",
       "ref": "None",
       "chromosome": "17",
-      "description": "ERBB2 M774INSAYVM"
+      "description": "ERBB2 M774INSAYVM",
+      "protein_allele": True
     }
 
     _test(civic_entry, expected_hgvs=expected_hgvs_g)

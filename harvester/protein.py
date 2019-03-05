@@ -24,7 +24,7 @@ for f in Path.glob(FASTA_FILE_DIR, '*.faa.gz'):
 
 gene_symbol_to_id = {}
 protein_id_re = re.compile('NP_\d+\.\d+')
-protein_name_re = re.compile(r'(?P<start>[A-Z]?\d+)(?:-|_(?P<end>[A-Z]?\d+))?(?P<alt_type>ins|del|dup)?(?P<alt>[A-Z]+)?')
+protein_name_re = re.compile(r'(?P<start>[A-Z]?\d+)(?:-|_(?P<end>[A-Z]?\d+))?(?P<alt_type>(ins|del|dup|INS|DEL|DUP)*)(?P<alt>[A-Z]+)?')
 
 
 def parse_components(name_string):
@@ -32,7 +32,7 @@ def parse_components(name_string):
     return match.groupdict()
 
 
-def lookup_from_gene(gene_symbol, ref_start=None, ref_end=None):
+def lookup_from_gene(gene_symbol, ref_start=None, ref_end=None, exclude={}):
     if gene_symbol in gene_symbol_to_id:
         _id = gene_symbol_to_id[gene_symbol]
     else:
@@ -68,7 +68,7 @@ def lookup_from_gene(gene_symbol, ref_start=None, ref_end=None):
                 keep.add(p)
         p_set = keep & p_set
     for p in proteins:
-        if p in p_set:
+        if p in p_set and p not in exclude:
             return p
     assert False
 
