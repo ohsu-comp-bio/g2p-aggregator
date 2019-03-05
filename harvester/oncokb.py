@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from pathlib import Path
+from pathlib2 import Path
 from os.path import exists
 import pandas as pd
 import json
