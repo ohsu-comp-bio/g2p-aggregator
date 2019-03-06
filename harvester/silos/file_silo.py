@@ -58,6 +58,6 @@ class FileSilo:
             try:
                 out_s = json.dumps(feature_association, separators=(',', ':'))
             except UnicodeDecodeError:
-                out_s = json.dumps(feature_association, separators=(',', ':'), ensure_ascii=False).decode("ISO-8859-1").encode('UTF-8')
+                out_s = json.dumps(feature_association, separators=(',', ':'), encoding='ISO-8859-1').encode('UTF-8')
             the_file.write(out_s)
             the_file.write('\n')
