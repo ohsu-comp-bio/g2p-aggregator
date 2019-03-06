@@ -206,12 +206,11 @@ def main():
                            help='array of hugo ids, no value will harvest all',
                            default=None)
 
-
-    argparser.add_argument('--phases',   nargs='+',
-                           help='array of harvest phases to run '
-                                '[harvest,convert,enrich,all]. default is all',
-                           default=['all'],
-                           choices=['all', 'harvest'])
+    argparser.add_argument('--phase',
+                           help='select harvest phase to run'
+                                '[harvest,convert,all]. default is all',
+                           default='all',
+                           choices=['all', 'harvest', 'convert'])
 
     elastic_silo.populate_args(argparser)
     kafka_silo.populate_args(argparser)
@@ -233,7 +232,7 @@ def main():
     logging.info("elastic_index: %r" % args.elastic_index)
     logging.info("delete_index: %r" % args.delete_index)
     logging.info("file_output_dir: %r" % args.file_output_dir)
-    logging.info("phases: %r" % args.phases)
+    logging.info("phase: %r" % args.phase)
 
 
 
@@ -248,18 +247,15 @@ def main():
         for silo in silos:
             silo.delete_all()
 
-    def _check_dup(harvest):
-        for feature_association in harvest:
-            feature_association['tags'] = []
-            feature_association['dev_tags'] = []
-            normalize(feature_association)
-            if not is_duplicate(feature_association):
-                yield feature_association
-
-    if 'all' in args.phases:
+    if args.phase == 'all':
         silos[0].save_bulk(_check_dup(harvest(args.genes)))
+        return
+    elif args.phase == 'harvest':
+        silos[0].save_bulk(harvest_only(args.genes), mode='harvest_only')
+    elif args.phase == 'convert':
+        raise NotImplementedError
     else:
-        silos[0].save_bulk(harvest_only(args.genes))
+        raise ValueError('Cannot handle input phase of {}'.format(args.phase))
 
 
 if __name__ == '__main__':

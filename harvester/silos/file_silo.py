@@ -41,20 +41,19 @@ class FileSilo:
         except Exception as e:
             logging.info("file silo: delete failed {}".format(e))
 
-    def save_bulk(self, feature_association_generator):
+    def save_bulk(self, feature_association_generator, mode=None):
         """ write to file """
         for feature_association in feature_association_generator:
-            self.save(feature_association)
+            self.save(feature_association, mode)
 
-    def save(self, feature_association):
+    def save(self, feature_association, mode=None):
         """ write dict to file """
         source = feature_association['source']
-        path = os.path.join(self._file_output_dir, '{}.json'.format(source))
-        if os.path.exists(path):
-            append_write = 'a'  # append if already exists
+        if mode is None:
+            path = os.path.join(self._file_output_dir, '{}.json'.format(source))
         else:
-            append_write = 'w'  # make a new file if not
-        with open(path, append_write) as the_file:
+            path = os.path.join(self._file_output_dir, '{}.{}.json'.format(source, mode))
+        with open(path, 'w') as the_file:
             try:
                 out_s = json.dumps(feature_association, separators=(',', ':'))
             except UnicodeDecodeError:
