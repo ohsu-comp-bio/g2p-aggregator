@@ -29,12 +29,12 @@ import disease_normalizer
 import reference_genome_normalizer
 import gene_enricher
 
-from elastic_silo import ElasticSilo
-import elastic_silo
-from kafka_silo import KafkaSilo
-import kafka_silo
-from file_silo import FileSilo
-import file_silo
+from silos.elastic_silo import ElasticSilo
+from silos import elastic_silo
+from silos.kafka_silo import KafkaSilo
+from silos import kafka_silo
+from silos.file_silo import FileSilo
+from silos import file_silo
 
 import requests
 import requests_cache
@@ -166,6 +166,15 @@ def normalize(feature_association):
         logging.info('gene_enricher {}'.format(elapsed))
 
 
+def _check_dup(harvest):
+    for feature_association in harvest:
+        feature_association['tags'] = []
+        feature_association['dev_tags'] = []
+        normalize(feature_association)
+        if not is_duplicate(feature_association):
+            yield feature_association
+
+
 def main():
     global args
     global silos
@@ -173,8 +182,7 @@ def main():
 
     argparser.add_argument('--harvesters',  nargs='+',
                            help='''harvest from these sources. default:
-                                   [cgi_biomarkers,jax,civic,oncokb,
-                                   pmkb]''',
+                                   [cgi_biomarkers,jax,civic,oncokb,pmkb]''',
                            default=['cgi_biomarkers', 'jax', 'civic',
                                     'oncokb', 'pmkb', 'brca', 'jax_trials',
                                     'molecularmatch_trials'])
