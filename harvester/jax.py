@@ -13,6 +13,7 @@ import evidence_direction as ed
 import cosmic_lookup_table
 from attrdict import AttrDict
 import time
+import os
 
 LOOKUP_TABLE = None
 gene_list = None
@@ -20,6 +21,8 @@ gene_list = None
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # see https://ckb.jax.org/about/curationMethodology
+
+JAX_URL = os.getenv('JAX_URL')
 
 
 def _parse_profile(profile):
@@ -122,8 +125,8 @@ def _get_gene_ids():
     size = 100
     gene_count = 0
     while offset > -1:
-        url = 'https://ckb.jax.org/ckb-app/api/v1/genes?offset={}&max={}' \
-                .format(offset, size)
+        url = '{}?offset={}&max={}' \
+                .format(JAX_URL, offset, size)
         with requests_cache.disabled():
             response = AttrDict(
                 requests.get(url, verify=False, timeout=120).json()
@@ -144,8 +147,8 @@ def get_evidence(genes):
     #     "approvalStatus": "Clinical Study",
     #     "evidenceType": "Actionable",
     for gene in genes:
-        url = 'https://ckb.jax.org/ckb-app/api/v1/genes/{}/evidence' \
-                .format(gene.id)
+        url = '{}/{}/evidence' \
+                .format(JAX_URL, gene.id)
         with requests_cache.disabled():
             response = requests.get(url, verify=False, timeout=120).json()
         for evidence in response:

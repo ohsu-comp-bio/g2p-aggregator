@@ -1,5 +1,4 @@
 from __future__ import print_function
-import sys
 import json
 import os
 import logging
@@ -56,6 +55,9 @@ class FileSilo:
         else:
             append_write = 'w'  # make a new file if not
         with open(path, append_write) as the_file:
-            the_file.write(
-                json.dumps(feature_association, separators=(',', ':')))
+            try:
+                out_s = json.dumps(feature_association, separators=(',', ':'))
+            except UnicodeDecodeError:
+                out_s = json.dumps(feature_association, separators=(',', ':'), ensure_ascii=False).decode("ISO-8859-1").encode('UTF-8')
+            the_file.write(out_s)
             the_file.write('\n')

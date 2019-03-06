@@ -15,7 +15,12 @@ all: oncokb_all_actionable_variants.tsv cgi_biomarkers_per_variant.tsv \
 ## Do bulk download of OncoKB and set up TSV for ingestion.
 oncokb_all_actionable_variants.tsv:
 	curl -o oncokb_all_actionable_variants_$(shell date +"%Y%m%d").tsv http://oncokb.org/api/v1/utils/allActionableVariants.txt
-	ln -s oncokb_all_actionable_variants_$(shell date +"%Y%m%d").tsv oncokb_all_actionable_variants.tsv
+	cp oncokb_all_actionable_variants_$(shell date +"%Y%m%d").tsv ../data/oncokb_allActionableVariants.txt
+
+## Do bulk download of OncoKB annotated variants for harvester
+oncokb_all_annotated_variants.tsv:
+	curl -o oncokb_all_annotated_variants_$(shell date +"%Y%m%d").tsv https://oncokb.org/api/v1/utils/allAnnotatedVariants.txt
+	cp oncokb_all_annotated_variants_$(shell date +"%Y%m%d").tsv ../data/oncokb_allAnnotatedVariants.txt
 
 ## Do bulk download of CGI and set up TSV for ingestion.
 cgi_biomarkers_per_variant.tsv:
