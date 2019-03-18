@@ -41,22 +41,36 @@ class FileSilo:
         except Exception as e:
             logging.info("file silo: delete failed {}".format(e))
 
-    def save_bulk(self, feature_association_generator, mode=None):
+    def save_bulk(self, feature_association_generator, source=None, mode=None):
         """ write to file """
-        for feature_association in feature_association_generator:
-            self.save(feature_association, mode)
+        w_file = self._get_file(source, mode)
+        with open(w_file, 'w') as fh:
+            for feature_association in feature_association_generator:
+                self.save(feature_association, mode=mode, fh=fh)
 
-    def save(self, feature_association, mode=None):
+    def save(self, feature_association, fh=None, mode=None):
         """ write dict to file """
-        source = feature_association['source']
+        if fh is None:
+            w_file = self._get_file(mode)
+            with open(w_file, 'w') as fh:
+                self._write_record(feature_association, fh)
+        else:
+            self._write_record(feature_association, fh)
+
+    @staticmethod
+    def _write_record(feature_association, fh):
+        try:
+            out_s = json.dumps(feature_association, separators=(',', ':'))
+        except UnicodeDecodeError:
+            out_s = json.dumps(feature_association, separators=(',', ':'), encoding='ISO-8859-1').encode('UTF-8')
+        fh.write(out_s)
+        fh.write('\n')
+
+    def _get_file(self, source, mode=None):
+        if source is None:
+            raise ValueError
         if mode is None:
             path = os.path.join(self._file_output_dir, '{}.json'.format(source))
         else:
             path = os.path.join(self._file_output_dir, '{}.{}.json'.format(source, mode))
-        with open(path, 'w') as the_file:
-            try:
-                out_s = json.dumps(feature_association, separators=(',', ':'))
-            except UnicodeDecodeError:
-                out_s = json.dumps(feature_association, separators=(',', ':'), encoding='ISO-8859-1').encode('UTF-8')
-            the_file.write(out_s)
-            the_file.write('\n')
+        return path

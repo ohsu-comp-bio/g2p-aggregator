@@ -350,7 +350,7 @@ def _test():
     gene_data = _test_harvest_wrapper()
     args = Namespace(file_output_dir='.')
     fs = FileSilo(args)
-    fs.save_bulk(gene_data)
+    fs.save_bulk('oncokb', gene_data)
 
 
 if __name__ == '__main__':

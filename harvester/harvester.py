@@ -247,15 +247,18 @@ def main():
         for silo in silos:
             silo.delete_all()
 
-    if args.phase == 'all':
-        silos[0].save_bulk(_check_dup(harvest(args.genes)))
-        return
-    elif args.phase == 'harvest':
-        silos[0].save_bulk(harvest_only(args.genes), mode='harvest_only')
-    elif args.phase == 'convert':
-        raise NotImplementedError
-    else:
-        raise ValueError('Cannot handle input phase of {}'.format(args.phase))
+    harvesters = list(args.harvesters)
+    for h in harvesters:
+        args.harvesters = [h]
+        if args.phase == 'all':
+            silos[0].save_bulk(_check_dup(harvest(args.genes)))
+            return
+        elif args.phase == 'harvest':
+            silos[0].save_bulk(harvest_only(args.genes), source=h, mode='harvest_only')
+        elif args.phase == 'convert':
+            raise NotImplementedError
+        else:
+            raise ValueError('Cannot handle input phase of {}'.format(args.phase))
 
 
 if __name__ == '__main__':
