@@ -189,7 +189,7 @@ def convert(evidence):
 
     association = {}
 
-    association['description'] = '{} {} {}'.format(' '.join(genes),
+    association['description'] = u'{} {} {}'.format(u' '.join(genes),
                                                    evidence['Drug full name'],
                                                    evidence['Association'])
     association['environmentalContexts'] = []

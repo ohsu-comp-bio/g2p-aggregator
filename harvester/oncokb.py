@@ -161,7 +161,7 @@ def convert(gene_data):
                     alteration = var['alteration']
                     feature = {}
                     feature['geneSymbol'] = gene
-                    feature['description'] = '{} {}'.format(gene, var['name'])
+                    feature['description'] = u'{} {}'.format(gene, var['name'])
                     feature['name'] = var['name']
                     feature['entrez_id'] = gene_data['entrezGeneId']
                     feature['biomarker_type'] = variant['consequence']['term']
@@ -171,7 +171,7 @@ def convert(gene_data):
         feature = {}
         feature['geneSymbol'] = gene
         feature['name'] = variant['name']
-        feature['description'] = '{} {}'.format(gene, variant['name'])
+        feature['description'] = u'{} {}'.format(gene, variant['name'])
         feature['entrez_id'] = gene_data['entrezGeneId']
         feature['biomarker_type'] = variant['consequence']['term']
         feature = _enrich_feature(gene, feature)
@@ -230,7 +230,7 @@ def convert(gene_data):
                 break
 
         association['drug_labels'] = ','.join([drug for drug in clinical['drug']])   # NOQA
-        feature_names = ', '.join(['{}:{}'.format(
+        feature_names = ', '.join([u'{}:{}'.format(
                                 f["geneSymbol"], f["name"]) for f in features])
 
         source_url = None
@@ -264,8 +264,7 @@ def convert(gene_data):
 
         # Look up variant and add position information.
         if not LOOKUP_TABLE:
-            LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
-                    "./cosmic_lookup_table.tsv")
+            LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup()
         matches = LOOKUP_TABLE.get_entries(gene, alteration)
         if len(matches) > 0:
             # FIXME: just using the first match for now;

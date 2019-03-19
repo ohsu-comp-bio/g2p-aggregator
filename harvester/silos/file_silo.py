@@ -21,6 +21,7 @@ class FileSilo:
     def __init__(self, args):
         """ initialize, set endpoint & index name """
         self._file_output_dir = args.file_output_dir
+        self._fh = None
 
     def __str__(self):
         return "FileSilo file_output:{}".format(
@@ -44,18 +45,23 @@ class FileSilo:
     def save_bulk(self, feature_association_generator, source=None, mode=None):
         """ write to file """
         w_file = self._get_file(source, mode)
-        with open(w_file, 'w') as fh:
-            for feature_association in feature_association_generator:
-                self.save(feature_association, mode=mode, fh=fh)
+        self._fh = open(w_file, 'w')
+        for feature_association in feature_association_generator:
+            self.save(feature_association, mode=mode)
 
-    def save(self, feature_association, fh=None, mode=None):
+    def load_raw_harvested(self, source):
+        r_file = self._get_file(source, 'harvest')
+        with open(r_file, 'r') as fh:
+            for record in fh:
+                yield json.loads(record)
+
+    def save(self, feature_association, mode=None):
         """ write dict to file """
-        if fh is None:
-            w_file = self._get_file(mode)
-            with open(w_file, 'w') as fh:
-                self._write_record(feature_association, fh)
-        else:
-            self._write_record(feature_association, fh)
+        source = feature_association['source']
+        if self._fh is None:
+            w_file = self._get_file(source, mode)
+            self._fh = open(w_file, 'w')
+        self._write_record(feature_association, self._fh)
 
     @staticmethod
     def _write_record(feature_association, fh):

@@ -83,7 +83,7 @@ def _make_silos(args):
 
 
 # cgi, jax, civic, oncokb
-def harvest(genes):
+def harvest_and_convert(genes):
     """ get evidence from all sources """
     for h in args.harvesters:
         harvester = sys.modules[h]
@@ -104,6 +104,20 @@ def harvest(genes):
             yield feature_association
 
 
+def convert(gene_data):
+    for h in args.harvesters:
+        harvester = sys.modules[h]
+        for feature_association in harvester.convert(gene_data):
+            logging.info(
+                '{} {} {}'.format(
+                    harvester.__name__,
+                    feature_association['genes'],
+                    feature_association['association']['evidence_label']
+                )
+            )
+            yield feature_association
+
+
 def harvest_only(genes):
     """ get evidence from all sources """
     for h in args.harvesters:
@@ -113,8 +127,8 @@ def harvest_only(genes):
                 if h == 'cgi_biomarkers':
                     h = 'cgi'
                 silo.delete_source(h)
-        for evidence in harvester.harvest(genes):
-            yield {'source': h, h: evidence}
+        for gene_data in harvester.harvest(genes):
+            yield {'source': h, h: gene_data}
 
 
 def normalize(feature_association):
@@ -182,10 +196,9 @@ def main():
 
     argparser.add_argument('--harvesters',  nargs='+',
                            help='''harvest from these sources. default:
-                                   [cgi_biomarkers,jax,civic,oncokb,pmkb]''',
+                                   [cgi_biomarkers,jax,civic,oncokb,pmkb,molecularmatch]''',
                            default=['cgi_biomarkers', 'jax', 'civic',
-                                    'oncokb', 'pmkb', 'brca', 'jax_trials',
-                                    'molecularmatch_trials'])
+                                    'oncokb', 'pmkb', 'molecularmatch'])
 
 
     argparser.add_argument('--silos',  nargs='+',
@@ -251,11 +264,15 @@ def main():
     for h in harvesters:
         args.harvesters = [h]
         if args.phase == 'all':
-            silos[0].save_bulk(_check_dup(harvest(args.genes)))
+            silos[0].save_bulk(_check_dup(harvest_and_convert(args.genes)), source=h)
             return
         elif args.phase == 'harvest':
-            silos[0].save_bulk(harvest_only(args.genes), source=h, mode='harvest_only')
+            silos[0].save_bulk(harvest_only(args.genes), source=h, mode='harvest')
         elif args.phase == 'convert':
+            for record in FileSilo(args).load_raw_harvested(h):
+                for evidence in convert(record[h]):
+                    silos[0].save(evidence, mode='convert')
+        elif args.phase == 'normalize':
             raise NotImplementedError
         else:
             raise ValueError('Cannot handle input phase of {}'.format(args.phase))

@@ -31,8 +31,7 @@ def _parse_profile(profile):
     global gene_list
     if not LOOKUP_TABLE:
         logging.info('_parse_profile: init LOOKUP_TABLE')
-        LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
-                "./cosmic_lookup_table.tsv")
+        LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup()
     parts = profile.split()
     # this list taken from https://ckb.jax.org/about/glossaryOfTerms
     # "Non specific variants" list, separated by space, where applicable
@@ -159,21 +158,21 @@ def get_evidence(genes):
 
 def convert(jax_evidence):
     global LOOKUP_TABLE
-    gene = jax_evidence.gene
-    jax = jax_evidence.jax_id
-    evidence = jax_evidence.evidence
+    gene = jax_evidence['gene']
+    jax = jax_evidence['jax_id']
+    evidence = jax_evidence['evidence']
     # TODO: alterations are treated individually right now, but they are
     # actually combinations and should be treated accordingly.
 
     # Parse molecular profile and use for variant-level information.
-    profile = evidence.molecularProfile.profileName.replace('Tp53', 'TP53').replace(' - ', '-')
+    profile = evidence['molecularProfile']['profileName'].replace('Tp53', 'TP53').replace(' - ', '-')
     gene_index, mut_index, biomarkers, fusions = _parse_profile(profile)
 
     if not (len(gene_index) == len(mut_index) == len(biomarkers)):
         logging.warning(
             "ERROR: This molecular profile has been parsed incorrectly!")
         logging.warning(json.dumps(
-            {"molecular_profile": evidence.molecularProfile},
+            {"molecular_profile": evidence['molecularProfile']},
             indent=2, sort_keys=True))
         return
 
@@ -222,37 +221,37 @@ def convert(jax_evidence):
     association['variant_name'] = mut_index
     association['source_link'] = \
         'https://ckb.jax.org/molecularProfile/show/{}' \
-        .format(evidence.molecularProfile.id)
+        .format(evidence['molecularProfile']['id'])
 
-    association['description'] = evidence.efficacyEvidence
+    association['description'] = evidence['efficacyEvidence']
     association['environmentalContexts'] = []
     association['environmentalContexts'].append({
-        'description': evidence.therapy.therapyName})
-    association['phenotypes'] = [{ 'description' : evidence.indication.name,
-                                   'id' :  '{}:{}'.format(evidence.indication.source,
-                                                          evidence.indication.id)}]
+        'description': evidence['therapy']['therapyName']})
+    association['phenotypes'] = [{ 'description' : evidence['indication']['name'],
+                                   'id' :  '{}:{}'.format(evidence['indication']['source'],
+                                                          evidence['indication']['id'])}]
     association['evidence'] = [{
         "evidenceType": {
             "sourceName": "jax"
         },
-        'description': evidence.responseType,
+        'description': evidence['responseType'],
         'info': {
             'publications':
-                [r.url for r in evidence.references]  # NOQA
+                [r['url'] for r in evidence['references']]  # NOQA
         }
     }]
     # add summary fields for Display
-    association = el.evidence_label(evidence.approvalStatus, association)
-    association = ed.evidence_direction(evidence.responseType, association)
+    association = el.evidence_label(evidence['approvalStatus'], association)
+    association = ed.evidence_direction(evidence['responseType'], association)
 
-    if len(evidence.references) > 0:
-        association['publication_url'] = evidence.references[0].url
+    if len(evidence['references']) > 0:
+        association['publication_url'] = evidence['references'][0]['url']
 
-    association['drug_labels'] = evidence.therapy.therapyName
-    source_url = "https://ckb.jax.org/therapy/show/{}".format(evidence.therapy.id)
+    association['drug_labels'] = evidence['therapy']['therapyName']
+    source_url = "https://ckb.jax.org/therapy/show/{}".format(evidence['therapy']['id'])
     feature_association = {'genes': [f['geneSymbol'] for f in features],
                            'feature_names':
-                           evidence.molecularProfile.profileName,
+                           evidence['molecularProfile']['profileName'],
                            'features': features,
                            'association': association,
                            'source': 'jax',
