@@ -221,9 +221,9 @@ def main():
 
     argparser.add_argument('--phase',
                            help='select harvest phase to run'
-                                '[harvest,convert,all]. default is all',
+                                '[harvest,convert,normalize,all]. default is all',
                            default='all',
-                           choices=['all', 'harvest', 'convert'])
+                           choices=['all', 'harvest', 'convert', 'normalize'])
 
     elastic_silo.populate_args(argparser)
     kafka_silo.populate_args(argparser)
@@ -265,15 +265,18 @@ def main():
         args.harvesters = [h]
         if args.phase == 'all':
             silos[0].save_bulk(_check_dup(harvest_and_convert(args.genes)), source=h)
-            return
+            silos[0].close_file()
         elif args.phase == 'harvest':
-            silos[0].save_bulk(harvest_only(args.genes), source=h, mode='harvest')
+            FileSilo(args).save_bulk(harvest_only(args.genes), source=h, mode='harvest')
         elif args.phase == 'convert':
-            for record in FileSilo(args).load_raw_harvested(h):
-                for evidence in convert(record[h]):
-                    silos[0].save(evidence, mode='convert')
+            for gene_data in FileSilo(args).load_file(h, 'harvest'):
+                for record in convert(gene_data[h]):
+                    silos[0].save(record, mode='convert')
+            silos[0].close_file()
         elif args.phase == 'normalize':
-            raise NotImplementedError
+            records = FileSilo(args).load_file(h, 'convert')
+            silos[0].save_bulk(_check_dup(records), source=h)
+            silos[0].close_file()
         else:
             raise ValueError('Cannot handle input phase of {}'.format(args.phase))
 

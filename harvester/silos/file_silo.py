@@ -49,19 +49,23 @@ class FileSilo:
         for feature_association in feature_association_generator:
             self.save(feature_association, mode=mode)
 
-    def load_raw_harvested(self, source):
-        r_file = self._get_file(source, 'harvest')
+    def load_file(self, source, phase):
+        r_file = self._get_file(source, phase)
         with open(r_file, 'r') as fh:
             for record in fh:
                 yield json.loads(record)
 
     def save(self, feature_association, mode=None):
         """ write dict to file """
-        source = feature_association['source']
         if self._fh is None:
+            source = feature_association['source']
             w_file = self._get_file(source, mode)
             self._fh = open(w_file, 'w')
         self._write_record(feature_association, self._fh)
+
+    def close_file(self):
+        self._fh.close()
+        self._fh = None
 
     @staticmethod
     def _write_record(feature_association, fh):
