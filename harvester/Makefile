@@ -57,7 +57,7 @@ cgi_mut_benchmarking.tsv:
 
 ## Create oncokb_mut_benchmarking.tsv file.
 oncokb_mut_benchmarking.tsv: oncokb_all_actionable_variants.tsv
-	cut -f1-2 oncokb_all_actionable_variants.tsv | \
+	cut -f1-2 oncokb_all_actionable_variants_$(shell date +"%Y%m%d").tsv | \
 	egrep -v "del|ins|Fusion|Oncogenic|mutations|dup|Wildtype|Amplification|Truncating|splice" \
 	> oncokb_mut_benchmarking.tsv
 
