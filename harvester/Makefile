@@ -30,6 +30,14 @@ cgi_biomarkers_per_variant.tsv:
 	unzip cgi_biomarkers_latest.zip
 	cp cgi_biomarkers_latest/cgi_biomarkers_per_variant.tsv .
 
+## Do bulk download of CGI validated mutations and set up TSV for ingestion.
+catalog_of_validated_oncogenic_mutations.tsv:
+	mkdir cgi_validated_oncogenic
+	cd cgi_validated_oncogenic && \
+	curl -Ok https://www.cancergenomeinterpreter.org/data/catalog_of_validated_oncogenic_mutations_latest.zip && \
+	unzip catalog_of_validated_oncogenic_mutations_latest.zip
+	cp cgi_validated_oncogenic/catalog_of_validated_oncogenic_mutations.tsv .
+
 ## Create COSMIC lookup table suitable for annotating variants with chrom/start/end/ref/alt
 cosmic_lookup_table.tsv:
 	gzcat $(COSMIC_MUTATIONS) | tail -n +2 | python cosmic_lookup_table.py create_table > temp.tsv
@@ -63,5 +71,6 @@ $(COSMIC_MUTATIONS):
 
 clean:
 	rm -rf cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv benchmark.txt \
+	rm -rf catalog_of_validated_oncogenic_mutations_latest \
 	cgi_biomarkers_$(CGI_VERSION) cgi_biomarkers_per_variant.tsv \
 	oncokb_all_actionable_variants*.tsv

@@ -56,3 +56,4 @@ harvester/zotero_help.py
 util/**/*.json
 harvester/*.json
 harvester/molecularmatch_trials.json
+harvester/cgi_validated_oncogenic
