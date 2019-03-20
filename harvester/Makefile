@@ -71,6 +71,6 @@ $(COSMIC_MUTATIONS):
 
 clean:
 	rm -rf cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv benchmark.txt \
-	rm -rf catalog_of_validated_oncogenic_mutations_latest \
+	rm -rf catalog_of_validated_oncogenic_mutations_latest cgi_biomarkers_latest \
 	cgi_biomarkers_$(CGI_VERSION) cgi_biomarkers_per_variant.tsv \
 	oncokb_all_actionable_variants*.tsv
