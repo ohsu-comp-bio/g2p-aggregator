@@ -546,72 +546,255 @@ if __name__ == '__main__':
     expected_hgvs_g = "NC_000017.10:g.37880985_37880996dup"
 
     civic_entry = {
-      "provenance_rule": "from_source",
-      "entrez_id": 2064,
-      "end": 37880994,
-      "name": "M774INSAYVM",
-      "sequence_ontology": {
-        "hierarchy": [
-          "SO:0001060",
-          "SO:0001537",
-          "SO:0001878",
-          "SO:0001564",
-          "SO:0001576",
-          "SO:0001791",
-          "SO:0001580",
-          "SO:0001818",
-          "SO:0001650",
-          "SO:0001820"
-        ],
-        "soid": "SO:0001821",
-        "root_name": "sequence_variant",
-        "name": "inframe_insertion",
-        "root_soid": "SO:0001060"
-      },
-      "start": 37880993,
-      "biomarker_type": "Inframe Insertion",
-      "referenceName": "GRCh37",
-      "geneSymbol": "ERBB2",
-      "alt": "GCTTACGTGATG",
-      "ref": "None",
-      "chromosome": "17",
-      "description": "ERBB2 M774INSAYVM",
-      "protein_allele": True
-    }
+        "features":[
+            {
+                "entrez_id":2064,
+                "end":37880994,
+                "name":"M774INSAYVM",
+                "start":37880993,
+                "biomarker_type":"Inframe Insertion",
+                "referenceName":"GRCh37",
+                "geneSymbol":"ERBB2",
+                "alt":"GCTTACGTGATG",
+                "ref":"None",
+                "chromosome":"17",
+                "description":"ERBB2 M774INSAYVM"}],
+        "civic":{
+            "variant_groups":[],
+            "entrez_name":"ERBB2",
+            "variant_types":[
+                {
+                    "display_name":"Inframe Insertion",
+                    "description":"An inframe non synonymous variant that inserts bases into in the coding sequence.",
+                    "url":"http://www.sequenceontology.org/browser/current_svn/term/SO:0001821","so_id":"SO:0001821",
+                    "id":106,
+                    "name":"inframe_insertion"
+                }],
+            "description":"Mutations in the HER2 kinase domain occur at a 2-4% frequency in lung adenocarcinomas, the majority of which are in exon 20 as in-frame duplications or insertions in a small 8 codon region (774-781 or 775-782). These are analogous to the exon 20 alterations found in EGFR TK domain. The M774 insertion, M774insAYVM, represents 62.5% of all HER2 kinase domain mutations identified (when combined with the A775insYVMA mutations as they translate to the identical amino acid sequence changes). As demonstrated in mouse models (Perrera et al., PNAS 2009) and subsequent clinical trials in human lung adenocarcinoma with these insertions, HER2 YVMA mutants predict response to several targeted HER2 agonists such as afatinib, trastuzumab, neratinib and TDM-1 (trastuzumab emtansine) as monotherapy or combined with specific chemotherapies.",
+            "clinvar_entries":[],
+            "lifecycle_actions":{
+                "last_modified":{
+                    "timestamp":"2017-05-31T22:26:45.259Z",
+                    "order":0,
+                    "user":{
+                        "username":"CIViC_Bot",
+                        "area_of_expertise":None,
+                        "organization":{},
+                        "twitter_handle":"CIViCdb",
+                        "name":"CIViC Bot",
+                        "bio":None,
+                        "url":None,
+                        "created_at":"2017-02-20T20:28:47.150Z",
+                        "avatars":{
+                            "x32":"https://secure.gravatar.com/avatar/e990ea7f667d9e4826a1b3127b324018.png?d=identicon&r=pg&s=32",
+                            "x14":"https://secure.gravatar.com/avatar/e990ea7f667d9e4826a1b3127b324018.png?d=identicon&r=pg&s=14",
+                            "x64":"https://secure.gravatar.com/avatar/e990ea7f667d9e4826a1b3127b324018.png?d=identicon&r=pg&s=64",
+                            "x128":"https://secure.gravatar.com/avatar/e990ea7f667d9e4826a1b3127b324018.png?d=identicon&r=pg&s=128"},
+                        "accepted_license":None,
+                        "affiliation":None,
+                        "avatar_url":"https://secure.gravatar.com/avatar/e990ea7f667d9e4826a1b3127b324018.png?d=identicon&r=pg&s=32",
+                        "role":"curator",
+                        "facebook_profile":None,
+                        "linkedin_profile":None,
+                        "orcid":None,
+                        "display_name":"CIViC_Bot",
+                        "last_seen_at":None,
+                        "featured_expert":False,
+                        "id":385,
+                        "signup_complete":None}},
+                "last_reviewed":{
+                    "timestamp":"2017-06-01T19:19:22.400Z",
+                    "order":1,
+                    "user":{
+                        "username":"ahwagner",
+                        "area_of_expertise":"Research Scientist",
+                        "organization":{
+                            "url":"http://genome.wustl.edu/",
+                            "id":1,
+                            "profile_image":{
+                                "x32":"/system/organizations/profile_images/000/000/001/x32/MGI_STANDARD4_logo_brown-example_v1b.png?1494525976",
+                                "x256":"/system/organizations/profile_images/000/000/001/x256/MGI_STANDARD4_logo_brown-example_v1b.png?1494525976",
+                                "x14":"/system/organizations/profile_images/000/000/001/x14/MGI_STANDARD4_logo_brown-example_v1b.png?1494525976",
+                                "x64":"/system/organizations/profile_images/000/000/001/x64/MGI_STANDARD4_logo_brown-example_v1b.png?1494525976",
+                                "x128":"/system/organizations/profile_images/000/000/001/x128/MGI_STANDARD4_logo_brown-example_v1b.png?1494525976"},
+                            "description":"The McDonnell Genome Institute (MGI) is a world leader in the fast-paced, constantly changing field of genomics. A truly unique institution, we are pushing the limits of academic research by creating, testing, and implementing new approaches to the study of biology with the goal of understanding human health and disease, as well as evolution and the biology of other organisms.",
+                            "name":"The McDonnell Genome Institute"},
+                        "twitter_handle":"HandlerWagner",
+                        "name":"Alex Handler Wagner, PhD",
+                        "bio":"Dr. Wagner is an NCI Postdoctoral Fellow training at the McDonnell Genome Institute at Washington University School of Medicine. His research interests are focused on the collaborative clinical interpretation of sequence variants in cancers.",
+                        "url":"http://alexwagner.info/",
+                        "created_at":"2015-02-26T15:58:31.729Z",
+                        "avatars":{
+                            "x32":"https://secure.gravatar.com/avatar/5a72d8047067d33487a78092f3bbb09e.png?d=identicon&r=pg&s=32",
+                            "x14":"https://secure.gravatar.com/avatar/5a72d8047067d33487a78092f3bbb09e.png?d=identicon&r=pg&s=14",
+                            "x64":"https://secure.gravatar.com/avatar/5a72d8047067d33487a78092f3bbb09e.png?d=identicon&r=pg&s=64",
+                            "x128":"https://secure.gravatar.com/avatar/5a72d8047067d33487a78092f3bbb09e.png?d=identicon&r=pg&s=128"},
+                        "accepted_license":None,
+                        "affiliation":"",
+                        "avatar_url":"https://secure.gravatar.com/avatar/5a72d8047067d33487a78092f3bbb09e.png?d=identicon&r=pg&s=32",
+                        "role":"editor",
+                        "facebook_profile":"AlexHWagner",
+                        "linkedin_profile":"alexphd",
+                        "orcid":"0000-0002-2502-8961",
+                        "display_name":"ahwagner",
+                        "last_seen_at":"2017-06-02T19:45:52.135Z",
+                        "featured_expert":False,
+                        "id":7,
+                        "signup_complete":None}}},
+            "provisional_values":{},
+            "gene_id":20,
+            "evidence_items":[
+                {
+                    "status":"accepted",
+                    "rating":3,
+                    "drug_interaction_type":"Combination",
+                    "description":"In preclinical studies of transgenic mice and xenografts, continuous expression of mutant ERBB2 (M774insAYVM or the equivalent A775insYVMA) was found to be essential for tumor maintenance. Furthermore, preclinical in vivo studies assessing erlotinib, trastuzumab, afatinib (aka BIBW2992), and/or sirolimus (aka rapamycin) revealed that the combination of afatinib and sirolimus was most effective in shrinking tumors harboring this insertion.",
+                    "open_change_count":0,
+                    "evidence_type":"Predictive",
+                    "drugs":[
+                        {"pubchem_id":None,"id":352,"name":"Rapamycin (Sirolimus)"},
+                        {"pubchem_id":None,"id":146,"name":"Afatinib"}],
+                    "variant_origin":"Somatic Mutation",
+                    "disease":{
+                        "doid":"3908",
+                        "url":"http://www.disease-ontology.org/?id=DOID:3908",
+                        "display_name":"Non-small Cell Lung Carcinoma",
+                        "id":8,"name":"Non-small Cell Lung Carcinoma"},
+                    "source":{
+                        "status":"fully curated",
+                        "open_access":True,
+                        "name":"HER2YVMA drives rapid development of adenosquamous lung tumors in mice that are sensitive to BIBW2992 and rapamycin combination therapy.",
+                        "journal":"Proc. Natl. Acad. Sci. U.S.A.",
+                        "citation":"Perera et al., 2009, Proc. Natl. Acad. Sci. U.S.A.",
+                        "pmc_id":"PMC2626727",
+                        "full_journal_title":"Proceedings of the National Academy of Sciences of the United States of America",
+                        "source_url":"http://www.ncbi.nlm.nih.gov/pubmed/19122144",
+                        "pubmed_id":"19122144",
+                        "is_review":False,
+                        "publication_date":{
+                            "year":2009,"day":13,"month":1},
+                        "id":662},
+                    "evidence_direction":"Supports",
+                    "variant_id":414,
+                    "clinical_significance":"Sensitivity",
+                    "evidence_level":"D",
+                    "type":"evidence",
+                    "id":960,
+                    "name":"EID960"}],
+            "sources":[{
+                "status":"fully curated",
+                "open_access":True,
+                "name":"HER2YVMA drives rapid development of adenosquamous lung tumors in mice that are sensitive to BIBW2992 and rapamycin combination therapy.",
+                "journal":"Proc. Natl. Acad. Sci. U.S.A.",
+                "citation":"Perera et al., 2009, Proc. Natl. Acad. Sci. U.S.A.",
+                "pmc_id":"PMC2626727",
+                "full_journal_title":"Proceedings of the National Academy of Sciences of the United States of America",
+                "source_url":"http://www.ncbi.nlm.nih.gov/pubmed/19122144",
+                "pubmed_id":"19122144",
+                "is_review":False,
+                "publication_date":{"month":1,"day":13,"year":2009},
+                "id":662}],
+            "entrez_id":2064,
+            "variant_aliases":["P.A775_G776INSYVMA","A775INSYVMA"],
+            "hgvs_expressions":["NC_000017.10:g.37880993_37880994insGCTTACGTGATG"],
+            "errors":{},
+            "coordinates":{
+                "chromosome2":None,
+                "reference_bases":None,
+                "start2":None,
+                "variant_bases":"GCTTACGTGATG",
+                "stop":37880994,
+                "stop2":None,
+                "representative_transcript2":None,
+                "start":37880993,
+                "representative_transcript":"ENST00000269571.5",
+                "ensembl_version":75,
+                "chromosome":"17",
+                "reference_build":"GRCh37"},
+            "type":"variant",
+            "id":414,
+            "name":"M774INSAYVM"},
+        "genes":["ERBB2"],
+        "source_url":"https://civicdb.org/events/genes/20/summary/variants/414/summary/evidence/960/summary#evidence",
+        "source":"civic",
+        "feature_names":"EID960",
+        "association":{
+            "drug_labels":"Rapamycin (Sirolimus),Afatinib","description":"In preclinical studies of transgenic mice and xenografts, continuous expression of mutant ERBB2 (M774insAYVM or the equivalent A775insYVMA) was found to be essential for tumor maintenance. Furthermore, preclinical in vivo studies assessing erlotinib, trastuzumab, afatinib (aka BIBW2992), and/or sirolimus (aka rapamycin) revealed that the combination of afatinib and sirolimus was most effective in shrinking tumors harboring this insertion.",
+            "variant_name":"M774INSAYVM",
+            "source_link":"https://civic.genome.wustl.edu/events/genes/20/summary/variants/414/summary",
+            "publication_url":["http://www.ncbi.nlm.nih.gov/pubmed/19122144"],
+            "phenotypes":[{"description":"Non-small Cell Lung Carcinoma","id":"http://www.disease-ontology.org/?id=DOID:3908"}],
+            "evidence":[{"info":{"publications":["http://www.ncbi.nlm.nih.gov/pubmed/19122144"]},
+                         "evidenceType":{"sourceName":"CIVIC","id":"960"},"description":"Sensitivity"}],
+            "environmentalContexts":[
+                {"term":"Rapamycin (Sirolimus)","description":"Rapamycin (Sirolimus)","id":None},
+                {"term":"Afatinib","description":"Afatinib","id":None}],
+            "evidence_label":"D",
+            "response_type":"Sensitivity","evidence_level":4}}
 
     _test(civic_entry, expected_hgvs=expected_hgvs_g)
     _test(civic_entry, expected_hgvs=expected_hgvs_p)
 
     cgi_entry = {
-        'geneSymbol': 'ERBB2',
-        'biomarker_type': 'ins',
-        'description': 'Inframe insertion A775YVMA',
-        'name': 'A775YVMA',
-        'protein_allele': True
+        "cgi":
+             {
+                 "Targeting":"",
+                 "Source":"AACR 2017 (abstr CT001)","cDNA":[""],
+                 "Primary Tumor type":"Any cancer type",
+                 "individual_mutation":[""],
+                 "Drug full name":"Neratinib (ERBB2 inhibitor)",
+                 "Curator":"RDientsmann",
+                 "Drug family":"ERBB2 inhibitor",
+                 "Alteration":"ERBB2::consequence::inframe_insertion:P780GSP,::inframe_insertion:.781GSP,::inframe_insertion:A775YVMA,::inframe_insertion:G776YVMA",
+                 "Drug":"Neratinib",
+                 "Biomarker":"ERBB2 inframe insertion (P780GSP),inframe insertion (781GSP),inframe insertion (A775YVMA),inframe insertion (G776YVMA)",
+                 "gDNA":[""],
+                 "Drug status":"",
+                 "Gene":"ERBB2",
+                 "transcript":[""],
+                 "strand":[""],
+                 "info":[""],
+                 "Assay type":"",
+                 "Alteration type":"MUT",
+                 "region":[""],
+                 "Evidence level":"Early trials",
+                 "Association":"Responsive","Metastatic Tumor Type":""
+             },
+        "features":[
+            {"geneSymbol":"ERBB2","protein_allele":True,"biomarker_type":"ins","description":"Inframe insertion P780GSP","name":"P780GSP"},
+            {"geneSymbol":"ERBB2","protein_allele":True,"biomarker_type":"ins","description":"Inframe insertion 781GSP","name":"781GSP"},
+            {"geneSymbol":"ERBB2","protein_allele":True,"biomarker_type":"ins","description":"Inframe insertion A775YVMA","name":"A775YVMA"},
+            {"geneSymbol":"ERBB2","protein_allele":True,"biomarker_type":"ins","description":"Inframe insertion G776YVMA","name":"G776YVMA"}
+        ],
+        "genes":["ERBB2"],
+        "source_url":"https://www.cancergenomeinterpreter.org/biomarkers",
+        "source":"cgi",
+        "feature_names":"ERBB2 inframe insertion (P780GSP),inframe insertion (781GSP),inframe insertion (A775YVMA),inframe insertion (G776YVMA)",
+        "association":{
+            "drug_labels":"Neratinib (ERBB2 inhibitor)",
+            "description":"ERBB2 Neratinib (ERBB2 inhibitor) Responsive",
+            "publication_url":"https://www.google.com/#q=AACR 2017 (abstr CT001)",
+            "phenotypes":[{"description":"Any cancer type"}],
+            "evidence":[
+                {
+                    "info":{"publications":["https://www.google.com/#q=AACR 2017 (abstr CT001)"]},
+                    "evidenceType":{"sourceName":"cgi"},"description":"Responsive"}
+            ],
+            "environmentalContexts":[{"description":"Neratinib (ERBB2 inhibitor)"}],
+            "evidence_label":"C",
+            "response_type":"Responsive",
+            "evidence_level":3
+        }
     }
 
     _test(cgi_entry, expected_hgvs=expected_hgvs_g)
     _test(cgi_entry, expected_hgvs=expected_hgvs_p)
 
-    # jax_entry = {
-    #     # TODO: Identify JAX entry
-    # }
-    #
-    # _test(jax_entry, expected_hgvs=expected_hgvs_g)
-    # _test(jax_entry, expected_hgvs=expected_hgvs_p)
+    jax_entry =
 
-    mm_entry = {
-      "protein_allele": True,
-      "end": 37880997,
-      "description": "ERBB2 A775_G776insYVMA",
-      "start": 37880996,
-      "biomarker_type": "ins",
-      "referenceName": "GRCh37",
-      "geneSymbol": "ERBB2",
-      "alt": "TATGTAATGGCA",
-      "ref": "-",
-      "chromosome": "17",
-      "name": "A775_G776insYVMA"
-    }
+    _test(jax_entry, expected_hgvs=expected_hgvs_g)
+    _test(jax_entry, expected_hgvs=expected_hgvs_p)
+
+    mm_entry =
     _test(mm_entry, expected_hgvs=expected_hgvs_g)
     _test(mm_entry, expected_hgvs=expected_hgvs_p)
