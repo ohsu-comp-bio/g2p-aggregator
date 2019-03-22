@@ -790,7 +790,40 @@ if __name__ == '__main__':
     _test(cgi_entry, expected_hgvs=expected_hgvs_g)
     _test(cgi_entry, expected_hgvs=expected_hgvs_p)
 
-    jax_entry =
+    jax_entry = {
+        "features":[{"geneSymbol":"ERBB2","name":"ERBB2 Y772_A775dup "}],
+        "jax":{
+            "responseType":"no benefit",
+            "efficacyEvidence":"In a retrospective study, Vizimpro (dacomitinib) treatment resulted in an objective response rate of 0% (0/13) in non-small cell lung cancer patients harboring ERBB2 (HER2) Y772_A775dup (reported as (A775_G776insYVMA) (PMID: 30527195).",
+            "molecularProfile":{"profileName":"ERBB2 Y772_A775dup","id":3148},
+            "evidenceType":"Actionable",
+            "therapy":{"id":714,"therapyName":"Dacomitinib"},
+            "references":[{
+                "url":"http://www.ncbi.nlm.nih.gov/pubmed/30527195",
+                "id":13464,
+                "pubMedId":30527195,
+                "title":"Activity of a novel HER2 inhibitor, poziotinib, for HER2 exon 20 mutations in lung cancer and mechanism of acquired resistance: An in vitro study."}],
+            "approvalStatus":"Clinical Study",
+            "indication":{"source":"DOID","id":3908,"name":"non-small cell lung carcinoma"},
+            "id":15598},
+        "genes":["ERBB2"],
+        "source_url":"https://ckb.jax.org/therapy/show/714",
+        "source":"jax",
+        "feature_names":"ERBB2 Y772_A775dup",
+        "association":{
+            "drug_labels":"Dacomitinib",
+            "description":"In a retrospective study, Vizimpro (dacomitinib) treatment resulted in an objective response rate of 0% (0/13) in non-small cell lung cancer patients harboring ERBB2 (HER2) Y772_A775dup (reported as (A775_G776insYVMA) (PMID: 30527195).",
+            "variant_name":["Y772_A775dup"],
+            "source_link":"https://ckb.jax.org/molecularProfile/show/3148",
+            "publication_url":"http://www.ncbi.nlm.nih.gov/pubmed/30527195",
+            "phenotypes":[{"description":"non-small cell lung carcinoma","id":"DOID:3908"}],
+            "evidence":[{"info":{"publications":["http://www.ncbi.nlm.nih.gov/pubmed/30527195"]},
+                         "evidenceType":{"sourceName":"jax"},"description":"no benefit"}],
+            "environmentalContexts":[{"description":"Dacomitinib"}],
+            "evidence_label":"C",
+            "response_type":"no benefit",
+            "evidence_level":3}
+    }
 
     _test(jax_entry, expected_hgvs=expected_hgvs_g)
     _test(jax_entry, expected_hgvs=expected_hgvs_p)
