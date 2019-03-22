@@ -1321,52 +1321,53 @@ if __name__ == '__main__':
         {"protein_allele": True, "end": 37880997, "description": "ERBB2 A775_G776insYVMA", "start": 37880996,
          "biomarker_type": "ins", "referenceName": "GRCh37", "geneSymbol": "ERBB2", "alt": "TATGTAATGGCA", "ref": "-",
          "chromosome": "17", "name": "A775_G776insYVMA"}], "genes": ["ERBB2"], "source": "molecularmatch",
-        "feature_names": "ERBB2 A775_G776insYVMA", "association": {"drug_labels": "Afatinib",
-                                                                   "description": "ERBB2 A775_G776insYVMA confers sensitivity to Afatinib in patients with Neoplasm of lung",
-                                                                   "variant_name": ["Y772_A775dupYVMA"],
-                                                                   "publication_url": "https://www.ncbi.nlm.nih.gov/pubmed/26545934",
-                                                                   "phenotypes": [
-                                                                       {"description": "Malignant tumor of lung"},
-                                                                       {"description": "Neoplasm by body site"}, {
-                                                                           "description": "Disorder of respiratory system"},
-                                                                       {"description": "Disorder of body system"},
-                                                                       {"description": "Disease"}, {
-                                                                           "description": "Disorder of thoracic segment of trunk"},
-                                                                       {"description": "Neoplastic disease"},
-                                                                       {"description": "Disorder by body site"},
-                                                                       {"description": "Neoplasm of lung"},
-                                                                       {"description": "Disorder of trunk"}, {
-                                                                           "description": "Malignant neoplasm of lower respiratory tract"},
-                                                                       {
-                                                                           "description": "Malignant neoplasm of respiratory system"},
-                                                                       {"description": "Disorder of thorax"},
-                                                                       {"description": "Neoplasm of respiratory tract"},
-                                                                       {
-                                                                           "description": "Neoplasm of respiratory system"},
-                                                                       {
-                                                                           "description": "Neoplasm of lower respiratory tract"},
-                                                                       {"description": "Malignant neoplastic disease"},
-                                                                       {"description": "Disorder of lung"}, {
-                                                                           "description": "Disorder of lower respiratory system"},
-                                                                       {"description": "Malignant neoplasm of thorax"},
-                                                                       {
-                                                                           "description": "Neoplasm of intrathoracic organs"},
-                                                                       {"description": "Neoplasm and/or hamartoma"},
-                                                                       {"description": "Neoplasm of thorax"},
-                                                                       {"description": "Neoplasm of trunk"},
-                                                                       {"description": "Solid tumor"}], "evidence": [{
-                                                                                                                         "info": {
-                                                                                                                             "publications": [
-                                                                                                                                 "https://www.ncbi.nlm.nih.gov/pubmed/26545934",
-                                                                                                                                 "https://www.ncbi.nlm.nih.gov/pubmed/26559459",
-                                                                                                                                 "https://www.ncbi.nlm.nih.gov/pubmed/22325357"]},
-                                                                                                                         "evidenceType": {
-                                                                                                                             "sourceName": "molecularmatch"},
-                                                                                                                         "description": "ERBB2 A775_G776insYVMA confers sensitivity to Afatinib in patients with Neoplasm of lung"}],
-                                                                   "environmentalContexts": [
-                                                                       {"description": "Afatinib"}],
-                                                                   "evidence_label": "A", "response_type": "1A",
-                                                                   "evidence_level": 1}}
+        "feature_names": "ERBB2 A775_G776insYVMA", "association": {
+           "drug_labels": "Afatinib",
+           "description": "ERBB2 A775_G776insYVMA confers sensitivity to Afatinib in patients with Neoplasm of lung",
+           "variant_name": ["Y772_A775dupYVMA"],
+           "publication_url": "https://www.ncbi.nlm.nih.gov/pubmed/26545934",
+           "phenotypes": [
+               {"description": "Malignant tumor of lung"},
+               {"description": "Neoplasm by body site"}, {
+                   "description": "Disorder of respiratory system"},
+               {"description": "Disorder of body system"},
+               {"description": "Disease"}, {
+                   "description": "Disorder of thoracic segment of trunk"},
+               {"description": "Neoplastic disease"},
+               {"description": "Disorder by body site"},
+               {"description": "Neoplasm of lung"},
+               {"description": "Disorder of trunk"}, {
+                   "description": "Malignant neoplasm of lower respiratory tract"},
+               {
+                   "description": "Malignant neoplasm of respiratory system"},
+               {"description": "Disorder of thorax"},
+               {"description": "Neoplasm of respiratory tract"},
+               {
+                   "description": "Neoplasm of respiratory system"},
+               {
+                   "description": "Neoplasm of lower respiratory tract"},
+               {"description": "Malignant neoplastic disease"},
+               {"description": "Disorder of lung"}, {
+                   "description": "Disorder of lower respiratory system"},
+               {"description": "Malignant neoplasm of thorax"},
+               {
+                   "description": "Neoplasm of intrathoracic organs"},
+               {"description": "Neoplasm and/or hamartoma"},
+               {"description": "Neoplasm of thorax"},
+               {"description": "Neoplasm of trunk"},
+               {"description": "Solid tumor"}], "evidence": [{
+                     "info": {
+                         "publications": [
+                             "https://www.ncbi.nlm.nih.gov/pubmed/26545934",
+                             "https://www.ncbi.nlm.nih.gov/pubmed/26559459",
+                             "https://www.ncbi.nlm.nih.gov/pubmed/22325357"]},
+                     "evidenceType": {
+                         "sourceName": "molecularmatch"},
+                     "description": "ERBB2 A775_G776insYVMA confers sensitivity to Afatinib in patients with Neoplasm of lung"}],
+           "environmentalContexts": [
+               {"description": "Afatinib"}],
+           "evidence_label": "A", "response_type": "1A",
+           "evidence_level": 1}}
 
     _test(mm_entry, expected_hgvs=expected_hgvs_g)
     _test(mm_entry, expected_hgvs=expected_hgvs_p)
