@@ -7,7 +7,6 @@ if [ -z "$ES" ]
 fi
 echo setting up $ES
 curl  -X DELETE $ES"/associations"
-curl  -X DELETE $ES"/associations-new"
 echo deleted
 
 

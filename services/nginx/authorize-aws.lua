@@ -91,17 +91,6 @@ local restrictions = {
     ["/plugins.*"]                      = { "GET" },
     ["/es_admin.*"]                     = { "GET", "POST" },
 
-    ["^/?[^/]*/?[^/]*/elasticsearch"]                     = { "GET" },
-    ["^/?[^/]*/?[^/]*/elasticsearch/_search"]             = { "GET", "POST" },
-    ["^/?[^/]*/?[^/]*/elasticsearch/_msearch"]            = { "GET", "POST" },
-    ["^/?[^/]*/?[^/]*/elasticsearch/_mget"]               = { "GET", "POST" },
-
-    ["^/?[^/]*/?[^/]*/elasticsearch/.*/_search"]             = { "GET", "POST" },
-    ["^/?[^/]*/?[^/]*/elasticsearch/.*/_msearch"]            = { "GET", "POST" },
-    ["^/?[^/]*/?[^/]*/elasticsearch/.*/_mget"]               = { "GET", "POST" },
-
-    [".*/index-pattern/.*"]               = { "GET", "POST", "PUT" },
-
     ["/static.*"]                       = { "GET" },
     ["/admin.*"]                        = { "GET" }
 
@@ -129,7 +118,6 @@ local restrictions = {
     ["^/?[^/]*/?[^/]*/elasticsearch/_search"]             = { "GET", "POST" },
     ["^/?[^/]*/?[^/]*/elasticsearch/_msearch"]            = { "GET", "POST" },
     ["^/?[^/]*/?[^/]*/elasticsearch/_mget"]               = { "GET", "POST" },
-
 
     ["/static.*"]                       = { "GET" },
 
@@ -191,4 +179,3 @@ if not allowed then
   ngx.say("403 Role ["..role.."] not allowed to access the resource ["..method.." "..uri.."]")
   return ngx.exit(403)
 end
-]

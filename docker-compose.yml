@@ -24,8 +24,6 @@ services:
       - http.cors.enabled=true
       - http.cors.allow-origin=*
       - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
-      # - http.cors.allow-methods=OPTIONS, HEAD, GET, POST, PUT, DELETE
-      # - http.cors.allow-headers="X-Requested-With,X-Auth-Token,Content-Type, Content-Length, Authorization"
 
   kibana:
     container_name: kibana_g2p

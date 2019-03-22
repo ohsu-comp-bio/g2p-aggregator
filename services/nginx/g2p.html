@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>G2P 0.12</title>
+    <title>G2P 0.9</title>
 
     <!-- Bootstrap -->
     <!-- Latest compiled and minified CSS -->
@@ -54,15 +54,8 @@
     <div class="container table-container"   >
       <!-- <div class="container-fluid"> -->
         <div class="row table-row no-float">
-
               <div class="col-sm-12 no-float">
                   <div id="imaginary_container">
-                    <div class="collapse in" id="help">
-                      <h1>The Variant Interpretation for Cancer Consortium Meta-Knowledgebase</h1>
-                      <p class="help-block">Welcome to the Variant Interpretation for Cancer Consortium <a href="http://cancervariants.org" target="_blank">(VICC)</a> meta-knowledgebase. This is a search interface for cancer variant interpretations assembled by aggregating and harmonizing across <a href="http://cancervariants.org/organizations/" target="_blank">multiple cancer variant interpretation knowledgebases</a>.</p>
-                      <p class="help-block">If this is your first time here, we recommend reading the <a href="https://drive.google.com/file/d/1ufLacZ-6OIry3T6AmdkXRyXN_3xb178i/view?usp=sharing" target="_blank">help documentation</a> and trying the example queries below. Please send any questions to <a href="mailto:help@cancervariants.org">help@cancervariants.org</a>.</p>
-                    </div>
-
                       <div class="input-group stylish-input-group">
                           <input id="user_query" type="text" class="form-control"
                             placeholder="Start typing a gene, variant name, drug or disease.  e.g. MDM4, Breast, Ponatinib, ..." >
@@ -72,7 +65,7 @@
                               </button>
                           </span>
                           <span class="input-group-addon">
-                              <button role="button" data-toggle="collapse" data-target="#help" href="#help">
+                              <button type="submit" onclick="show_help()">
                                   <span class="glyphicon glyphicon-question-sign"></span>
                               </button>
                           </span>
@@ -81,7 +74,6 @@
               </div>
         <!-- </div> -->
       </div>
-
 
       <div class="row table-row full-height" >
         <div class="no-float" style="padding-bottom:8px">

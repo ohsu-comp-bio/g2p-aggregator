@@ -66,6 +66,9 @@ def _stdin_actions(args):
         count = count + 1
         if count > args.skip:
             hit = json.loads(line)
+            if hit['source'] == 'litvar':
+                continue
+
             # hit = _fix_features(hit)
             # hit = _fix_genes(hit)
             hit = _stringify(hit)
@@ -143,7 +146,8 @@ def _from_stdin(args):
     if not args.dry_run:
         print bulk(client,
                    (d for d in _stdin_actions(args)),
-                   request_timeout=120
+                   request_timeout=120,
+                   max_chunk_bytes=10485760
                    )
     else:
         for d in _stdin_actions(args):
