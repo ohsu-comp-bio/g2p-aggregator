@@ -9,7 +9,7 @@ CGI_VERSION=20170208
 
 all: oncokb_all_actionable_variants.tsv cgi_biomarkers_per_variant.tsv \
 		cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv \
-		benchmark_results.txt \
+		benchmark_results.txt oncokb_all_annotated_variants.tsv\
 		proteins
 
 ## Do bulk download of OncoKB and set up TSV for ingestion.
@@ -28,7 +28,7 @@ cgi_biomarkers_per_variant.tsv:
 	cd cgi_biomarkers_latest && \
 	curl -Ok https://www.cancergenomeinterpreter.org/data/cgi_biomarkers_latest.zip && \
 	unzip cgi_biomarkers_latest.zip
-	cp cgi_biomarkers_latest/cgi_biomarkers_per_variant.tsv .
+	cp cgi_biomarkers_latest/cgi_biomarkers_per_variant.tsv ../data/
 
 ## Do bulk download of CGI validated mutations and set up TSV for ingestion.
 catalog_of_validated_oncogenic_mutations.tsv:
