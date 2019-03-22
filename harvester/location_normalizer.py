@@ -545,6 +545,7 @@ if __name__ == '__main__':
     expected_hgvs_p = "NP_004439.2:p.Ala772_Met775dup"
     expected_hgvs_g = "NC_000017.10:g.37880985_37880996dup"
 
+    print('Testing CIViC AA normalization')
     civic_entry = {
         "features":[
             {
@@ -735,6 +736,7 @@ if __name__ == '__main__':
     _test(civic_entry, expected_hgvs=expected_hgvs_g)
     _test(civic_entry, expected_hgvs=expected_hgvs_p)
 
+    print('Testing CGI AA normalization')
     cgi_entry = {
         "cgi":
              {
@@ -790,6 +792,7 @@ if __name__ == '__main__':
     _test(cgi_entry, expected_hgvs=expected_hgvs_g)
     _test(cgi_entry, expected_hgvs=expected_hgvs_p)
 
+    print('Testing JAX AA normalization')
     jax_entry = {
         "features":[{"geneSymbol":"ERBB2","name":"ERBB2 Y772_A775dup "}],
         "jax":{
@@ -828,6 +831,7 @@ if __name__ == '__main__':
     _test(jax_entry, expected_hgvs=expected_hgvs_g)
     _test(jax_entry, expected_hgvs=expected_hgvs_p)
 
+    print('Testing MM AA normalization')
     mm_entry = {"molecularmatch":{
         "criteriaUnmet":[
             {
