@@ -440,6 +440,16 @@ def _test(feature, expected_hgvs=''):
         print 'OK', 'not normalized'
 
 
+def _test_feature_association(feature_association, expected_hgvs=''):
+    normalize_feature_association(feature_association)
+    for feature in feature_association['features']:
+        if expected_hgvs in feature.get('hgvs_p_suffix', []):
+            print "hgvs p suffix found"
+        if expected_hgvs in feature.get('hgvs_g_suffix', []):
+            print "hgvs g suffix found"
+    print "hgvs not found"
+
+
 if __name__ == '__main__':
     import yaml
     import logging.config
@@ -737,8 +747,8 @@ if __name__ == '__main__':
             "evidence_label":"D",
             "response_type":"Sensitivity","evidence_level":4}}
 
-    _test(civic_entry, expected_hgvs=expected_hgvs_g)
-    _test(civic_entry, expected_hgvs=expected_hgvs_p)
+    _test_feature_association(civic_entry, expected_hgvs=expected_hgvs_g)
+    _test_feature_association(civic_entry, expected_hgvs=expected_hgvs_p)
 
     print('Testing CGI AA normalization')
     cgi_entry = {
@@ -793,8 +803,8 @@ if __name__ == '__main__':
         }
     }
 
-    _test(cgi_entry, expected_hgvs=expected_hgvs_g)
-    _test(cgi_entry, expected_hgvs=expected_hgvs_p)
+    _test_feature_association(cgi_entry, expected_hgvs=expected_hgvs_g)
+    _test_feature_association(cgi_entry, expected_hgvs=expected_hgvs_p)
 
     print('Testing JAX AA normalization')
     jax_entry = {
@@ -832,8 +842,8 @@ if __name__ == '__main__':
             "evidence_level":3}
     }
 
-    _test(jax_entry, expected_hgvs=expected_hgvs_g)
-    _test(jax_entry, expected_hgvs=expected_hgvs_p)
+    _test_feature_association(jax_entry, expected_hgvs=expected_hgvs_g)
+    _test_feature_association(jax_entry, expected_hgvs=expected_hgvs_p)
 
     print('Testing MM AA normalization')
     mm_entry = {"molecularmatch":{
@@ -1377,5 +1387,5 @@ if __name__ == '__main__':
            "evidence_label": "A", "response_type": "1A",
            "evidence_level": 1}}
 
-    _test(mm_entry, expected_hgvs=expected_hgvs_g)
-    _test(mm_entry, expected_hgvs=expected_hgvs_p)
+    _test_feature_association(mm_entry, expected_hgvs=expected_hgvs_g)
+    _test_feature_association(mm_entry, expected_hgvs=expected_hgvs_p)
