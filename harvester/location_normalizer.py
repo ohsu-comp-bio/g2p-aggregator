@@ -536,9 +536,13 @@ if __name__ == '__main__':
                           "description": {"string_value": None}},
            "alt": "A", "ref": "T", "chromosome": "7"})
 
-    _test( {"entrez_id": 1956, "end": None, "name": "R776C", "start": None, "referenceName": "GRCh37", "geneSymbol": "EGFR", "alt": "None", "ref": "None", "chromosome": "None"})
+    _test({"entrez_id": 1956, "end": None, "name": "R776C", "start": None, "referenceName": "GRCh37",
+           "geneSymbol": "EGFR", "alt": "None", "ref": "None", "chromosome": "None"})
 
-    _test({"end": "55242478", "description": "EGFR E746_E749delELRE", "links": ["https://api.molecularmatch.com/v2/mutation/get?name=EGFR+E746_E749delELRE"], "start": "55242467", "biomarker_type": "nonsense", "referenceName": "GRCh37", "alt": "-", "ref": "12", "chromosome": "7", "name": "EGFR E746_E749delELRE"})
+    _test({"end": "55242478", "description": "EGFR E746_E749delELRE",
+           "links": ["https://api.molecularmatch.com/v2/mutation/get?name=EGFR+E746_E749delELRE"], "start": "55242467",
+           "biomarker_type": "nonsense", "referenceName": "GRCh37", "alt": "-", "ref": "12", "chromosome": "7",
+           "name": "EGFR E746_E749delELRE"})
 
     # Testing for AA normalization:
 
