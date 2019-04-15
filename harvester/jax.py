@@ -177,14 +177,12 @@ def convert(jax_evidence):
         return
 
     features = []
-    parts = profile.split()
 
     startTime = time.time()
     for i in range(len(gene_index)):
         feature = {}
         feature['geneSymbol'] = gene_index[i]
-        feature['name'] = ' '.join([gene_index[i],
-                                    mut_index[i], biomarkers[i]])
+        feature['name'] = ' '.join([mut_index[i], biomarkers[i]]).strip()
         if biomarkers[i]:
             feature['biomarker_type'] = biomarkers[i]
 
@@ -206,6 +204,8 @@ def convert(jax_evidence):
             feature['ref'] = match['ref']
             feature['alt'] = match['alt']
             feature['referenceName'] = str(match['build'])
+        else:
+            feature['protein_allele'] = True
         features.append(feature)
     logging.info("Time taken len(gene_index) {}".format(time.time() - startTime))
 

@@ -57,6 +57,12 @@ def lookup_from_gene(gene_symbol, ref_start=None, ref_end=None, exclude={}):
         if known is None:
             continue
         aa = known[0]
+        try:
+            int(aa)
+        except ValueError:
+            pass
+        else:
+            continue
         pos = int(known[1:])
         keep = set()
         for p in p_set:
