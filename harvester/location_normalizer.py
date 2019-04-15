@@ -10,7 +10,7 @@ import hgvs.edit
 from hgvs.sequencevariant import SequenceVariant
 from feature_enricher import enrich
 import protein
-from Bio.SeqUtils import seq1
+import time
 import hgvs.parser
 
 # expensive resource, create only once
@@ -260,23 +260,42 @@ def normalize(feature):
 
 
 variant_hgvs = dict()
-
+query_variant_ids = dict()
+WAIT_TIME = 10
 
 def _get_hgvs_set(clinvar_alleles, attempt=0):
-    url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&term={}[alleleid]'.format(
-        ','.join(clinvar_alleles)
-    )
-    resp = requests.get(url)
-    resp.raise_for_status()
-    tree = ElementTree.fromstring(resp.content)
-    variant_ids = [x.text for x in tree.find('IdList')]
+    query_string = ','.join(clinvar_alleles)
+    if query_string not in query_variant_ids:
+        url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&term={}[alleleid]'.format(
+            query_string
+        )
+        resp = requests.get(url)
+        if resp.status_code == 429:
+            if attempt < 3:
+                logging.info("Requests too frequent for query {}. Waiting {} seconds and reattempting.".format(query_string, WAIT_TIME))
+                time.sleep(WAIT_TIME)  # Wait
+                return _get_hgvs_set(clinvar_alleles, attempt=attempt+1)
+            else:
+                logging.info("Aborting allele query {} after 3 retries.".format(query_string))
+        resp.raise_for_status()
+        tree = ElementTree.fromstring(resp.content)
+        variant_ids = [x.text for x in tree.find('IdList')]
+        query_variant_ids[query_string] = variant_ids
+    else:
+        variant_ids = query_variant_ids[query_string]
     hgvs_set = set()
 
+    attempt = 0
     for variant_id in variant_ids:
         if variant_id in variant_hgvs:
             return variant_hgvs[variant_id]
         url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=clinvar&id={}&rettype=variation'.format(variant_id)
         resp = requests.get(url)
+        while resp.status_code == 429 and attempt < 3:
+            logging.info("Requests too frequent for variation {}. Waiting {} seconds and reattempting.".format(variant_id, WAIT_TIME))
+            time.sleep(WAIT_TIME)  # Wait
+            attempt += 1
+            resp = requests.get(url)
         resp.raise_for_status()
         tree = ElementTree.fromstring(resp.content)
         hgvs_list = tree.find('VariationReport').find('Allele').find('HGVSlist')
