@@ -94,6 +94,8 @@ def get_evidence():
                     yield hit
                 else:
                     logging.info('duplicate: {}'.format(hit['hashKey']))
+            if not assertions['rows']:
+                start = -1
 
         except Exception as e:
             logging.error(
