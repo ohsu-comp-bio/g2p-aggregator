@@ -41,6 +41,7 @@ def _get_ref_alt(description):
     return None
 
 
+normalized_hgvs_sets = dict()
 def hgvs_query_allele_registry(hgvs):
     """
     call allele registry with hgvs notation, return allele registry response and url
@@ -48,11 +49,31 @@ def hgvs_query_allele_registry(hgvs):
     url = 'http://reg.genome.network/allele?hgvs={}' \
         .format(requests.utils.quote(hgvs))
     r = requests.get(url, headers={'Accept': 'application/json'})
-    if r.status_code not in [200, 400, 404]:
+    if r.status_code not in [200, 400, 404, 500]:
         logging.info('unexpected allele_registry {} {}'.format(url,
                                                                r.status_code))
     rsp = r.json()
+    if r.status_code == 200 and 'errorType' not in rsp:
+        all_hgvs = {hgvs, }
+        ga = rsp.get('genomicAlleles', [])
+        ta = rsp.get('transcriptAlleles', [])
+        aa = rsp.get('aminoAcidAlleles', [])
+        ga_hgvs = set([y for x in ga for y in x['hgvs']])
+        ta_hgvs = set([y for x in ta for y in x['hgvs']])
+        aa_hgvs = set([y for x in aa for y in x['hgvs']])
+        all_hgvs = all_hgvs | ga_hgvs | ta_hgvs | aa_hgvs
+        for h in all_hgvs:
+            normalized_hgvs_sets[h] = all_hgvs
+    elif r.status_code in [400, 404, 500]:
+        normalized_hgvs_sets[hgvs] = set()
     return rsp, url
+
+
+def _get_normalized_hgvs_set(hgvs_query):
+    if hgvs_query in normalized_hgvs_sets:
+        return normalized_hgvs_sets[hgvs_query]
+    hgvs_query_allele_registry(hgvs_query)
+    return normalized_hgvs_sets.get(hgvs_query, set())
 
 
 def construct_hgvs(feature, complement=False, description=False, exclude={}):
@@ -261,7 +282,7 @@ def normalize(feature):
 
 variant_hgvs = dict()
 query_variant_ids = dict()
-WAIT_TIME = 10
+WAIT_TIME = 2
 
 def _get_hgvs_set(clinvar_alleles, attempt=0):
     query_string = ','.join(clinvar_alleles)
@@ -364,6 +385,11 @@ def _apply_allele_registry(feature, allele_registry, provenance):
     pa = feature.get('protein_allele', False)
     hgvs_set = _get_hgvs_set(extract['clinvar_alleles'])
     synonyms.update(hgvs_set)
+    normalized_synonyms = set()
+    for s in synonyms:
+        normalized_hgvs_set = _get_normalized_hgvs_set(s)
+        normalized_synonyms.update(normalized_hgvs_set)
+    synonyms |= normalized_synonyms
 
     if len(synonyms) > 0:
         feature['synonyms'] = list(synonyms)
@@ -578,7 +604,7 @@ if __name__ == '__main__':
 
     # Testing for AA normalization:
 
-    expected_hgvs_p = "NP_004439.2:p.A775_G776insYVMA"
+    expected_hgvs_p = "NP_004439.2:p.A772_M775dup"
     expected_hgvs_g = "NC_000017.10:g.37880985_37880996dup"
 
     print('Testing CIViC AA normalization')
