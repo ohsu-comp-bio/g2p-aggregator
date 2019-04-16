@@ -70,7 +70,7 @@ def lookup_from_gene(gene_symbol, ref_start=None, ref_end=None, exclude={}):
         for p in p_set:
             try:
                 ref_aa = fasta[p][pos-1]
-            except IndexError:
+            except (KeyError, IndexError):
                 continue
             if ref_aa == aa:
                 keep.add(p)
