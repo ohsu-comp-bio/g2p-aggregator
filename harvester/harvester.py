@@ -274,6 +274,8 @@ def main():
                     silos[0].save(record, mode='convert')
             silos[0].close_file()
         elif args.phase == 'normalize':
+            if h == 'cgi_biomarkers':
+                h = 'cgi'
             records = FileSilo(args).load_file(h, 'convert')
             silos[0].save_bulk(_check_dup(records), source=h)
             silos[0].close_file()

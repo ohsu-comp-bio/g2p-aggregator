@@ -29,6 +29,8 @@ protein_name_re = re.compile(r'(?P<start>[A-Z]?\d+)(?:-|_(?P<end>[A-Z]?\d+))?(?P
 
 def parse_components(name_string):
     match = protein_name_re.match(name_string)
+    if match is None:
+        return None
     return match.groupdict()
 
 

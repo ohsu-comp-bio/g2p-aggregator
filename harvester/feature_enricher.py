@@ -133,12 +133,15 @@ def enrich(feature, feature_association):
     # rules for protein features
     if feature.get('protein_allele', False):
         components = protein.parse_components(feature['name'])
-        for component in ['alt', 'start', 'end']:
-            if not feature.get('protein_{}'.format(component), False):
-                feature['protein_{}'.format(component)] = components[component]
-        if components.get('alt_type', False):
-            feature['biomarker_type'] = components['alt_type']
-        return enriched_features
+        if components is None:
+            feature['protein_allele'] = False
+        else:
+            for component in ['alt', 'start', 'end']:
+                if not feature.get('protein_{}'.format(component), False):
+                    feature['protein_{}'.format(component)] = components[component]
+            if components.get('alt_type', False):
+                feature['biomarker_type'] = components['alt_type']
+            return enriched_features
 
     # rules for other features
     try:
@@ -157,7 +160,6 @@ def enrich(feature, feature_association):
         if not feature.get('description', None):
             feature['provenance_rule'] = 'missing_description'
             return [feature]
-
 
         # apply rules
         description_parts = re.split(' +', feature['description'].strip())
