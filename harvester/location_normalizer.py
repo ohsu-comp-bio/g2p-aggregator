@@ -130,7 +130,7 @@ def construct_hgvs(feature, complement=False, description=False, exclude={}):
     if pa:
         ref = feature.get('protein_ref', None)
         alt = feature.get('protein_alt', None)
-        var_type = feature['biomarker_type'].lower()
+        var_type = feature.get('biomarker_type', '').lower()
         if var_type == 'ins':
             edit = hgvs.edit.AARefAlt(alt=alt)
         elif var_type == 'dup':
@@ -229,8 +229,8 @@ def _get_feature_attr(feature, attr):
 
 
 def normalize(feature):
-
-    if feature.get('protein_allele', False):
+    pa = feature.get('protein_allele', False)
+    if pa:
         start = _get_feature_attr(feature, 'protein_start')
         if not start:
             return None, None
@@ -269,14 +269,20 @@ def normalize(feature):
                 allele['errorType'] == 'IncorrectHgvsPosition'):
             # print 'position error re-try'
             hgvs = construct_hgvs(feature, exclude={hgvs.split(':')[0],})
-            (allele, provenance) = hgvs_query_allele_registry(hgvs)
+            if hgvs:
+                (allele, provenance) = hgvs_query_allele_registry(hgvs)
 
         if ('errorType' in allele and
                 allele['errorType'] == 'IncorrectHgvsPosition'):
             # print 'position error re-try'
             hgvs = construct_hgvs(feature, description=True)
-            (allele, provenance) = hgvs_query_allele_registry(hgvs)
-
+            if hgvs:
+                (allele, provenance) = hgvs_query_allele_registry(hgvs)
+            else:
+                (allele, provenance) = None, None
+    if hgvs is None and pa:
+        feature['protein_allele'] = False
+        return normalize(feature)
     return allele, provenance
 
 

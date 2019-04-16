@@ -78,7 +78,7 @@ def lookup_from_gene(gene_symbol, ref_start=None, ref_end=None, exclude={}):
     for p in proteins:
         if p in p_set and p not in exclude:
             return p
-    assert False
+    return None
 
 
 def _test_lookup(gene_symbol, expected_protein_id, **kwargs):
