@@ -318,7 +318,7 @@ def _get_hgvs_set(clinvar_alleles, attempt=0):
             return variant_hgvs[variant_id]
         url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=clinvar&id={}&rettype=variation'.format(variant_id)
         resp = requests.get(url)
-        while resp.status_code == 429 and attempt < 3:
+        while (resp.status_code == 429 or resp.status_code >= 500) and attempt < 3:
             logging.info("Requests too frequent for variation {}. Waiting {} seconds and reattempting.".format(variant_id, WAIT_TIME))
             time.sleep(WAIT_TIME)  # Wait
             attempt += 1
