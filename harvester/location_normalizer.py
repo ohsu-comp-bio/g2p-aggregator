@@ -297,7 +297,7 @@ def _get_hgvs_set(clinvar_alleles, attempt=0):
             query_string
         )
         resp = requests.get(url)
-        if resp.status_code == 429:
+        if resp.status_code == 429 or resp.status_code >= 500:
             if attempt < 3:
                 logging.info("Requests too frequent for query {}. Waiting {} seconds and reattempting.".format(query_string, WAIT_TIME))
                 time.sleep(WAIT_TIME)  # Wait
@@ -468,31 +468,6 @@ def normalize_feature_association(feature_association):
                                                            allele_registry))
 
 
-def _test(feature, expected_hgvs=''):
-    if feature.get('protein_allele', False):
-        feature = enrich(feature, None)[0]
-    ar, q = normalize(feature)
-    if ar:
-        _apply_allele_registry(feature, ar, q)
-        hgvs = feature.get('synonyms', [])
-        if '@id' not in ar:
-            print 'FAIL', ar['message']
-            print "\t", ', '.join(hgvs)
-            print "\t", feature
-            print "\t", ar
-        elif expected_hgvs and expected_hgvs not in hgvs:
-            print 'FAIL', 'expected hgvs not found in synonyms'
-            print "\t", q
-            print "\t", ', '.join(hgvs)
-            print "\t", expected_hgvs
-        else:
-            print 'OK'
-    elif expected_hgvs:
-        print 'FAIL', 'no response object'
-    else:
-        print 'OK', 'not normalized'
-
-
 def _test_feature_association(feature_association, expected_hgvs=''):
     normalize_feature_association(feature_association)
     suffix = expected_hgvs.split(':')[-1]
@@ -513,100 +488,6 @@ if __name__ == '__main__':
     with open(path) as f:
         config = yaml.load(f)
     logging.config.dictConfig(config)
-
-    # _test({
-    #   "entrez_id": 238,
-    #   "end": 29445213,
-    #   "name": "HIP1-ALK I1171N",
-    #   "start": 29445213,
-    #   "biomarker_type": "snp",
-    #   "referenceName": "GRCh37",
-    #   "geneSymbol": "ALK",
-    #   "alt": "T",
-    #   "ref": "A",
-    #   "chromosome": "2"
-    # })
-    #
-    # _test({"end": "55242483",
-    #        "name": "EGFR c.2237_2253delAATTAAGAGAAGCAACAinsTC",
-    #        "start": "55242467", "biomarker_type": "snp",
-    #        "referenceName": "GRCh37", "alt": "TC", "ref": "-",
-    #        "chromosome": "7",
-    #        "description": "EGFR c.2237_2253delAATTAAGAGAAGCAACAinsTC"})
-    #
-    # _test({"entrez_id": 9968, "end": 70349258, "name": "L1224F",
-    #        "start": 70349258, "biomarker_type": "snp",
-    #        "referenceName": "GRCh37", "geneSymbol": "MED12",
-    #        "alt": "T", "ref": "C", "chromosome": "23"})
-    #
-    # _test({"name": "ABL1:V289I", "start": 133747558,
-    #        "biomarker_type": "mutant", "referenceName": "GRCh37",
-    #        "geneSymbol": "ABL1", "alt": "A", "ref": "G", "chromosome": "9",
-    #        "description": "ABL1:I242T,M244V,K247R,L248V,G250E,G250R,Q252R,Q252H,Y253F,Y253H,E255K,E255V,M237V,E258D,W261L,L273M,E275K,E275Q,D276G,T277A,E279K,V280A,V289A,V289I,E292V,E292Q,I293V,L298V,V299L,F311L,F311I,T315I,F317L,F317V,F317I,F317C,Y320C,L324Q,Y342H,M343T,A344V,A350V,M351T,E355D,E355G,E355A,F359V,F359I,F359C,F359L,D363Y,L364I,A365V,A366G,L370P,V371A,E373K,V379I,A380T,F382L,L384M,L387M,L387F,L387V,M388L,Y393C,H396P,H396R,H396A,A397P,S417F,S417Y,I418S,I418V,A433T,S438C,E450K,E450G,E450A,E450V,E453K,E453G,E453A,E453V,E459K,E459G,E459A,E459V,M472I,P480L,F486S,E507G"})  # NOQA
-    #
-    # _test({"end": 28592642, "name": "FLT3 D835N", "referenceName": "GRCh37",
-    #        "start": 28592642, "biomarker_type": "snp", "geneSymbol": "FLT3",
-    #        "attributes": {"amino_acid_change": {"string_value": "D835N"},
-    #                         "germline": {"string_value": None},
-    #                         "partner_gene": {"string_value": None},
-    #                         "cytoband": {"string_value": None},
-    #                         "exons": {"string_value": "20"},
-    #                         "notes": {"string_value": None},
-    #                         "cosmic": {"string_value": "789"},
-    #                         "effect": {"string_value": None},
-    #                         "cnv_type": {"string_value": None},
-    #                         "id": {"string_value": 139},
-    #                         "variant_type": {"string_value": "missense"},
-    #                         "dna_change": {"string_value": "2503G>A"},
-    #                         "codons": {"string_value": "835"},
-    #                         "chromosome_based_cnv": {"string_value": False},
-    #                         "transcript": {"string_value": "ENST00000241453"},
-    #                         "description_type": {"string_value": "HGVS"},
-    #                         "chromosome": {"string_value": None},
-    #                         "description": {"string_value": None}},
-    #       "alt": "A", "ref": "G", "chromosome": "13"})
-    #
-    # _test({"end": "55592183", "name": "KIT p.S501_A502dup",
-    #        "start": "55592183",
-    #        "biomarker_type": "polymorphism", "referenceName": "GRCh37",
-    #        "alt": "CTGCCT", "ref": "-", "chromosome": "4",
-    #        "description": "KIT p.S501_A502dup"})
-    #
-    # _test({"end": "37880996", "name": "ERBB2 Y772_A775dup",
-    #        "start": "37880995",
-    #        "biomarker_type": "nonsense", "referenceName": "GRCh37",
-    #        "alt": "ATACGTGATGGC", "ref": "-", "chromosome": "17",
-    #        "description": "ERBB2 Y772_A775dup"})
-    #
-    # _test({"end": 140453136, "name": "BRAF V600E", "referenceName": "GRCh37",
-    #        "start": 140453136, "biomarker_type": "snp", "geneSymbol": "BRAF",
-    #        "attributes": {"amino_acid_change": {"string_value": "V600E"},
-    #                       "germline": {"string_value": None},
-    #                       "partner_gene": {"string_value": None},
-    #                       "cytoband": {"string_value": None},
-    #                       "exons": {"string_value": "15"},
-    #                       "notes": {"string_value": None},
-    #                       "cosmic": {"string_value": "476"},
-    #                       "effect": {"string_value": None},
-    #                       "cnv_type": {"string_value": None},
-    #                       "id": {"string_value": 112},
-    #                       "variant_type": {"string_value": "missense"},
-    #                       "dna_change": {"string_value": "1799T>A"},
-    #                       "codons": {"string_value": "600"},
-    #                       "chromosome_based_cnv": {"string_value": False},
-    #                       "transcript": {"string_value": "ENST00000288602"},
-    #                       "description_type": {"string_value": "HGVS"},
-    #                       "chromosome": {"string_value": None},
-    #                       "description": {"string_value": None}},
-    #        "alt": "A", "ref": "T", "chromosome": "7"})
-    #
-    # _test({"entrez_id": 1956, "end": None, "name": "R776C", "start": None, "referenceName": "GRCh37",
-    #        "geneSymbol": "EGFR", "alt": "None", "ref": "None", "chromosome": "None"})
-    #
-    # _test({"end": "55242478", "description": "EGFR E746_E749delELRE",
-    #        "links": ["https://api.molecularmatch.com/v2/mutation/get?name=EGFR+E746_E749delELRE"], "start": "55242467",
-    #        "biomarker_type": "nonsense", "referenceName": "GRCh37", "alt": "-", "ref": "12", "chromosome": "7",
-    #        "name": "EGFR E746_E749delELRE"})
 
     # Testing for AA normalization:
 
