@@ -130,7 +130,10 @@ def construct_hgvs(feature, complement=False, description=False, exclude={}):
     if pa:
         ref = feature.get('protein_ref', None)
         alt = feature.get('protein_alt', None)
-        var_type = feature.get('biomarker_type', '').lower()
+        try:
+            var_type = feature.get('biomarker_type', '').lower()
+        except AttributeError:
+            var_type = ''
         if var_type == 'ins':
             edit = hgvs.edit.AARefAlt(alt=alt)
         elif var_type == 'dup':
