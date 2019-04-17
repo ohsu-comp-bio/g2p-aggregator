@@ -27,8 +27,7 @@ def _parse_profile(profile):
     global LOOKUP_TABLE
     global gene_list
     if not LOOKUP_TABLE:
-        LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
-                "./cosmic_lookup_table.tsv")
+        LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup()
     parts = profile.split()
     # this list taken from https://ckb.jax.org/about/glossaryOfTerms
     # "Non specific variants" list, separated by space, where applicable
@@ -137,11 +136,14 @@ def _get_trials_ids():
 
 def get_evidence(trial_infos):
     """ scrape api """
-    gene_evidence = []
     for trial_info in trial_infos:
         url = 'https://ckb.jax.org/ckb-app/api/v1/clinicalTrials/{}'.format(trial_info['id'])  # NOQA
         with requests_cache.disabled():
-            page = requests.get(url, verify=False)
+            try:
+                page = requests.get(url, verify=False)
+            except requests.ConnectionError as e:
+                logging.warn(e)
+                continue
         clinicalTrial = page.json()
         if clinicalTrial['variantRequirements'] == 'no' or len(clinicalTrial['variantRequirementDetails']) == 0:  # NOQA
             logging.info('no variants, skipping {}'.format(trial_info['id']))
