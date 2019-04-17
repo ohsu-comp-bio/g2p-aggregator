@@ -161,7 +161,7 @@ def construct_hgvs(feature, complement=False, description=False, exclude={}):
 
         edit = hgvs.edit.NARefAlt(ref=ref, alt=alt)
         hgvs_type = 'g'
-        if feature.get('referenceName') == '37':
+        if '37' in feature.get('referenceName', ''):
             feature['referenceName'] = 'GRCh37'
         assert feature.get('referenceName') == 'GRCh37',  'should be GRCh37? was {}'.format(feature.get('referenceName'))
         ac = ac_map[feature['chromosome']]
