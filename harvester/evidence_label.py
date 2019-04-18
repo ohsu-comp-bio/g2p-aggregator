@@ -24,8 +24,8 @@ def evidence_label(evidence, association, na=False):
 
     # JAX
     jax_a = ['guideline', 'fda approved']
-    jax_b = ['phase iii']
-    jax_c = ['phase i', 'phase ib', 'phase ib/ii', 'phase ii', 'clinical study']
+    jax_b = ['phase iii', 'clinical study - cohort', 'clinical study - meta-analysis']
+    jax_c = ['phase i', 'phase ib', 'phase ib/ii', 'phase ii', 'clinical study', 'case reports/case series']
     jax_d = ['phase 0', 'preclinical', 'preclinical - cell line xenograft', 'preclinical - cell culture', 'preclinical - pdx', 'preclinical - patient cell culture', 'preclinical - pdx & cell culture'] # NOQA
 
     # PMKB
