@@ -1,4 +1,4 @@
-# g2p-aggregator
+# The VICC Meta-Knowledgebase
 
 
 ## What is it?  Why use it?
@@ -9,9 +9,11 @@
 
 * Quickly determine the diseases, drugs and outcomes based on evidence from trusted sources. Find relevant articles and (soon) drug response data.
 
-* Inform GA4GH G2P discussions
+* Inform discussions on modeling interpretation data between the VICC, GA4GH, and ClinGen
 
-A prototype of the Genotype to phenotype user interface exists [here](https://search.cancervariants.org).   
+We host this Meta-Knowledgebase online at [search.cancervariants.org](https://search.cancervariants.org).
+
+Documentation and usage examples can be found online at [docs.cancervariants.org](https://docs.cancervariants.org)
 
 ##  Where does the data come from?
 
