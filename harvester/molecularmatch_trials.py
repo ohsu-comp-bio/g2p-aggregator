@@ -16,12 +16,6 @@ TRIAL_IDS = []
 
 def get_evidence(gene_ids=None):
     """ load from remote api, ignores genes - returns all CANCER trials """
-    # override with data from file if it exists
-    if os.path.isfile('molecularmatch_trials.json'):
-        for evidence in get_evidence_from_file('molecularmatch_trials.json'):
-            yield evidence
-        return
-    # otherwise, get data from remote api
     apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
     if not apiKey:
         raise ValueError('Please set MOLECULAR_MATCH_API_KEY in environment')
@@ -30,18 +24,18 @@ def get_evidence(gene_ids=None):
         gene_ids = DEFAULT_GENES
 
     count = 0
+    prev_count = -1
     start = int(os.getenv('MM_TRIALS_START', 0))
-    end = int(os.getenv('MM_TRIALS_END', sys.maxint))
-    limit = 20
+    limit = 100
     filters = [{'facet': 'CONDITION', 'term': 'CANCER'}]
     resourceURLs = {
-        "trials": "/v2/trial/search"
+        "trials": "/v3/trial/search"
     }
     mmService = "http://api.molecularmatch.com"
-    apiKey = os.environ.get('MOLECULAR_MATCH_API_KEY')
     url = mmService + resourceURLs["trials"]
 
-    while start >= 0:
+    while count > prev_count:
+        prev_count = count
         payload = {
             'apiKey': apiKey,
             'limit': limit,
@@ -52,42 +46,34 @@ def get_evidence(gene_ids=None):
             # time.sleep(2)  # rate limit
             logging.info('%s %s', url, json.dumps(payload))
             with requests_cache.disabled():
-                r = requests.post(url, data=payload, timeout=120)
+                r = requests.post(url, data=payload, timeout=30)
+                r.raise_for_status()
                 assertions = r.json()
-            if 'page' not in assertions:
-                logging.info(assertions)
-            logging.info(
-                "page {} of {}. total {} count {}".format(
-                    assertions['page'],
-                    assertions['totalPages'],
-                    assertions['total'],
-                    count
-                    )
-            )
-            # filter those drugs, only those with diseases
-            for hit in assertions['rows']:
-                count += 1
-                yield hit
-            if assertions['total'] == 0:
-                start = -1
+            attempt = 0
+        except (requests.ConnectionError, requests.HTTPError) as e:
+            if attempt < 3:
+                prev_count = -1
+                attempt += 1
                 continue
             else:
-                start = start + limit
-            if start > end:
-                logging.info("reached end {}".format(end))
-                start = -1
-        except requests.exceptions.ConnectionError as ce:
-            logging.error(
-                "molecularmatch ConnectionError, retrying. fetching {}"
-                .format(gene),
-            )
-        except Exception as e:
-            logging.error(
-                "molecularmatch error fetching {}".format(gene),
-                exc_info=1
-            )
-            start = -1
+                raise('Received 3 sequential errors, final error: {}'.format(e))
 
+        if 'page' not in assertions:
+            logging.info(assertions)
+        logging.info(
+            "page {} of {}. total {} count {}".format(
+                assertions['page'],
+                assertions['totalPages'],
+                assertions['total'],
+                count
+                )
+        )
+
+        for hit in assertions['rows']:
+            count += 1
+            yield hit
+
+        start += 1
 
 def get_evidence_from_file(filepath):
     """ read raw mm data from file """
