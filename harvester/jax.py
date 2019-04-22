@@ -2,7 +2,6 @@
 import requests
 import requests_cache
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from inflection import parameterize, underscore
 import json
 import re
 
