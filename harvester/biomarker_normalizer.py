@@ -69,8 +69,11 @@ def get_soid_data(soid):
 
 def normalize(biomarker):
     """ take the given biomarker definition from each
-        source and search through sqquence ontology
+        source and search through sequence ontology
         for it """
+    if biomarker is None:
+        return None
+
     if biomarker in BIOONTOLOGY_NOFINDS:
         logging.info('{} in biomarker_normalizer.BIOONTOLOGY_NOFINDS'
                      .format(biomarker))
@@ -106,6 +109,7 @@ def normalize_feature_association(feature_association):
     for feat in feature_association['features']:
         if 'biomarker_type' not in feat:
             continue
+        print(feat['biomarker_type'])
         btype = normalize(feat['biomarker_type'])
         if btype is None:
             feature_association['dev_tags'].append('no-so')

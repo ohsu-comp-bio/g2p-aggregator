@@ -9,27 +9,45 @@ CGI_VERSION=20170208
 
 all: oncokb_all_actionable_variants.tsv cgi_biomarkers_per_variant.tsv \
 		cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv \
-		benchmark_results.txt
-	
+		benchmark_results.txt oncokb_all_annotated_variants.tsv\
+		proteins
 
 ## Do bulk download of OncoKB and set up TSV for ingestion.
 oncokb_all_actionable_variants.tsv:
 	curl -o oncokb_all_actionable_variants_$(shell date +"%Y%m%d").tsv http://oncokb.org/api/v1/utils/allActionableVariants.txt
-	ln -s oncokb_all_actionable_variants_$(shell date +"%Y%m%d").tsv oncokb_all_actionable_variants.tsv
+	cp oncokb_all_actionable_variants_$(shell date +"%Y%m%d").tsv ../data/oncokb_allActionableVariants.txt
+
+## Do bulk download of OncoKB annotated variants for harvester
+oncokb_all_annotated_variants.tsv:
+	curl -o oncokb_all_annotated_variants_$(shell date +"%Y%m%d").tsv https://oncokb.org/api/v1/utils/allAnnotatedVariants.txt
+	cp oncokb_all_annotated_variants_$(shell date +"%Y%m%d").tsv ../data/oncokb_allAnnotatedVariants.txt
 
 ## Do bulk download of CGI and set up TSV for ingestion.
 cgi_biomarkers_per_variant.tsv:
-	mkdir cgi_biomarkers_$(CGI_VERSION)
-	cd cgi_biomarkers_$(CGI_VERSION) && \
-	curl -Ok https://www.cancergenomeinterpreter.org/data/cgi_biomarkers_$(CGI_VERSION).zip && \
-	unzip cgi_biomarkers_$(CGI_VERSION).zip
-	cp cgi_biomarkers_$(CGI_VERSION)/cgi_biomarkers_per_variant.tsv .
+	mkdir cgi_biomarkers_latest
+	cd cgi_biomarkers_latest && \
+	curl -Ok https://www.cancergenomeinterpreter.org/data/cgi_biomarkers_latest.zip && \
+	unzip cgi_biomarkers_latest.zip
+	cp cgi_biomarkers_latest/cgi_biomarkers_per_variant.tsv ../data/
+
+## Do bulk download of CGI validated mutations and set up TSV for ingestion.
+catalog_of_validated_oncogenic_mutations.tsv:
+	mkdir cgi_validated_oncogenic
+	cd cgi_validated_oncogenic && \
+	curl -Ok https://www.cancergenomeinterpreter.org/data/catalog_of_validated_oncogenic_mutations_latest.zip && \
+	unzip catalog_of_validated_oncogenic_mutations_latest.zip
+	cp cgi_validated_oncogenic/catalog_of_validated_oncogenic_mutations.tsv .
 
 ## Create COSMIC lookup table suitable for annotating variants with chrom/start/end/ref/alt
 cosmic_lookup_table.tsv:
 	gzcat $(COSMIC_MUTATIONS) | tail -n +2 | python cosmic_lookup_table.py create_table > temp.tsv
 	(head -n 1 temp.tsv ; tail -n +2 temp.tsv | sort | uniq) > cosmic_lookup_table.tsv
 	rm -f temp.tsv
+
+## Create lookup tables for proteins
+proteins:
+	mkdir -p ../data/proteins/
+	wget -r -l1 -np -nd "ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/" -P ../data/proteins -A "human.*.protein.faa.gz"
 
 ## Create cgi_mut_benchmarking.tsv file.
 cgi_mut_benchmarking.tsv:
@@ -39,7 +57,7 @@ cgi_mut_benchmarking.tsv:
 
 ## Create oncokb_mut_benchmarking.tsv file.
 oncokb_mut_benchmarking.tsv: oncokb_all_actionable_variants.tsv
-	cut -f1-2 oncokb_all_actionable_variants.tsv | \
+	cut -f1-2 oncokb_all_actionable_variants_$(shell date +"%Y%m%d").tsv | \
 	egrep -v "del|ins|Fusion|Oncogenic|mutations|dup|Wildtype|Amplification|Truncating|splice" \
 	> oncokb_mut_benchmarking.tsv
 
@@ -53,5 +71,6 @@ $(COSMIC_MUTATIONS):
 
 clean:
 	rm -rf cosmic_lookup_table.tsv cgi_mut_benchmarking.tsv oncokb_mut_benchmarking.tsv benchmark.txt \
+	rm -rf catalog_of_validated_oncogenic_mutations_latest cgi_biomarkers_latest \
 	cgi_biomarkers_$(CGI_VERSION) cgi_biomarkers_per_variant.tsv \
 	oncokb_all_actionable_variants*.tsv

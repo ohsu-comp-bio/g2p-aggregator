@@ -23,17 +23,18 @@ util/elastic/backups
 data/*.json
 data/*.txt
 data/msk_impact_2017*
-# data/*.tsv
+data/*.tsv
 data/cgi_biomarkers_per_variant.tsv
 data/cgi_oncogenic_mutations.tsv
 data/oncokb_all_mutations.tsv
+data/proteins/
 harvester/data
 harvester/cosmic_lookup_table.tsv
 harvester/CosmicMutantExport.tsv.gz
 harvester/benchmark_results.txt
 harvester/cgi_mut_benchmarking.tsv
 harvester/oncokb_mut_benchmarking.tsv
-harvester/oncokb_all_actionable_variants*.*
+harvester/oncokb_all_*.*
 data/local
 
 # ignore certs, etc.
@@ -55,3 +56,4 @@ harvester/zotero_help.py
 util/**/*.json
 harvester/*.json
 harvester/molecularmatch_trials.json
+harvester/cgi_validated_oncogenic

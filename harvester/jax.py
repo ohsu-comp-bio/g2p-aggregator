@@ -1,8 +1,7 @@
 
-import sys
 import requests
+import requests_cache
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from inflection import parameterize, underscore
 import json
 import re
 
@@ -13,6 +12,7 @@ import evidence_direction as ed
 import cosmic_lookup_table
 from attrdict import AttrDict
 import time
+import os
 
 LOOKUP_TABLE = None
 gene_list = None
@@ -21,6 +21,8 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # see https://ckb.jax.org/about/curationMethodology
 
+JAX_URL = os.getenv('JAX_URL')
+
 
 def _parse_profile(profile):
     parts = profile.split()
@@ -28,8 +30,7 @@ def _parse_profile(profile):
     global gene_list
     if not LOOKUP_TABLE:
         logging.info('_parse_profile: init LOOKUP_TABLE')
-        LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
-                "./cosmic_lookup_table.tsv")
+        LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup()
     parts = profile.split()
     # this list taken from https://ckb.jax.org/about/glossaryOfTerms
     # "Non specific variants" list, separated by space, where applicable
@@ -122,10 +123,12 @@ def _get_gene_ids():
     size = 100
     gene_count = 0
     while offset > -1:
-        url = 'https://ckb.jax.org/ckb-api/api/v1/genes?offset={}&max={}' \
-                .format(offset, size)
-        response = AttrDict(
-            requests.get(url, verify=False, timeout=120).json())
+        url = '{}?offset={}&max={}' \
+                .format(JAX_URL, offset, size)
+        with requests_cache.disabled():
+            response = AttrDict(
+                requests.get(url, verify=False, timeout=120).json()
+            )
         gene_count = gene_count + len(response.genes)
         if gene_count >= response.totalCount:
             offset = -1
@@ -142,9 +145,10 @@ def get_evidence(genes):
     #     "approvalStatus": "Clinical Study",
     #     "evidenceType": "Actionable",
     for gene in genes:
-        url = 'https://ckb.jax.org/ckb-api/api/v1/genes/{}/evidence' \
-                .format(gene.id)
-        response = requests.get(url, verify=False, timeout=120).json()
+        url = '{}/{}/evidence' \
+                .format(JAX_URL, gene.id)
+        with requests_cache.disabled():
+            response = requests.get(url, verify=False, timeout=120).json()
         for evidence in response:
             yield AttrDict({'gene': gene.geneSymbol,
                             'jax_id': gene.id,
@@ -153,33 +157,31 @@ def get_evidence(genes):
 
 def convert(jax_evidence):
     global LOOKUP_TABLE
-    gene = jax_evidence.gene
-    jax = jax_evidence.jax_id
-    evidence = jax_evidence.evidence
+    gene = jax_evidence['gene']
+    jax = jax_evidence['jax_id']
+    evidence = jax_evidence['evidence']
     # TODO: alterations are treated individually right now, but they are
     # actually combinations and should be treated accordingly.
 
     # Parse molecular profile and use for variant-level information.
-    profile = evidence.molecularProfile.profileName.replace('Tp53', 'TP53').replace(' - ', '-')
+    profile = evidence['molecularProfile']['profileName'].replace('Tp53', 'TP53').replace(' - ', '-')
     gene_index, mut_index, biomarkers, fusions = _parse_profile(profile)
 
     if not (len(gene_index) == len(mut_index) == len(biomarkers)):
         logging.warning(
             "ERROR: This molecular profile has been parsed incorrectly!")
         logging.warning(json.dumps(
-            {"molecular_profile": evidence.molecularProfile},
+            {"molecular_profile": evidence['molecularProfile']},
             indent=2, sort_keys=True))
         return
 
     features = []
-    parts = profile.split()
 
     startTime = time.time()
     for i in range(len(gene_index)):
         feature = {}
         feature['geneSymbol'] = gene_index[i]
-        feature['name'] = ' '.join([gene_index[i],
-                                    mut_index[i], biomarkers[i]])
+        feature['name'] = ' '.join([mut_index[i], biomarkers[i]]).strip()
         if biomarkers[i]:
             feature['biomarker_type'] = biomarkers[i]
 
@@ -201,6 +203,8 @@ def convert(jax_evidence):
             feature['ref'] = match['ref']
             feature['alt'] = match['alt']
             feature['referenceName'] = str(match['build'])
+        else:
+            feature['protein_allele'] = True
         features.append(feature)
     logging.info("Time taken len(gene_index) {}".format(time.time() - startTime))
 
@@ -216,39 +220,41 @@ def convert(jax_evidence):
     association['variant_name'] = mut_index
     association['source_link'] = \
         'https://ckb.jax.org/molecularProfile/show/{}' \
-        .format(evidence.molecularProfile.id)
+        .format(evidence['molecularProfile']['id'])
 
-    association['description'] = evidence.efficacyEvidence
+    association['description'] = evidence['efficacyEvidence']
     association['environmentalContexts'] = []
     association['environmentalContexts'].append({
-        'description': evidence.therapy.therapyName})
-    association['phenotypes'] = [{ 'description' : evidence.indication.name,
-                                   'id' :  '{}:{}'.format(evidence.indication.source, 
-                                                          evidence.indication.id) }]
+        'description': evidence['therapy']['therapyName']})
+    association['phenotypes'] = [{ 'description' : evidence['indication']['name'],
+                                   'id' :  '{}:{}'.format(evidence['indication']['source'],
+                                                          evidence['indication']['id'])}]
     association['evidence'] = [{
         "evidenceType": {
             "sourceName": "jax"
         },
-        'description': evidence.responseType,
+        'description': evidence['responseType'],
         'info': {
             'publications':
-                [r.url for r in evidence.references]  # NOQA
+                [r['url'] for r in evidence['references']]  # NOQA
         }
     }]
     # add summary fields for Display
-    association = el.evidence_label(evidence.approvalStatus, association)
-    association = ed.evidence_direction(evidence.responseType, association)
+    association = el.evidence_label(evidence['approvalStatus'], association)
+    association = ed.evidence_direction(evidence['responseType'], association)
 
-    if len(evidence.references) > 0:
-        association['publication_url'] = evidence.references[0].url
+    if len(evidence['references']) > 0:
+        association['publication_url'] = evidence['references'][0]['url']
 
-    association['drug_labels'] = evidence.therapy.therapyName
+    association['drug_labels'] = evidence['therapy']['therapyName']
+    source_url = "https://ckb.jax.org/therapy/show/{}".format(evidence['therapy']['id'])
     feature_association = {'genes': [f['geneSymbol'] for f in features],
                            'feature_names':
-                           evidence.molecularProfile.profileName,
+                           evidence['molecularProfile']['profileName'],
                            'features': features,
                            'association': association,
                            'source': 'jax',
+                           'source_url': source_url,
                            'jax': evidence}
     yield feature_association
 

@@ -16,7 +16,7 @@ class CosmicLookup(object):
     Class that uses lookup table to return relevant information.
     """
 
-    def __init__(self, lookup_table_file):
+    def __init__(self, lookup_table_file='../data/cosmic_lookup_table.tsv'):
         self.lookup_table = pandas.read_csv(lookup_table_file, sep="\t")
         self.gene_df_cache = {}
 

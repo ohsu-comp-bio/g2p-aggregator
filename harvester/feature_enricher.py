@@ -6,6 +6,7 @@ import logging
 import re
 import copy
 import gene_enricher
+import protein
 
 
 def _enrich_ensemble(feature, transcript_id, exon, provenance_rule):
@@ -125,9 +126,24 @@ def _enrich_feature(feature,
 
 def enrich(feature, feature_association):
     """
-    given a feature, decorate it with genomic location
+    given a feature, decorate it with location
     """
     enriched_features = [feature]
+
+    # rules for protein features
+    if feature.get('protein_allele', False):
+        components = protein.parse_components(feature['name'])
+        if components is None:
+            feature['protein_allele'] = False
+        else:
+            for component in ['alt', 'start', 'end']:
+                if not feature.get('protein_{}'.format(component), False):
+                    feature['protein_{}'.format(component)] = components[component]
+            if components.get('alt_type', False):
+                feature['biomarker_type'] = components['alt_type']
+            return enriched_features
+
+    # rules for other features
     try:
         # return if already there
         if feature.get('start', None):
@@ -145,11 +161,9 @@ def enrich(feature, feature_association):
             feature['provenance_rule'] = 'missing_description'
             return [feature]
 
-
         # apply rules
         description_parts = re.split(' +', feature['description'].strip())
         description_length = len(description_parts)
-        source = None
         source = feature_association['source'] if 'source' in feature_association else None
         exonMatch = re.match(r'.* Exon ([0-9]*) .*', feature['name'], re.M|re.I)
 

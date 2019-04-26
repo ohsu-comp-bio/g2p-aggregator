@@ -29,12 +29,12 @@ import disease_normalizer
 import reference_genome_normalizer
 import gene_enricher
 
-from elastic_silo import ElasticSilo
-import elastic_silo
-from kafka_silo import KafkaSilo
-import kafka_silo
-from file_silo import FileSilo
-import file_silo
+from silos.elastic_silo import ElasticSilo
+from silos import elastic_silo
+from silos.kafka_silo import KafkaSilo
+from silos import kafka_silo
+from silos.file_silo import FileSilo
+from silos import file_silo
 
 import requests
 import requests_cache
@@ -83,7 +83,7 @@ def _make_silos(args):
 
 
 # cgi, jax, civic, oncokb
-def harvest(genes):
+def harvest_and_convert(genes):
     """ get evidence from all sources """
     for h in args.harvesters:
         harvester = sys.modules[h]
@@ -104,6 +104,20 @@ def harvest(genes):
             yield feature_association
 
 
+def convert(gene_data):
+    for h in args.harvesters:
+        harvester = sys.modules[h]
+        for feature_association in harvester.convert(gene_data):
+            logging.info(
+                '{} {} {}'.format(
+                    harvester.__name__,
+                    feature_association['genes'],
+                    feature_association['association']['evidence_label']
+                )
+            )
+            yield feature_association
+
+
 def harvest_only(genes):
     """ get evidence from all sources """
     for h in args.harvesters:
@@ -113,8 +127,8 @@ def harvest_only(genes):
                 if h == 'cgi_biomarkers':
                     h = 'cgi'
                 silo.delete_source(h)
-        for evidence in harvester.harvest(genes):
-            yield {'source': h, h: evidence}
+        for gene_data in harvester.harvest(genes):
+            yield {'source': h, h: gene_data}
 
 
 def normalize(feature_association):
@@ -166,6 +180,15 @@ def normalize(feature_association):
         logging.info('gene_enricher {}'.format(elapsed))
 
 
+def _check_dup(harvest):
+    for feature_association in harvest:
+        feature_association['tags'] = []
+        feature_association['dev_tags'] = []
+        normalize(feature_association)
+        if not is_duplicate(feature_association):
+            yield feature_association
+
+
 def main():
     global args
     global silos
@@ -173,11 +196,9 @@ def main():
 
     argparser.add_argument('--harvesters',  nargs='+',
                            help='''harvest from these sources. default:
-                                   [cgi_biomarkers,jax,civic,oncokb,
-                                   pmkb]''',
+                                   [cgi_biomarkers,jax,civic,oncokb,pmkb,molecularmatch]''',
                            default=['cgi_biomarkers', 'jax', 'civic',
-                                    'oncokb', 'pmkb', 'brca', 'jax_trials',
-                                    'molecularmatch_trials'])
+                                    'oncokb', 'pmkb', 'molecularmatch'])
 
 
     argparser.add_argument('--silos',  nargs='+',
@@ -198,12 +219,11 @@ def main():
                            help='array of hugo ids, no value will harvest all',
                            default=None)
 
-
-    argparser.add_argument('--phases',   nargs='+',
-                           help='array of harvest phases to run '
-                                '[harvest,convert,enrich,all]. default is all',
-                           default=['all'],
-                           choices=['all', 'harvest'])
+    argparser.add_argument('--phase',
+                           help='select harvest phase to run'
+                                '[harvest,convert,normalize,all]. default is all',
+                           default='all',
+                           choices=['all', 'harvest', 'convert', 'normalize'])
 
     elastic_silo.populate_args(argparser)
     kafka_silo.populate_args(argparser)
@@ -225,7 +245,7 @@ def main():
     logging.info("elastic_index: %r" % args.elastic_index)
     logging.info("delete_index: %r" % args.delete_index)
     logging.info("file_output_dir: %r" % args.file_output_dir)
-    logging.info("phases: %r" % args.phases)
+    logging.info("phase: %r" % args.phase)
 
 
 
@@ -240,18 +260,27 @@ def main():
         for silo in silos:
             silo.delete_all()
 
-    def _check_dup(harvest):
-        for feature_association in harvest:
-            feature_association['tags'] = []
-            feature_association['dev_tags'] = []
-            normalize(feature_association)
-            if not is_duplicate(feature_association):
-                yield feature_association
-
-    if 'all' in args.phases:
-        silos[0].save_bulk(_check_dup(harvest(args.genes)))
-    else:
-        silos[0].save_bulk(harvest_only(args.genes))
+    harvesters = list(args.harvesters)
+    for h in harvesters:
+        args.harvesters = [h]
+        if args.phase == 'all':
+            silos[0].save_bulk(_check_dup(harvest_and_convert(args.genes)), source=h)
+            silos[0].close_file()
+        elif args.phase == 'harvest':
+            FileSilo(args).save_bulk(harvest_only(args.genes), source=h, mode='harvest')
+        elif args.phase == 'convert':
+            for gene_data in FileSilo(args).load_file(h, 'harvest'):
+                for record in convert(gene_data[h]):
+                    silos[0].save(record, mode='convert')
+            silos[0].close_file()
+        elif args.phase == 'normalize':
+            if h == 'cgi_biomarkers':
+                h = 'cgi'
+            records = FileSilo(args).load_file(h, 'convert')
+            silos[0].save_bulk(_check_dup(records), source=h)
+            silos[0].close_file()
+        else:
+            raise ValueError('Cannot handle input phase of {}'.format(args.phase))
 
 
 if __name__ == '__main__':

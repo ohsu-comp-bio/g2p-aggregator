@@ -1,11 +1,12 @@
 #!/usr/bin/python
 
-from pathlib import Path
-from os.path import exists
+from pathlib2 import Path
+from silos.file_silo import FileSilo
+from argparse import Namespace
 import pandas as pd
 import json
 import requests
-import json
+import requests_cache
 from urllib import urlencode, quote_plus
 
 import cosmic_lookup_table
@@ -19,7 +20,7 @@ LOOKUP_TABLE = None
 # OncoKB harvester now pulls from the below downloadable OncoKB files
 # and supplements with additional variant data pulled from their public
 # API. This is because pulling from the private API gives unpredictable
-# results and their is no endpoint in the public API that gives the
+# results and there is no endpoint in the public API that gives the
 # same drug-gene-variant association information as was being
 # pulled from the private API.
 clinv = Path('../data/oncokb_allActionableVariants.txt')
@@ -28,14 +29,15 @@ biov = Path('../data/oncokb_allAnnotatedVariants.txt')
 
 def harvest(genes):
     i = 0
-    r = requests.get('http://oncokb.org/api/v1/levels')
-    levels = r.json()
-    if not genes:
-        r = requests.get('http://oncokb.org/api/v1/genes')
-        all_genes = r.json()
-        genes = []
-        for gene in all_genes:
-            genes.append(gene['hugoSymbol'])
+    with requests_cache.disabled():
+        r = requests.get('http://oncokb.org/api/v1/levels')
+        levels = r.json()
+        if not genes:
+            r = requests.get('http://oncokb.org/api/v1/genes')
+            all_genes = r.json()
+            genes = []
+            for gene in all_genes:
+                genes.append(gene['hugoSymbol'])
 
     # get all variants
     print 'gathering all OncoKB variants'
@@ -47,7 +49,7 @@ def harvest(genes):
         print 'Loading OncoKB clinical TSV'
         # then use it to harvest from oncokb actionable
         global v
-        v = pd.read_csv(clinv, sep='\t')
+        v = pd.read_csv(str(clinv), sep='\t')
         v = v[v['Gene'].isin(genes)]
         cols = {'Gene': 'gene',
                 'Alteration': 'variant',
@@ -63,14 +65,16 @@ def harvest(genes):
             url = url.format(row['gene'], row['variant'])
             r = requests.get(url)
             for ret in r.json():
-                if str(ret['name']) == v['variant'][idx]:
+                if ret['name'].encode('utf-8') == v['variant'][idx]:
                     v.at[idx, 'variant'] = ret
+    else:
+        raise IOError('{} does not exist. Please see Makefile.'.format(clinv))
 
     if biov.exists():
         print 'Loading OncoKB biological TSV'
         # then use it to harvest from oncokb biologic
         global b
-        b = pd.read_csv(biov, sep='\t')
+        b = pd.read_csv(str(biov), sep='\t')
         b = b[b['Gene'].isin(genes)]
         cols = {'Gene': 'gene',
                 'Alteration': 'variant',
@@ -86,7 +90,7 @@ def harvest(genes):
             url = url.format(row['gene'], row['variant'])
             r = requests.get(url)
             for ret in r.json():
-                if str(ret['name']) == b['variant'][idx]:
+                if ret['name'].encode('utf-8') == b['variant'][idx]:
                     b.at[idx, 'variant'] = ret
                     FLAG = True
             if FLAG == False:
@@ -99,6 +103,8 @@ def harvest(genes):
                                 i = i + 1
                         if i == len(check):
                             b.at[idx, 'variant'] = var
+    else:
+        raise IOError('{} does not exist. Please see Makefile.'.format(biov))
 
     for gene in set(genes):
         gene_data = {'gene': gene, 'oncokb': {}}
@@ -122,19 +128,18 @@ def convert(gene_data):
         global LOOKUP_TABLE
         # Look up variant and add position information.
         if not LOOKUP_TABLE:
-            LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
-                    "./cosmic_lookup_table.tsv")
+            LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup()
         matches = LOOKUP_TABLE.get_entries(gene, alteration)
         if len(matches) > 0:
             # FIXME: just using the first match for now;
             # it's not clear what to do if there are multiple matches.
             match = matches[0]
-            feature['chromosome'] = str(match['chrom'])
+            feature['chromosome'] = str(match['chrom']).encode('utf-8')
             feature['start'] = match['start']
             feature['end'] = match['end']
             feature['ref'] = match['ref']
             feature['alt'] = match['alt']
-            feature['referenceName'] = str(match['build'])
+            feature['referenceName'] = str(match['build']).encode('utf-8')
 
         return feature
 
@@ -156,7 +161,7 @@ def convert(gene_data):
                     alteration = var['alteration']
                     feature = {}
                     feature['geneSymbol'] = gene
-                    feature['description'] = '{} {}'.format(gene, var['name'])
+                    feature['description'] = u'{} {}'.format(gene, var['name'])
                     feature['name'] = var['name']
                     feature['entrez_id'] = gene_data['entrezGeneId']
                     feature['biomarker_type'] = variant['consequence']['term']
@@ -166,7 +171,7 @@ def convert(gene_data):
         feature = {}
         feature['geneSymbol'] = gene
         feature['name'] = variant['name']
-        feature['description'] = '{} {}'.format(gene, variant['name'])
+        feature['description'] = u'{} {}'.format(gene, variant['name'])
         feature['entrez_id'] = gene_data['entrezGeneId']
         feature['biomarker_type'] = variant['consequence']['term']
         feature = _enrich_feature(gene, feature)
@@ -225,13 +230,21 @@ def convert(gene_data):
                 break
 
         association['drug_labels'] = ','.join([drug for drug in clinical['drug']])   # NOQA
-        feature_names = ', '.join(['{}:{}'.format(
+        feature_names = ', '.join([u'{}:{}'.format(
                                 f["geneSymbol"], f["name"]) for f in features])
+
+        source_url = None
+        if len(features) > 0:
+            f = features[0]
+            source_url = 'http://oncokb.org/#/gene/{}/variant/{}'.format(
+                f["geneSymbol"], f["name"])
+
         feature_association = {'genes': [gene],
                                'features': features,
                                'feature_names': feature_names,
                                'association': association,
                                'source': 'oncokb',
+                               'source_url': source_url,
                                'oncokb': {'clinical': clinical}}
         yield feature_association
 
@@ -251,19 +264,18 @@ def convert(gene_data):
 
         # Look up variant and add position information.
         if not LOOKUP_TABLE:
-            LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
-                    "./cosmic_lookup_table.tsv")
+            LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup()
         matches = LOOKUP_TABLE.get_entries(gene, alteration)
         if len(matches) > 0:
             # FIXME: just using the first match for now;
             # it's not clear what to do if there are multiple matches.
             match = matches[0]
-            feature['chromosome'] = str(match['chrom'])
+            feature['chromosome'] = str(match['chrom']).encode('utf-8')
             feature['start'] = match['start']
             feature['end'] = match['end']
             feature['ref'] = match['ref']
             feature['alt'] = match['alt']
-            feature['referenceName'] = str(match['build'])
+            feature['referenceName'] = str(match['build']).encode('utf-8')
 
         association = {}
         association['variant_name'] = variant['name']
@@ -305,11 +317,16 @@ def convert(gene_data):
                 break
 
         feature_names = feature["geneSymbol"] + ' ' + feature["name"]
+
+        source_url = 'http://oncokb.org/#/gene/{}/variant/{}'.format(
+            feature["geneSymbol"].encode('utf8'), feature["name"].encode('utf8'))
+
         feature_association = {'genes': [gene],
                                'features': [feature],
                                'feature_names': feature_names,
                                'association': association,
                                'source': 'oncokb',
+                               'source_url': source_url,
                                'oncokb': {'biological': biological}}
         yield feature_association
 
@@ -323,10 +340,17 @@ def harvest_and_convert(genes):
             yield feature_association
 
 
+def _test_harvest_wrapper():
+    for evidence in harvest(None):
+        yield {'source': 'oncokb', 'oncokb': evidence}
+
+
 def _test():
-    for feature_association in harvest_and_convert(None):
-        print feature_association.keys()
-        break
+    gene_data = _test_harvest_wrapper()
+    args = Namespace(file_output_dir='.')
+    fs = FileSilo(args)
+    fs.save_bulk('oncokb', gene_data)
+
 
 if __name__ == '__main__':
     _test()

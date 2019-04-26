@@ -106,9 +106,12 @@ def normalize_pubchem(name):
     return compounds
 
 
+DRUG_BASE_URL = 'mychem.info'
+
+
 def normalize_biothings(name):
     """
-     curl 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:aspirin&fields=pubchem.cid,chembl.molecule_synonyms,chembl.molecule_chembl_id,chebi.chebi_id' | jq .
+     curl 'http://mychem.info/v1/query?q=chembl.molecule_synonyms.synonyms:aspirin&fields=pubchem.cid,chembl.molecule_synonyms,chembl.molecule_chembl_id,chebi.chebi_id' | jq .
     """  # NOQA
     try:
         if name in NOFINDS_BIOTHINGS:
@@ -128,14 +131,14 @@ def normalize_biothings(name):
                 'drugbank.taxonomy.kingdom,drugbank.taxonomy.subclass,' \
                 'drugbank.taxonomy.superclass,' \
                 'chembl.usan_stem_definition'
-            url = 'http://c.biothings.io/v1/query?q=chembl.pref_name:{}&{}'.format(name_part, fields)  # NOQA
+            url = 'http://{}/v1/query?q=chembl.pref_name:{}&{}'.format(DRUG_BASE_URL, name_part, fields)  # NOQA
             logging.debug(url)
             r = requests.get(url, timeout=60)
             rsp = r.json()
             hits = rsp['hits']
             logging.debug('len(hits) {}'.format(len(hits)))
             if len(hits) == 0:
-                url = 'http://c.biothings.io/v1/query?q=chembl.molecule_synonyms.synonyms:{}&{}'.format(name_part, fields)  # NOQA
+                url = 'http://{}/v1/query?q=chembl.molecule_synonyms.synonyms:{}&{}'.format(DRUG_BASE_URL, name_part, fields)  # NOQA
                 logging.debug(url)
                 r = requests.get(url, timeout=60)
                 rsp = r.json()
@@ -317,8 +320,8 @@ def normalize_feature_association(feature_association):
     if ('environmentalContexts' not in association or
             association['environmentalContexts'] == []):
         # skip if they have no drugs
-        logging.warning('normalize_drugs NODRUGS {}'
-                        .format(feature_association['source']))
+        # logging.warning('normalize_drugs NODRUGS {}'
+        #                 .format(feature_association['source']))
         return
     compounds = []
     for ctx in association['environmentalContexts']:

@@ -12,19 +12,17 @@ def harvest(genes=None):
     """ there is only one gene, BRCA, ignore passed parameter"""
     # harvest all genes
     page_num = 0
-    more_data = True
-    while more_data:
+    payload = {'data': True}
+    while payload.get('data', False):
         r = requests.get('http://brcaexchange.org/backend/data/?format=json&order_by=Gene_Symbol&direction=ascending&page_size=100&page_num={}&search_term=&include=Variant_in_ENIGMA&include=Variant_in_ClinVar&include=Variant_in_1000_Genomes&include=Variant_in_ExAC&include=Variant_in_LOVD&include=Variant_in_BIC&include=Variant_in_ESP&include=Variant_in_exLOVD'.format(page_num))  # NOQA
         payload = r.json()
-        if ('data' not in payload or len(payload['data']) == 0):
-            more_data = False
-        else:
-            page_num = page_num + 1
-            for record in payload['data']:
-                if not record['Pathogenicity_expert'] == 'Not Yet Reviewed':
-                    gene = record['Gene_Symbol']
-                    gene_data = {'gene': gene, 'brca': record}
-                    yield gene_data
+
+        page_num = page_num + 1
+        for record in payload['data']:
+            if not record['Pathogenicity_expert'] == 'Not Yet Reviewed':
+                gene = record['Gene_Symbol']
+                gene_data = {'gene': gene, 'brca': record}
+                yield gene_data
 
 
 def convert(gene_data):

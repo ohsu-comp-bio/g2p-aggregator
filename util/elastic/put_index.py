@@ -3,6 +3,8 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from elasticsearch.helpers import bulk
 
+import hgvs.parser
+
 import json
 import os
 import argparse
@@ -13,6 +15,49 @@ FIX_COUNTERS = {'feature_end': {},
                 'genes': {},
                 }
 
+# expensive resource, create only once
+HGVS_PARSER = hgvs.parser.Parser()
+
+
+def _calculated_fields(hit):
+    """ add scripted fields """
+    if 'drug_labels' in hit['association']:
+        hit["association"]["drug_labels_truncated"] = '{:10.10}'.format(hit['association']['drug_labels'])
+        hit["drugs"] = hit['association']['drug_labels']
+    if 'phenotypes' in hit['association']:
+        hit["diseases"] = ','.join([p.get('term','') for p in hit['association']['phenotypes']])
+        hit["association"]["disease_labels_truncated"] = ','.join([p['description'] for p in hit['association']['phenotypes']])
+    publications = []
+    for e in hit['association']['evidence']:
+        if e and 'info' in e and e['info']:
+            for p in e.get('info', {}).get('publications', []):
+                publications.append(p)
+    hit["publications"] = ','.join(publications)
+    hit["evidence_label"] = hit['association']['evidence_label']
+    hit["response"] = hit['association'].get('response_type', None)
+    return hit
+
+def _feature_suffixes(hit):
+    """ add scripted feature suffixes """
+    for feature in hit['features']:
+        hgvs_g = set()
+        hgvs_p = set()
+        for synonym in feature.get('synonyms', []):
+            if not ('g.' in synonym or 'p.' in synonym):
+                continue
+            try:
+                hgvs_variant = HGVS_PARSER.parse_hgvs_variant(synonym)
+            except Exception as e:
+                print(str(e))
+                continue
+            if hgvs_variant.type == 'p':
+                hgvs_p.add(hgvs_variant.format().split(':')[1])
+                hgvs_p.add(hgvs_variant.format(conf={"p_3_letter": False}).split(':')[1])
+            if hgvs_variant.type == 'g':
+                hgvs_g.add(hgvs_variant.format().split(':')[1])
+        feature['hgvs_g_suffix'] = list(hgvs_g)
+        feature['hgvs_p_suffix'] = list(hgvs_p)
+    return hit
 
 def _stdin_actions(args):
     """ create a index record from std in """
@@ -26,8 +71,10 @@ def _stdin_actions(args):
 
             # hit = _fix_features(hit)
             # hit = _fix_genes(hit)
-            # hit = _stringify(hit)
-            hit = _del_source(hit)
+            hit = _stringify(hit)
+            # hit = _del_source(hit)
+            hit = _calculated_fields(hit)
+            hit = _feature_suffixes(hit)
             yield {
                 '_index': args.index,
                 '_op_type': 'index',

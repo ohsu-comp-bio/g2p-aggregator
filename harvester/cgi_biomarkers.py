@@ -116,10 +116,10 @@ def convert(evidence):
 
     gDNA = evidence['gDNA']
     indiv_mut = evidence['individual_mutation']
-    if len(gDNA) != 0 or len(indiv_mut) != 0:
+    if any(gDNA) or any(indiv_mut):
         if not LOOKUP_TABLE:
             LOOKUP_TABLE = cosmic_lookup_table.CosmicLookup(
-                "./cosmic_lookup_table.tsv")
+                "../data/cosmic_lookup_table.tsv")
         for idx, emut in enumerate(indiv_mut):
             # get genomic locus from COSMIC; if mutation not in COSMIC,
             # get locus info from given gDNA instead
@@ -156,17 +156,40 @@ def convert(evidence):
             features.append(feature)
 
     if len(features) == 0:
-        description_parts = re.split(' +|:|__', evidence['Biomarker'].strip())
-        features.append({
-            'description': ' '.join(description_parts),
-            'name': ' '.join(description_parts),
-            'geneSymbol': genes[0],
-            'biomarker_type': mut.norm_biomarker(evidence['Alteration type'], evidence['Biomarker'])
-        })
+        a = evidence['Biomarker'].split(' ', 1)
+        gene = a[0]
+        remainder = ''
+        if len(a) > 1:
+            remainder = a[1]
+        idx = 0
+        if 'inframe insertion' in remainder:
+            while True:
+                idx = remainder.find('inframe insertion', idx)
+                if idx == -1:
+                    break
+                start = remainder.find('(', idx) + 1
+                stop = remainder.find(')', idx)
+                idx = stop
+                insertion = remainder[start:stop]
+                features.append({
+                    'description': 'Inframe insertion {}'.format(insertion),
+                    'name': insertion,
+                    'geneSymbol': gene,
+                    'biomarker_type': 'ins',
+                    'protein_allele': True,
+                })
+        else:
+            description_parts = re.split(' +|:|__', evidence['Biomarker'].strip())
+            features.append({
+                'description': ' '.join(description_parts),
+                'name': ' '.join(description_parts),
+                'geneSymbol': genes[0],
+                'biomarker_type': mut.norm_biomarker(evidence['Alteration type'], evidence['Biomarker'])
+            })
 
     association = {}
 
-    association['description'] = '{} {} {}'.format(' '.join(genes),
+    association['description'] = u'{} {} {}'.format(u' '.join(genes),
                                                    evidence['Drug full name'],
                                                    evidence['Association'])
     association['environmentalContexts'] = []
@@ -210,6 +233,7 @@ def convert(evidence):
                            'feature_names': evidence['Biomarker'],
                            'association': association,
                            'source': 'cgi',
+                           'source_url': 'https://www.cancergenomeinterpreter.org/biomarkers',
                            'cgi': evidence}
 
     yield feature_association
@@ -232,8 +256,9 @@ def harvest_and_convert(genes=None, drugs=None):
 
 
 def _test():
-    for feature_association in harvest_and_convert(['KIT']):
-        logging.info(feature_association.keys())
+    logging.basicConfig(filename='cgi_biomarkers_test.log', level=logging.DEBUG)
+    for feature_association in harvest_and_convert(['ERBB2']):
+        logging.info(feature_association['features'])
 
 if __name__ == '__main__':
     _test()
