@@ -215,7 +215,7 @@ def convert(gene_data):
         association = el.evidence_label(clinical['level'],
                                         association, na=True)
         association = ed.evidence_direction(clinical['level_label'],
-                                            association, na=True)
+                                            association, na=False)
 
         if len(clinical['drugAbstracts']) > 0:
             association['publication_url'] = clinical['drugAbstracts'][0]['link']  # NOQA

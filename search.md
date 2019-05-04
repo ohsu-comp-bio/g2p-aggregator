@@ -1,7 +1,7 @@
 
 # Search Examples:
 
-The G2P datastore has been extensively normalized, denormalized and tagged to make it easier to find what you want.
+The G2P datastore has been extensively harmonized, denormalized and tagged to make it easier to find what you want.
 
 Lets assume you are interested in "EGFR mutations interpretations in lung adenocarcinoma"
 

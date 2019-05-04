@@ -96,9 +96,19 @@ def convert(gene_data):
                 association = el.evidence_label(
                     evidence_item['evidence_level'], association, na=True
                 )
-                association = ed.evidence_direction(
-                    evidence_item['clinical_significance'], association
-                )
+
+                description = evidence_item['clinical_significance'].lower()
+                if description == 'positive':
+                    description = 'positive outcome'
+                if description == 'negative':
+                    description = 'negative outcome'
+                if description == 'n/a':
+                    description = ''
+
+                association['response_type'] = '{} {} {}'.format(
+                    evidence_item['evidence_direction'],
+                    evidence_item['evidence_type'],
+                    description).rstrip()
 
                 association['source_link'] = 'https://civic.genome.wustl.edu/events/genes/{}/summary/variants/{}/summary'.format(variant['gene_id'], variant['id']) # NOQA
                 association['publication_url'] = evidence_item['source']['source_url'],   # NOQA
