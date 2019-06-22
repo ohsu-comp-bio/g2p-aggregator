@@ -113,7 +113,7 @@ def convert(gene_data):
                 source_url = "https://civicdb.org/events/genes/{}/summary/variants/{}/summary/evidence/{}/summary#evidence".format(variant['gene_id'], variant['id'], evidence_item['id'])  # NOQA
                 feature_association = {'genes': [gene_data['gene']],
                                        'features': [feature],
-                                       'feature_names': evidence_item['name'],
+                                       'feature_names': variant['name'],
                                        'association': association,
                                        'source': 'civic',
                                        'source_url': source_url,
