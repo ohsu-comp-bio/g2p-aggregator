@@ -1,8 +1,4 @@
 from __future__ import print_function
-import sys
-
-import requests
-from inflection import parameterize, underscore
 import json
 import evidence_label as el
 import evidence_direction as ed
@@ -66,15 +62,12 @@ def convert(interpretation):
 
         features.append(feature)
 
-    # association['evidence_label'] = interpretation['tier']
     association['source_link'] = 'https://pmkb.weill.cornell.edu/therapies/{}'.format(interpretation['id'])
 
     association = el.evidence_label(str(interpretation['tier']), association, na=True)
     association = ed.evidence_direction(str(interpretation['tier']), association, na=True)
 
     association['description'] = interpretation['interpretation']
-    # TODO pmkb does not break out drug !?!?
-    # association['environmentalContexts'] = []
 
     association['phenotypes'] = []
     for tumor in tumors:
@@ -90,9 +83,7 @@ def convert(interpretation):
              ]
          }
     }]
-        # add summary fields for Display
-   #     if len(interpretation['citations']) > 0:
-   #          association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])  # NOQA
+
     association['publication_url'] = ''
     source_url = 'https://pmkb.weill.cornell.edu/therapies/{}'.format(interpretation['id'])
     feature_association = {
@@ -113,7 +104,5 @@ def convert(interpretation):
 def harvest_and_convert(genes):
     """ get data from pmkb, convert it to ga4gh and return via yield """
     for evidence in harvest(genes):
-        # print "harvester_yield {}".format(evidence.keys())
         for feature_association in convert(evidence):
-            # print "pmkb convert_yield {}".format(feature_association.keys())
             yield feature_association
