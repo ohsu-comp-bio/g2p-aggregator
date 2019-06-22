@@ -29,11 +29,11 @@ def convert(interpretation):
     features = []
     variant_name = []
     for variant in variants:
-	if 'coordinates' in variant:
-	    s = variant['coordinates']
+        if 'coordinates' in variant:
+            s = variant['coordinates']
             if not s:
-		continue
-	    coordinates = s.replace(' ', '').split(',')
+                continue
+            coordinates = s.replace(' ', '').split(',')
             for coordinate in coordinates:
                 feature = {}
                 feature['geneSymbol'] = variant['gene']['name']
@@ -64,9 +64,9 @@ def convert(interpretation):
                     feature['alt'] = alt
 
         if attributes['amino_acid_change']['string_value']:
-	    variant_name.append(attributes['amino_acid_change']['string_value'])
+            variant_name.append(attributes['amino_acid_change']['string_value'])
 
-	features.append(feature)
+        features.append(feature)
 
     # association['evidence_label'] = interpretation['tier']
     association['source_link'] = 'https://pmkb.weill.cornell.edu/therapies/{}'.format(interpretation['id'])
