@@ -29,29 +29,27 @@ def convert(interpretation):
     features = []
     variant_name = []
     for variant in variants:
-        if 'coordinates' in variant:
-            s = variant['coordinates']
-            if not s:
-                continue
-            coordinates = s.replace(' ', '').split(',')
-            for coordinate in coordinates:
-                feature = {}
-                feature['geneSymbol'] = variant['gene']['name']
-                feature['name'] = variant['name']
-                a = coordinate.split(':')
-                chromosome = a[0]
-                start, stop = a[1].split('-')
-                feature['start'] = int(start)
-                feature['end'] = int(stop)
-                feature['chromosome'] = str(chromosome)
-                feature['referenceName'] = 'GRCh37/hg19'
-                feature['biomarker_type'] = variant['variant_type']
+        c = variant.get('coordinates')
+        feature = {}
+        if c:
+            coordinates = c.replace(' ', '').split(',')
+            coordinate = coordinates[0]
+            a = coordinate.split(':')
+            chromosome = a[0]
+            start, stop = a[1].split('-')
+            feature['start'] = int(start)
+            feature['end'] = int(stop)
+            feature['chromosome'] = str(chromosome)
 
-                attributes = {}
-                for key in variant.keys():
-                    if key not in ['coordinates', 'name', 'gene']:
-                        attributes[key] = {'string_value': variant[key]}
-                feature['attributes'] = attributes
+        feature['name'] = variant['name']
+        feature['geneSymbol'] = variant['gene']['name']
+        feature['referenceName'] = 'GRCh37/hg19'
+        feature['biomarker_type'] = variant['variant_type']
+        attributes = {}
+        for key in variant.keys():
+            if key not in ['coordinates', 'name', 'gene']:
+                attributes[key] = {'string_value': variant[key]}
+        feature['attributes'] = attributes
 
         # TODO - replace w/ biocommons/hgvs ?
         if 'dna_change' in variant:
@@ -97,17 +95,18 @@ def convert(interpretation):
    #          association['publication_url'] = 'http://www.ncbi.nlm.nih.gov/pubmed/{}'.format(interpretation['citations'][0]['pmid'])  # NOQA
     association['publication_url'] = ''
     source_url = 'https://pmkb.weill.cornell.edu/therapies/{}'.format(interpretation['id'])
-    feature_association = {'genes': [genes],
-                           'features': features,
-                           'feature_names': ['{} {}'.format(f["geneSymbol"], f["name"]) for f in features],
-                           'association': association,
-                           'source': 'pmkb',
-                           'source_url': source_url,
-                           'pmkb': {
-                               'variant': variants,
-                               'tumor': tumors,
-                               'tissues': interpretation['tissues']
-                           }}
+    feature_association = {
+        'genes': [genes],
+        'features': features,
+        'feature_names': ', '.join(sorted([f['name'] for f in features])),
+        'association': association,
+        'source': 'pmkb',
+        'source_url': source_url,
+        'pmkb': {
+            'variant': variants,
+            'tumor': tumors,
+            'tissues': interpretation['tissues']
+    }}
     yield feature_association
 
 
