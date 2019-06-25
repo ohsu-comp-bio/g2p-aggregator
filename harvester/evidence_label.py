@@ -32,7 +32,7 @@ def evidence_label(evidence, association, na=False):
     pmkb_a = ['1']
     pmkb_b = []
     pmkb_c = ['2']
-    pmkb_d = ['3']
+    pmkb_d = []
 
     # CIVIC
     civic_a = ['a']
