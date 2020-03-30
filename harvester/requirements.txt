@@ -8,7 +8,7 @@ backports.shutil-get-terminal-size==1.0.0
 biocommons.seqrepo==0.3.5
 biopython==1.69
 bioutils==0.3.3
-bleach==2.1.2
+bleach==3.1.4
 bokeh==0.12.5
 certifi==2017.7.27.1
 chardet==3.0.4
