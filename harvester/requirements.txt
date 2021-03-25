@@ -69,7 +69,7 @@ python-dateutil==2.6.1
 python-slugify==1.2.4
 pytz==2017.2
 PyUpSet==0.1.1.post7
-PyYAML==3.12
+PyYAML==5.4
 pyzmq==16.0.3
 qtconsole==4.3.1
 requests==2.18.4
