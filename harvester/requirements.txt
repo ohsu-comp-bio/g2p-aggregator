@@ -61,7 +61,7 @@ psycopg2==2.7.3.2
 ptyprocess==0.5.2
 py==1.5.2
 pydash==4.1.0
-Pygments==2.2.0
+Pygments==2.7.4
 pyparsing==2.2.0
 pysam==0.13
 pytest==3.3.1
