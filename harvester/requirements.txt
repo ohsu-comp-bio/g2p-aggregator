@@ -30,7 +30,7 @@ idna==2.6
 inflection==0.3.1
 iniherit==0.3.9
 ipykernel==4.7.0
-ipython==5.5.0
+ipython==7.16.3
 ipython-genutils==0.2.0
 ipywidgets==7.0.5
 Jinja2==2.9.6
