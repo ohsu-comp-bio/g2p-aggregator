@@ -10,7 +10,7 @@ biopython==1.69
 bioutils==0.3.3
 bleach==2.1.2
 bokeh==0.12.5
-certifi==2017.7.27.1
+certifi==2022.12.7
 chardet==3.0.4
 configparser==3.5.0
 cycler==0.10.0
